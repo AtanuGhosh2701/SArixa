@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/Main_logo.png">
+    <title>Privacy Policy • SArixa</title>
+    <style>
+        /* =========================================
+           1. CSS VARIABLES & THEME
+        ========================================= */
+        :root { 
+            --bg: #021b1a; 
+            --main: #b2ebf2; 
+            --green: #00e676; 
+            --card-border: rgba(0, 230, 118, 0.2);
+        }
+
+        /* =========================================
+           2. BASE RESET
+        ========================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--main); 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            line-height: 1.6; 
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+           3. NAVBAR STYLES
+        ========================================= */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 8%;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+            background: rgba(2, 27, 26, 0.95);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: transform 0.4s ease;
+        }
+
+        .navbar.hidden-nav {
+            transform: translateY(-100%);
+        }
+
+        .logo a { display: flex; align-items: center; text-decoration: none; }
+
+        .navbar nav a {
+            color: var(--main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin-left: 30px; 
+            padding-bottom: 5px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav a:hover { color: var(--green); }
+
+        /* =========================================
+           4. CONTENT BOX
+        ========================================= */
+        .container {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .box { 
+            max-width: 750px; 
+            margin: 0 auto; 
+            padding: 30px; 
+            border: 1px solid var(--card-border); 
+            border-radius: 15px;
+            background: rgba(0, 230, 118, 0.02);
+        }
+
+        h1, h2 { color: var(--green); margin-bottom: 15px; }
+        h2 { margin-top: 25px; }
+        
+        .my-note { 
+            border-left: 4px solid var(--green); 
+            padding-left: 15px; 
+            font-style: italic; 
+            margin: 20px 0; 
+            background: rgba(0, 230, 118, 0.05);
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* BUTTON STYLE */
+        .contact-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background-color: var(--green);
+            color: #021b1a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.3);
+            background-color: #00c853;
+        }
+
+        @media (max-width: 600px) {
+            .navbar { padding: 15px 5%; }
+            .box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="home_page.html">
+                <img src="assets/SArixa_logo.png" alt="SArixa Logo" style="height: 40px; width: auto; transform: scale(4) translateY(2px); transform-origin: left center;">
+            </a>
+        </div>
+        <nav>
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="box">
+            <h1>Hi, We Care About Your Privacy</h1>
+            <p>At <strong>SArixa</strong>, We believe that your photos and documents are your own business. That’s why I built this tool to be as safe as possible.</p>
+            
+            <div class="my-note">
+                "We don’t store your images. Period. Everything happens right inside your browser."
+            </div>
+
+            <h2>How SArixa Works</h2>
+            <p>When you use our Image-to-PDF tool, your files never touch our servers. All the processing is done by your own device's browser. This is the safest way to convert files online.</p>
+            
+            <h2>The Information We See</h2>
+            <p>We don't have accounts or logins. The only time we see your details is if you voluntarily use our Contact Form to say 'Hi' or report a bug. In that case, we only use your email to reply to you.</p>
+
+            <h2>Ads and Analytics</h2>
+            <p>To keep SArixa free, we show ads through Google AdSense. Google uses 'cookies' to show you relevant ads. You can always turn this off in your browser settings if you're not comfortable.</p>
+
+            <h2>Contact Us</h2>
+            <p>If you have any questions about your data, or if you'd like to share feedback, we're always here to listen:</p>
+            <a href="contact.html" class="contact-btn">Contact Us</a>
+        </div>
+    </main>
+
+    <script>
+        // Smart Scroll Navbar Logic
+        let lastScrollTop = 0;
+        const navbar = document.querySelector('.navbar');
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 80) {
+                navbar.classList.add('hidden-nav');
+            } else {
+                navbar.classList.remove('hidden-nav');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+    </script>
+</body>
+</html>
