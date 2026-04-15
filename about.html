@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="icon" type="image/jpeg" href="assets/Main_logo.png">
+    
+    <title>About Us • SArixa</title>
+    
+    <style>
+        /* =========================================
+           ABOUT US PAGE SPECIFIC STYLES
+        ========================================= */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+        }
+
+        h1, h2, h3 {
+            color: var(--accent-primary);
+            line-height: 1.3;
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p { margin-bottom: 1.5rem; }
+        strong, b { color: var(--text-bright); font-weight: 600; }
+        em, i { color: var(--text-bright); font-style: italic; }
+
+        hr {
+            border: none;
+            border-top: 1px solid rgba(0, 255, 200, 0.2);
+            margin: 50px 0;
+            border-radius: 2px;
+        }
+
+        /* The Problem Section - Warning Box */
+        .problem-box {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-left: 4px solid var(--accent-secondary);
+            border-radius: 0 12px 12px 0;
+            padding: 20px 25px;
+            margin: 25px 0;
+        }
+
+        .problem-box ul { list-style: none; }
+        .problem-box li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: #ff8a80;
+        }
+        .problem-box li:last-child { margin-bottom: 0; }
+
+        /* The Solution Section - Check List */
+        .solution-list {
+            list-style: none;
+            margin: 20px 0 25px 0;
+            padding-left: 10px;
+        }
+        .solution-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.15rem;
+        }
+        .solution-list li strong { color: var(--accent-primary); }
+
+        /* What We Stand For - CSS Grid Cards */
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .value-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 25px 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.08);
+            border-color: rgba(0, 255, 200, 0.3);
+        }
+
+        .value-card p {
+            margin-bottom: 0;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* A Note From Me - Blockquote */
+        .highlight-quote {
+            background: rgba(0, 230, 118, 0.05);
+            border: 1px solid rgba(0, 230, 118, 0.1);
+            border-left: 5px solid var(--accent-primary);
+            border-radius: 0 16px 16px 0;
+            padding: 30px;
+            margin: 35px 0;
+            font-size: 1.25rem;
+            font-style: italic;
+            color: var(--text-bright);
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .highlight-quote::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 4rem;
+            color: rgba(0, 230, 118, 0.15);
+            font-family: Georgia, serif;
+            line-height: 1;
+        }
+
+        .intro-lead {
+            font-size: 1.25rem;
+            color: var(--text-bright);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
+    </header>
+
+    <main class="container">
+        
+        <h1>About Us</h1>
+        
+        <p class="intro-lead">Hi there 👋</p>
+        <p>We’re really glad you’re here.</p>
+        <p><strong>SArixa</strong> is a simple, free tool that helps you turn images into PDFs—right inside your browser. No sign-ups, no hidden costs, no unnecessary steps. Just open it, use it, and you’re done.</p>
+
+        <hr>
+
+        <h2>⚠️ The Problem</h2>
+        <p>If you’ve ever used online PDF tools, you probably know the drill.</p>
+        
+        <div class="problem-box">
+            <ul>
+                <li>❌ <span>You upload your files.</span></li>
+                <li>❌ <span>You wait.</span></li>
+                <li>❌ <span>And you’re left <em>wondering</em> where those files actually go.</span></li>
+            </ul>
+        </div>
+
+        <p>And sometimes, it just feels… uncomfortable.</p>
+        <p>Your images might be personal. Notes, documents, IDs—things you don’t want floating around on some unknown server. On top of that, many tools are slow, full of ads, or suddenly ask you to pay.</p>
+        <p>That never felt right to us.</p>
+
+        <hr>
+
+        <h2>💡 The SArixa Solution</h2>
+        <p>So we built SArixa differently.</p>
+        <p>Your files <strong>never leave your device</strong>. Everything happens right inside your browser. That means:</p>
+        
+        <ul class="solution-list">
+            <li>✅ <strong>No uploads</strong></li>
+            <li>✅ <strong>No servers</strong></li>
+            <li>✅ <strong>No tracking your files</strong></li>
+        </ul>
+
+        <p>It’s just your device doing the work.</p>
+        <p>Because of that, it’s also fast. Even on low-end phones, it runs smoothly. No heavy loading screens. No waiting for files to travel back and forth.</p>
+
+        <hr>
+
+        <h2>🛡️ What We Stand For</h2>
+        <p>We kept three things in mind while building SArixa:</p>
+        
+        <div class="values-grid">
+            <div class="value-card">
+                <h3>🆓 Free</h3>
+                <p>You shouldn’t have to pay for basic tools like this. Ever.</p>
+            </div>
+            <div class="value-card">
+                <h3>🔒 Private</h3>
+                <p>Your files are yours. Period.</p>
+            </div>
+            <div class="value-card">
+                <h3>⚡ Fast</h3>
+                <p>Tools should save time, not waste it.</p>
+            </div>
+        </div>
+
+        <hr>
+
+        <h2>✍️ A Message from our Founder</h2>
+        <p>Hey, I’m Atanu.</p>
+        <p>I’m an indie developer, and I built SArixa on my own.</p>
+
+        <blockquote class="highlight-quote">
+            I didn’t start SArixa to compete with big companies. I started it to build simple, honest tools that people can trust.
+        </blockquote>
+
+        <p>This started because I needed a simple tool for myself. Something quick. Something that didn’t ask me to upload my files to some random place. When I couldn’t find one that felt right, I decided to make it.</p>
+        <p>I’m still learning, still building, and honestly—this is just the beginning for me. I care a lot about what I create. And even more about the people who use it.</p>
+        <p>If SArixa helps you even a little, that means a lot.</p>
+
+        <hr>
+
+        <h2>🚀 What’s Next</h2>
+        <p>SArixa is just getting started.</p>
+        <p>We're already working quietly behind the scenes on more tools—things that stay simple, stay free, and respect your privacy the same way.</p>
+        <p>Nothing complicated. Just useful things that actually help.</p>
+        <p><strong>Thanks for being here. It really means a lot.</strong></p>
+
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
+    </footer>
+
+    <script src="js/global.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/Main_logo.png">
+    <title>Contact Us • SArixa</title>
+    
+    <link rel="stylesheet" href="css/global.css">
+
+    <style>
+        /* =========================================
+           CONTACT PAGE SPECIFIC STYLES
+        ========================================= */
+        :root {
+            /* এই পেজের ফর্মের ইনপুটের জন্য আলাদা ব্যাকগ্রাউন্ড কালার */
+            --input-bg: rgba(2, 27, 26, 0.8);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+        }
+
+        h1 {
+            color: var(--accent-primary);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .contact-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .email-info {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-bright);
+        }
+
+        .email-info a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-form label {
+            color: var(--text-bright);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .contact-form input, 
+        .contact-form textarea {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-bright);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form input:focus, 
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
+        }
+
+        .submit-btn {
+            background-color: var(--accent-primary);
+            color: #021b1a;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: #00c853;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Success/Error Message Style */
+        #status {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            .contact-container { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
+    </header>
+
+    <main class="container">
+        <h1>Contact Us</h1>
+        <p class="intro-text">Got a question, a brilliant idea for a new feature, or facing a sudden technical glitch? We’re all ears! 💡 SArixa is built for users like you, and your feedback is what helps us grow. Drop us a message below—we'd absolutely love to hear from you and promise to reply as fast as we can!</p>
+
+        <div class="contact-container">
+            <div class="email-info">
+                📧 Email us directly at: <a href="mailto:officialsarixa@gmail.com">officialsarixa@gmail.com</a>
+            </div>
+
+            <form id="my-form" class="contact-form" action="https://formspree.io/f/xqegoynd" method="POST">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="How can we help?" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+                </div>
+
+                <button type="submit" id="submit-btn" class="submit-btn">Send Message</button>
+                
+                <div id="status"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
+    </footer>
+
+    <script>
+        // Form Submission Logic (AJAX) - তোমার পুরনো কোড একদম অক্ষত আছে
+        var form = document.getElementById("my-form");
+        
+        async function handleSubmit(event) {
+            event.preventDefault();
+            var status = document.getElementById("status");
+            var button = document.getElementById("submit-btn");
+            var data = new FormData(event.target);
+            
+            // Disable button and show sending status
+            button.disabled = true;
+            button.innerHTML = "Sending...";
+
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    // Success Styling
+                    status.innerHTML = "✅ Success! Your message has been sent to our team.";
+                    status.style.display = "block";
+                    status.style.backgroundColor = "rgba(0, 230, 118, 0.15)";
+                    status.style.color = "#00e676";
+                    status.style.border = "1px solid var(--accent-primary)";
+                    form.reset(); // Clear form
+                    button.innerHTML = "Sent Successfully!";
+                } else {
+                    response.json().then(data => {
+                        status.style.display = "block";
+                        status.style.backgroundColor = "rgba(255, 82, 82, 0.15)";
+                        status.style.color = "#ff5252";
+                        if (Object.hasOwn(data, 'errors')) {
+                            status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                        } else {
+                            status.innerHTML = "Oops! There was a problem submitting your form";
+                        }
+                    })
+                }
+            }).catch(error => {
+                status.style.display = "block";
+                status.innerHTML = "Oops! Connection error. Please try again.";
+            }).finally(() => {
+                // Keep button disabled for 3 seconds then reset
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = "Send Message";
+                }, 3000);
+            });
+        }
+        form.addEventListener("submit", handleSubmit);
+    </script>
+    
+    <script src="js/global.js"></script>
+
+</body>
+</html>

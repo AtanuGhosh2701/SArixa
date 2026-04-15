@@ -1,0 +1,99 @@
+:root {
+    --bg-color: #021b1a; --text-main: #b2ebf2; --text-bright: #ffffff;
+    --accent-primary: #00e676; --accent-secondary: #ff5252;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background-color: var(--bg-color); color: var(--text-main);
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.7; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================
+   NAVBAR (DESKTOP)
+========================================= */
+.navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 8%; border-bottom: 1px solid rgba(0, 255, 200, 0.2);
+    background: rgba(2, 27, 26, 0.95); backdrop-filter: blur(10px);
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+}
+
+.logo img { height: 40px; width: 160px; object-fit: contain; aspect-ratio: 4 / 1; }
+
+.navbar nav { display: flex; align-items: center; gap: 30px; }
+
+.navbar nav a {
+    color: var(--text-main); text-decoration: none; font-size: 1.1rem;
+    position: relative; padding-bottom: 5px; transition: 0.3s;
+}
+
+/* Magic Line (Hover State) */
+.navbar nav a::after {
+    content: ''; position: absolute; bottom: 0; left: 50%;
+    transform: translateX(-50%); width: 0; height: 2px;
+    background-color: var(--accent-primary); transition: 0.3s;
+}
+.navbar nav a:hover::after { width: 100%; }
+.navbar nav a:hover { color: var(--accent-primary); }
+
+/* Distinct Active State */
+.navbar nav a.active {
+    color: var(--accent-primary) !important; 
+    font-weight: 700;
+    background: rgba(0, 230, 118, 0.08); 
+    padding: 8px 16px; 
+    border: 1px solid rgba(0, 230, 118, 0.3); 
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.1); 
+}
+.navbar nav a.active::after {
+    display: none; /* Hide magic line on active page */
+}
+
+/* Hamburger Icon */
+.hamburger { display: none; flex-direction: column; cursor: pointer; gap: 5px; z-index: 1001; }
+.hamburger span { width: 25px; height: 3px; background: var(--accent-primary); border-radius: 3px; transition: 0.3s; }
+
+/* =========================================
+   FOOTER
+========================================= */
+.footer { background: rgba(0, 255, 200, 0.02); border-top: 1px solid rgba(0, 255, 200, 0.2); padding: 50px 20px 20px; margin-top: 40px; }
+.footer-container { max-width: 1000px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px; }
+.footer-col { flex: 1 1 150px; } .brand-col { flex: 1 1 300px; }
+.footer h3, .footer h4 { margin: 0 0 10px 0; color: var(--accent-primary); }
+.footer p, .footer a { color: var(--text-main); text-decoration: none; opacity: 0.8; transition: 0.3s; }
+.footer a:hover { color: var(--accent-primary); opacity: 1; }
+.footer ul { list-style: none; line-height: 2; }
+.footer-bottom { max-width: 1000px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid rgba(0, 255, 200, 0.2); text-align: center; font-size: 13px; opacity: 0.7; }
+
+/* =========================================
+   MOBILE RESPONSIVE (NAVBAR)
+========================================= */
+@media (max-width: 900px) {
+    .hamburger { display: flex; }
+    .navbar nav {
+        position: absolute; top: 100%; left: 0; width: 100%;
+        background: #021b1a; flex-direction: column; gap: 10px;
+        padding: 0; max-height: 0; overflow: hidden; opacity: 0;
+        transition: 0.4s ease-in-out; border-bottom: 0 solid rgba(0, 255, 200, 0.2);
+    }
+    .navbar nav.active { max-height: 400px; padding: 20px 0; opacity: 1; border-bottom: 1px solid rgba(0, 255, 200, 0.2); }
+    .navbar nav a {
+        width: 80%; text-align: center; padding: 10px; border: 1px solid rgba(0, 255, 200, 0.4);
+        border-radius: 8px; background: rgba(0, 255, 200, 0.05); font-weight: 500;
+    }
+    .navbar nav a::after { display: none; }
+    
+    /* Hover state for mobile */
+    .navbar nav a:hover { background: rgba(0, 255, 200, 0.15); transform: translateY(-2px); }
+    
+    /* Distinct Active state for mobile */
+    .navbar nav a.active { 
+        background: rgba(0, 230, 118, 0.2) !important; 
+        border-color: var(--accent-primary) !important; 
+        transform: scale(1.05); 
+    }
+}
