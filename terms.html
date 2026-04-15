@@ -3,73 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="assets/Main_logo.png">
     <title>Terms & Conditions • SArixa</title>
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="icon" type="image/png" href="assets/Main_logo.png">
+
     <style>
         /* =========================================
-           1. CSS VARIABLES & THEME
-        ========================================= */
-        :root { 
-            --bg: #021b1a; 
-            --main: #b2ebf2; 
-            --green: #00e676; 
-            --card-border: rgba(0, 230, 118, 0.2);
-        }
-
-        /* =========================================
-           2. BASE RESET
-        ========================================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--main); 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            line-height: 1.6; 
-            overflow-x: hidden;
-        }
-
-        /* =========================================
-           3. NAVBAR STYLES
-        ========================================= */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 8%;
-            border-bottom: 1px solid rgba(0, 255, 200, 0.2);
-            background: rgba(2, 27, 26, 0.95);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            transition: transform 0.4s ease;
-        }
-
-        .navbar.hidden-nav { transform: translateY(-100%); }
-
-        .logo a { display: flex; align-items: center; text-decoration: none; }
-
-        .navbar nav a {
-            color: var(--main);
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin-left: 30px; 
-            padding-bottom: 5px;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .navbar nav a:hover { color: var(--green); }
-
-        /* =========================================
-           4. CONTENT BOX (Human Touch)
+           TERMS PAGE SPECIFIC STYLES
         ========================================= */
         .container {
             padding-top: 120px;
@@ -82,12 +23,12 @@
             max-width: 750px; 
             margin: 0 auto; 
             padding: 30px; 
-            border: 1px solid var(--card-border); 
+            border: 1px solid rgba(0, 230, 118, 0.2); 
             border-radius: 15px;
             background: rgba(0, 230, 118, 0.02);
         }
 
-        h1, h2 { color: var(--green); margin-bottom: 15px; }
+        h1, h2 { color: var(--accent-primary); margin-bottom: 15px; }
         h2 { margin-top: 25px; font-size: 1.4rem; }
         
         .disclaimer { 
@@ -98,12 +39,12 @@
             color: #ff8a80;
         }
 
-        /* NEW BUTTON STYLE */
+        /* BUTTON STYLE */
         .contact-btn {
             display: inline-block;
             margin-top: 15px;
             padding: 12px 25px;
-            background-color: var(--green);
+            background-color: var(--accent-primary);
             color: #021b1a;
             text-decoration: none;
             border-radius: 8px;
@@ -120,7 +61,6 @@
         strong { color: #fff; }
 
         @media (max-width: 600px) {
-            .navbar { padding: 15px 5%; }
             .box { padding: 20px; }
         }
     </style>
@@ -128,55 +68,84 @@
 <body>
 
     <header class="navbar">
-        <div class="logo">
-            <a href="home_page.html">
-                <img src="assets/SArixa_logo.png" alt="SArixa Logo" style="height: 40px; width: auto; transform: scale(4) translateY(2px); transform-origin: left center;">
-            </a>
-        </div>
-        <nav>
-            <a href="index.html">Home</a>
-        </nav>
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
     </header>
 
     <main class="container">
-    <div class="box">
-        <h1>Terms of Service</h1> <p>Welcome to <strong>SArixa</strong>. We designed this platform to provide simple, honest tools for everyone. By using our website, you agree to follow these basic guidelines.</p>
-        
-        <div class="disclaimer">
-            <strong>Important Note:</strong> While we strive for perfection, our tools are provided "as is." We cannot be held responsible for any unexpected issues, so please use the service mindfully.
+        <div class="box">
+            <h1>Terms of Service</h1> 
+            <p>Welcome to <strong>SArixa</strong>. We designed this platform to provide simple, honest tools for everyone. By using our website, you agree to follow these basic guidelines.</p>
+            
+            <div class="disclaimer">
+                <strong>Important Note:</strong> While we strive for perfection, our tools are provided "as is." We cannot be held responsible for any unexpected issues, so please use the service mindfully.
+            </div>
+
+            <h2>1. Proper Usage</h2>
+            <p>You are welcome to use SArixa for both personal and professional projects. However, we ask that you do not attempt to bypass our security or use automated systems to overwhelm our services.</p>
+            
+            <h2>2. Content Responsibility</h2>
+            <p>We do not store or see your files. Because of this, you are solely responsible for the content you process. Please ensure you have the legal right to use and convert the images you upload.</p>
+
+            <h2>3. Service Reliability</h2>
+            <p>SArixa is a free tool provided for the community. While we aim for 100% uptime, we may occasionally need to perform maintenance or updates. We appreciate your patience during these brief windows.</p>
+
+            <h2>4. Updates to These Terms</h2>
+            <p>As we grow and add new features, we might update these terms. Continued use of the site means you’re on board with any changes we make to improve our service.</p>
+
+            <h2>5. Questions or Issues?</h2>
+            <p>If you have any questions about these terms or encounter any problems, we’d love to hear from you:</p>
+            <a href="contact.html" class="contact-btn">Contact Us</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
         </div>
 
-        <h2>1. Proper Usage</h2>
-        <p>You are welcome to use SArixa for both personal and professional projects. However, we ask that you do not attempt to bypass our security or use automated systems to overwhelm our services.</p>
-        
-        <h2>2. Content Responsibility</h2>
-        <p>We do not store or see your files. Because of this, you are solely responsible for the content you process. Please ensure you have the legal right to use and convert the images you upload.</p>
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
+    </footer>
 
-        <h2>3. Service Reliability</h2>
-        <p>SArixa is a free tool provided for the community. While we aim for 100% uptime, we may occasionally need to perform maintenance or updates. We appreciate your patience during these brief windows.</p>
+    <script src="js/global.js"></script>
 
-        <h2>4. Updates to These Terms</h2>
-        <p>As we grow and add new features, we might update these terms. Continued use of the site means you’re on board with any changes we make to improve our service.</p>
-
-        <h2>5. Questions or Issues?</h2>
-        <p>If you have any questions about these terms or encounter any problems, we’d love to hear from you:</p>
-        <a href="contact.html" class="contact-btn">Contact Us</a>
-    </div>
-</main>
-
-    <script>
-        let lastScrollTop = 0;
-        const navbar = document.querySelector('.navbar');
-
-        window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop > lastScrollTop && scrollTop > 80) {
-                navbar.classList.add('hidden-nav');
-            } else {
-                navbar.classList.remove('hidden-nav');
-            }
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        });
-    </script>
 </body>
 </html>

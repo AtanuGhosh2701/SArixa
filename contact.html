@@ -5,94 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="assets/Main_logo.png">
     <title>Contact Us • SArixa</title>
+    
+    <link rel="stylesheet" href="css/global.css">
+
     <style>
         /* =========================================
-           1. CSS VARIABLES FOR THEME
+           CONTACT PAGE SPECIFIC STYLES
         ========================================= */
         :root {
-            --bg-color: #021b1a;
-            --text-main: #b2ebf2;
-            --text-bright: #ffffff;
-            --accent-primary: #00e676;
-            --accent-secondary: #ff5252;
-            --card-bg: rgba(0, 255, 200, 0.05);
-            --card-border: rgba(0, 255, 200, 0.1);
+            /* এই পেজের ফর্মের ইনপুটের জন্য আলাদা ব্যাকগ্রাউন্ড কালার */
             --input-bg: rgba(2, 27, 26, 0.8);
         }
 
-        /* =========================================
-           2. BASE STYLES & RESET
-        ========================================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.7;
-            font-size: 1.1rem;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* =========================================
-           3. NAVBAR
-        ========================================= */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 8%;
-            border-bottom: 1px solid rgba(0, 255, 200, 0.2);
-            background: rgba(2, 27, 26, 0.95);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            transition: transform 0.4s cubic-bezier(0.3, 1, 0.3, 1);
-        }
-
-        .navbar.hidden-nav {
-            transform: translateY(-100%);
-        }
-
-        .logo { display: flex; align-items: center; }
-        .logo a { display: flex; align-items: center; line-height: 0; }
-
-        .navbar nav { display: flex; align-items: center; }
-        .navbar nav a {
-            color: #b2ebf2;
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin-left: 30px; 
-            padding-bottom: 5px;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .navbar nav a:hover { color: #00e676; }
-        .navbar nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background-color: #00e676;
-            transition: width 0.3s ease-in-out;
-        }
-        .navbar nav a:hover::after { width: 100%; }
-
-        /* =========================================
-           4. CONTACT PAGE STYLES
-        ========================================= */
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -213,22 +137,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* =========================================
-           5. FOOTER
-        ========================================= */
-        .footer {
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid rgba(0, 255, 200, 0.2);
-            font-size: 0.9rem;
-            color: #b2ebf2;
-        }
-
-        .footer a { color: #00e676; text-decoration: none; }
-
         @media (max-width: 900px) {
-            .navbar { padding: 18px 20px; }
-            .navbar nav a { margin-left: 0; padding: 8px 16px; border: 1px solid rgba(0, 255, 200, 0.4); border-radius: 8px; }
             .contact-container { padding: 25px 20px; }
         }
     </style>
@@ -236,14 +145,25 @@
 <body>
 
     <header class="navbar">
-        <div class="logo">
-            <a href="home_page.html">
-                <img src="assets/SArixa_logo.png" alt="SArixa Logo" style="height: 40px; width: auto; transform: scale(4) translateY(2px); transform-origin: left center;">
-            </a>
-        </div>
-        <nav>
-            <a href="index.html">Home</a>
-        </nav>
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
     </header>
 
     <main class="container">
@@ -284,28 +204,36 @@
     </main>
 
     <footer class="footer">
-        © 2026 SArixa • Built by Atanu Ghosh
-        <br><br>
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="terms.html">Terms of Service</a>
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
     </footer>
 
     <script>
-        // Navbar Scroll Logic
-        let lastScrollTop = 0;
-        const navbar = document.querySelector('.navbar');
-
-        window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop > lastScrollTop && scrollTop > 80) {
-                navbar.classList.add('hidden-nav');
-            } else {
-                navbar.classList.remove('hidden-nav');
-            }
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        });
-
-        // Form Submission Logic (AJAX)
+        // Form Submission Logic (AJAX) - তোমার পুরনো কোড একদম অক্ষত আছে
         var form = document.getElementById("my-form");
         
         async function handleSubmit(event) {
@@ -359,5 +287,8 @@
         }
         form.addEventListener("submit", handleSubmit);
     </script>
+    
+    <script src="js/global.js"></script>
+
 </body>
 </html>

@@ -3,114 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpeg" href="../../assets/Main_logo.png">
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="icon" type="image/jpeg" href="assets/Main_logo.png">
+    
     <title>About Us • SArixa</title>
+    
     <style>
         /* =========================================
-           1. CSS VARIABLES FOR THEME
-        ========================================= */
-        :root {
-            --bg-color: #021b1a;
-            --text-main: #b2ebf2;
-            --text-bright: #ffffff;
-            --accent-primary: #00e676;
-            --accent-secondary: #ff5252;
-            --card-bg: rgba(0, 255, 200, 0.05);
-            --card-border: rgba(0, 255, 200, 0.1);
-            --warning-bg: rgba(255, 82, 82, 0.05);
-            --warning-border: rgba(255, 82, 82, 0.1);
-        }
-
-        /* =========================================
-           2. BASE STYLES & RESET
-        ========================================= */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.7;
-            font-size: 1.1rem;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* =========================================
-           3. NAVBAR (Updated for Smart Scroll)
-        ========================================= */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 18px 8%;
-            border-bottom: 1px solid rgba(0, 255, 200, 0.2);
-            background: rgba(2, 27, 26, 0.95);
-            backdrop-filter: blur(10px);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            transition: transform 0.4s cubic-bezier(0.3, 1, 0.3, 1);
-        }
-
-        .navbar.hidden-nav {
-            transform: translateY(-100%);
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo a {
-            display: flex;
-            align-items: center;
-            line-height: 0;
-        }
-
-        .navbar nav {
-            display: flex;
-            align-items: center;
-        }
-
-        .navbar nav a {
-            color: #b2ebf2;
-            text-decoration: none;
-            font-size: 1.1rem;
-            margin-left: 30px; 
-            padding-bottom: 5px;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .navbar nav a:hover {
-            color: #00e676;
-        }
-
-        .navbar nav a::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 2px;
-            background-color: #00e676;
-            transition: width 0.3s ease-in-out;
-        }
-
-        .navbar nav a:hover::after {
-            width: 100%;
-        }
-
-        /* =========================================
-           4. ABOUT US PAGE STYLES
+           ABOUT US PAGE SPECIFIC STYLES
         ========================================= */
         .container {
             max-width: 800px;
@@ -248,74 +149,30 @@
             font-size: 1.25rem;
             color: var(--text-bright);
         }
-
-        /* =========================================
-           5. FOOTER
-        ========================================= */
-        .footer {
-            text-align: center;
-            padding: 30px;
-            border-top: 1px solid rgba(0, 255, 200, 0.2);
-            font-size: 0.9rem;
-            color: #b2ebf2;
-        }
-
-        .footer a {
-            color: #00e676;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* =========================================
-           6. RESPONSIVE (MOBILE)
-        ========================================= */
-        @media (max-width: 900px) {
-            .navbar {
-                padding: 18px 20px;
-            }
-            
-            .navbar nav {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-            }
-
-            .navbar nav a {
-                margin-left: 0;
-                padding: 8px 16px;
-                border: 1px solid rgba(0, 255, 200, 0.4);
-                border-radius: 8px;
-                background: rgba(0, 255, 200, 0.05);
-                font-weight: 500;
-                font-size: 1rem;
-            }
-
-            .navbar nav a::after {
-                display: none; 
-            }
-
-            .navbar nav a:hover {
-                background: rgba(0, 255, 200, 0.15);
-                color: #00e676;
-                border-color: #00e676;
-            }
-        }
     </style>
 </head>
 <body>
 
     <header class="navbar">
-        <div class="logo">
-            <a href="index.html">
-                <img src="../../assets/SArixa_logo.png" alt="SArixa Logo" style="height: 40px; width: auto; transform: scale(4) translateY(2px); transform-origin: left center;">
-            </a>
-        </div>
-        <nav>
-            <a href="index.html">Home</a>
-        </nav>
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
     </header>
 
     <main class="container">
@@ -403,27 +260,35 @@
     </main>
 
     <footer class="footer">
-        © 2026 SArixa • Built by Atanu Ghosh
-        <br><br>
-        <a href="privacy.html">Privacy Policy</a> |
-        <a href="terms.html">Terms of Service</a>
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
     </footer>
 
-    <script>
-        let lastScrollTop = 0;
-        const navbar = document.querySelector('.navbar');
+    <script src="js/global.js"></script>
 
-        window.addEventListener('scroll', function() {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            if (scrollTop > lastScrollTop && scrollTop > 80) {
-                navbar.classList.add('hidden-nav');
-            } else {
-                navbar.classList.remove('hidden-nav');
-            }
-            
-            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-        });
-    </script>
 </body>
 </html>
