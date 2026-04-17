@@ -19,6 +19,11 @@ body {
     padding: 18px 8%; border-bottom: 1px solid rgba(0, 255, 200, 0.2);
     background: rgba(2, 27, 26, 0.95); backdrop-filter: blur(10px);
     position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    transition: transform 0.3s ease-in-out;
+}
+
+.navbar.hidden-nav {
+    transform: translateY(-100%);
 }
 
 .logo img { height: 40px; width: 160px; object-fit: contain; aspect-ratio: 4 / 1; }
