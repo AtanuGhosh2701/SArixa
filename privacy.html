@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="assets/Main_logo.png">
+    <title>Privacy Policy • SArixa</title>
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="preload" href="assets/SArixa_logo.png" as="image">
+    <style>
+        /* =========================================
+           PRIVACY PAGE SPECIFIC STYLES
+        ========================================= */
+        .container {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .box { 
+            max-width: 750px; 
+            margin: 0 auto; 
+            padding: 30px; 
+            border: 1px solid rgba(0, 230, 118, 0.2); 
+            border-radius: 15px;
+            background: rgba(0, 230, 118, 0.02);
+        }
+
+        h1, h2 { color: var(--accent-primary); margin-bottom: 15px; }
+        h2 { margin-top: 25px; }
+        
+        .my-note { 
+            border-left: 4px solid var(--accent-primary); 
+            padding-left: 15px; 
+            font-style: italic; 
+            margin: 20px 0; 
+            background: rgba(0, 230, 118, 0.05);
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* BUTTON STYLE */
+        .contact-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background-color: var(--accent-primary);
+            color: #021b1a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.3);
+            background-color: #00c853;
+        }
+
+        @media (max-width: 600px) {
+            .box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+       <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         <a href="about.html">About Us</a>
+         <a href="contact.html">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
+    </header>
+
+    <main class="container">
+        <div class="box">
+            <h1>Hi, We Care About Your Privacy</h1>
+            <p>At <strong>SArixa</strong>, We believe that your photos and documents are your own business. That’s why I built this tool to be as safe as possible.</p>
+            
+            <div class="my-note">
+                "We don’t store your images. Period. Everything happens right inside your browser."
+            </div>
+
+            <h2>How SArixa Works</h2>
+            <p>When you use our Image-to-PDF tool, your files never touch our servers. All the processing is done by your own device's browser. This is the safest way to convert files online.</p>
+            
+            <h2>The Information We See</h2>
+            <p>We don't have accounts or logins. The only time we see your details is if you voluntarily use our Contact Form to say 'Hi' or report a bug. In that case, we only use your email to reply to you.</p>
+
+            <h2>Ads and Analytics</h2>
+            <p>To keep SArixa free, we show ads through Google AdSense. Google uses 'cookies' to show you relevant ads. You can always turn this off in your browser settings if you're not comfortable.</p>
+
+            <h2>Contact Us</h2>
+            <p>If you have any questions about your data, or if you'd like to share feedback, we're always here to listen:</p>
+            <a href="contact.html" class="contact-btn">Contact Us</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h3>SArixa</h3>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
+    </footer>
+
+    <script src="js/global.js" defer></script>
+</body>
+</html>
