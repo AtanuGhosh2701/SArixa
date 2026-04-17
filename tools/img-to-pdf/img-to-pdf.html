@@ -54,7 +54,7 @@
       <div style="text-align:center;">
         <label class="file-btn">
           <span id="fileLabelText">Select File</span>
-          <input type="file" id="fileInput" accept="image/*" hidden multiple>
+          <input type="file" id="fileInput" accept="image/*" aria-label="Select Image Files" hidden multiple>
         </label>
       </div>
       
@@ -67,7 +67,7 @@
         
         <div class="setting-item">
           <label>Image Quality:</label>
-        <select id="qualitySelect">
+        <select id="qualitySelect" aria-label="Select Image Quality">
           <option value="1">High</option>
           <option value="0.7" selected>Medium</option>
           <option value="0.4">Low</option>
@@ -76,7 +76,7 @@
       
       <div class="setting-item">
         <label>Image Fit Mode:</label>
-        <select id="fitMode">
+        <select id="fitMode" aria-label="Select Image Fit Mode">
           <option value="auto">Auto Fit</option>
           <option value="width">Fit to Width</option>
           <option value="height">Fit to Height</option>
@@ -85,7 +85,7 @@
       
       <div class="setting-item">
         <label>Page Size:</label>
-        <select id="pageSize">
+        <select id="pageSize" aria-label="Select Page Size">
           <option value="original">Original Image Size</option>
           <option value="a4">A4</option>
           <option value="a3">A3</option>
@@ -95,7 +95,7 @@
       
       <div class="setting-item">
         <label>Orientation:</label>
-        <select id="orientation">
+        <select id="orientation" aria-label="Select Orientation">
           <option value="portrait">Portrait</option>
           <option value="landscape">Landscape</option>
         </select>
@@ -103,32 +103,32 @@
       
       <div class="setting-item">
         <label>Margin (px):</label>
-        <input type="number" id="marginInput" value="10" min="0">
+        <input type="number" id="marginInput" value="10" min="0" aria-label="Margin in pixels">
       </div>
       
       <div class="setting-item" style="position: relative;">
         <label>Background Color:</label>
         <div class="bg-custom-wrapper">
-          <select id="bgMode" style="width: 100%;">
+          <select id="bgMode" style="width: 100%;" aria-label="Select Background Color Mode">
             <option value="white">White</option>
             <option value="black">Black</option>
             <option value="custom">Custom Color</option>
           </select>
           
           <div id="customColorSection" style="display:none; position: relative;">
-            <button id="colorSwatchBtn" type="button" class="color-swatch-btn" title="Pick a color"></button>
+            <button id="colorSwatchBtn" type="button" class="color-swatch-btn" title="Pick a color" aria-label="Pick custom background color"></button>
             
             <div id="colorPopoverOverlay" class="picker-overlay"></div>
             
             <div id="canvaColorPickerPanel" class="canva-picker-panel">
               <div class="panel-header">
                 <span>Solid Color</span>
-                <button type="button" id="closePickerBtn" class="close-picker-btn">&times;</button>
+                <button type="button" id="closePickerBtn" class="close-picker-btn" aria-label="Close Color Picker">&times;</button>
               </div>
               <div id="iroPickerContainer"></div>
               <div class="hex-input-box">
                 <div id="hexColorPreview" class="hex-preview-circle"></div>
-                <input type="text" id="bgCustomHex" value="#FFFFFF" maxlength="7" spellcheck="false">
+                <input type="text" id="bgCustomHex" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Custom Background Hex Color">
               </div>
               <button type="button" id="colorOkBtn" class="color-ok-btn">OK</button>
             </div>
@@ -139,7 +139,7 @@
       <div class="setting-item">
         <label>Black & White:</label>
         <label class="switch">
-          <input type="checkbox" id="bwToggle">
+          <input type="checkbox" id="bwToggle" aria-label="Toggle Black and White Mode">
           <span class="slider"></span>
         </label>
       </div>
@@ -147,14 +147,14 @@
       <div class="setting-item">
         <label>Page Numbers:</label>
         <label class="switch">
-          <input type="checkbox" id="pageNumToggle">
+          <input type="checkbox" id="pageNumToggle" aria-label="Toggle Page Numbers">
           <span class="slider"></span>
         </label>
       </div>
       
       <div class="setting-item page-num-extra" style="display:none;">
         <label>Number Position:</label>
-        <select id="pageNumPos">
+        <select id="pageNumPos" aria-label="Select Page Number Position">
           <option value="bottom-center">Bottom Center</option>
           <option value="bottom-right">Bottom Right</option>
           <option value="bottom-left">Bottom Left</option>
@@ -167,19 +167,19 @@
       <div class="setting-item page-num-extra" style="display:none; position: relative;">
         <label>Number Color:</label>
         <div class="bg-custom-wrapper">
-          <button id="fontColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #000000;" title="Pick a color"></button>
+          <button id="fontColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #000000;" title="Pick a color" aria-label="Pick font color"></button>
           
           <div id="fontColorPopoverOverlay" class="picker-overlay"></div>
           
           <div id="fontColorPickerPanel" class="canva-picker-panel">
             <div class="panel-header">
               <span>Font Color</span>
-              <button type="button" id="fontClosePickerBtn" class="close-picker-btn">&times;</button>
+              <button type="button" id="fontClosePickerBtn" class="close-picker-btn" aria-label="Close Font Color Picker">&times;</button>
             </div>
             <div id="fontIroPickerContainer"></div>
             <div class="hex-input-box">
               <div id="fontHexColorPreview" class="hex-preview-circle" style="background-color: #000000;"></div>
-              <input type="text" id="fontCustomHex" value="#000000" maxlength="7" spellcheck="false">
+              <input type="text" id="fontCustomHex" value="#000000" maxlength="7" spellcheck="false" aria-label="Custom Font Hex Color">
             </div>
             <button type="button" id="fontColorOkBtn" class="color-ok-btn">OK</button>
           </div>
@@ -189,14 +189,14 @@
       <div class="setting-item">
         <label>Watermark:</label>
         <label class="switch">
-          <input type="checkbox" id="wmToggle">
+          <input type="checkbox" id="wmToggle" aria-label="Toggle Watermark">
           <span class="slider"></span>
         </label>
       </div>
       
       <div class="setting-item wm-extra" style="display:none;">
         <label>Watermark Type:</label>
-        <select id="wmType">
+        <select id="wmType" aria-label="Select Watermark Type">
           <option value="text">Text</option>
           <option value="image">Image/Logo</option>
         </select>
@@ -204,20 +204,20 @@
       
       <div class="setting-item wm-extra wm-text-only" style="display:none;">
         <label>Watermark Text:</label>
-        <input type="text" id="wmTextInput" value="" placeholder="Enter text...">
+        <input type="text" id="wmTextInput" value="" placeholder="Enter text..." aria-label="Watermark Text">
       </div>
       
       <div class="setting-item wm-extra wm-image-only" style="display:none;">
         <label>Select Logo:</label>
         <label class="wm-file-label" title="Choose a logo file">
           <span id="wmFileNameText">Choose Logo Image</span>
-          <input type="file" id="wmImageInput" accept="image/*" hidden>
+          <input type="file" id="wmImageInput" accept="image/*" aria-label="Watermark Image Input" hidden>
         </label>
       </div>
       
       <div class="setting-item wm-extra" style="display:none;">
         <label>Watermark Position:</label>
-        <select id="wmPos">
+        <select id="wmPos" aria-label="Select Watermark Position">
           <option value="center" selected>Center</option>
           <option value="bottom-center">Bottom Center</option>
           <option value="bottom-right">Bottom Right</option>
@@ -230,17 +230,17 @@
       
       <div class="setting-item wm-extra" style="display:none;">
         <label>Size: <span id="wmSizeVal">50</span>%</label>
-        <input type="range" id="wmSize" min="5" max="100" value="50">
+        <input type="range" id="wmSize" min="5" max="100" value="50" aria-label="Watermark Size">
       </div>
       
       <div class="setting-item wm-extra" style="display:none;">
         <label>Opacity: <span id="wmOpacityVal">50</span>%</label>
-        <input type="range" id="wmOpacity" min="1" max="100" value="50">
+        <input type="range" id="wmOpacity" min="1" max="100" value="50" aria-label="Watermark Opacity">
       </div>
       
       <div class="setting-item wm-extra wm-text-only" style="display:none;">
         <label>Angle:</label>
-        <select id="wmAngle">
+        <select id="wmAngle" aria-label="Select Watermark Angle">
           <option value="45">Diagonal (45°)</option>
           <option value="-45">Diagonal (-45°)</option>
           <option value="0">Horizontal</option>
@@ -251,19 +251,19 @@
       <div class="setting-item wm-extra wm-text-only" style="display:none; position: relative;">
         <label>Watermark Color:</label>
         <div class="bg-custom-wrapper">
-          <button id="wmColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #808080;" title="Pick a color"></button>
+          <button id="wmColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #808080;" title="Pick a color" aria-label="Pick watermark color"></button>
           
           <div id="wmColorPopoverOverlay" class="picker-overlay"></div>
           
           <div id="wmColorPickerPanel" class="canva-picker-panel">
             <div class="panel-header">
               <span>Watermark Color</span>
-              <button type="button" id="wmClosePickerBtn" class="close-picker-btn">&times;</button>
+              <button type="button" id="wmClosePickerBtn" class="close-picker-btn" aria-label="Close Watermark Color Picker">&times;</button>
             </div>
             <div id="wmIroPickerContainer"></div>
             <div class="hex-input-box">
               <div id="wmHexColorPreview" class="hex-preview-circle" style="background-color: #808080;"></div>
-              <input type="text" id="wmCustomHex" value="#808080" maxlength="7" spellcheck="false">
+              <input type="text" id="wmCustomHex" value="#808080" maxlength="7" spellcheck="false" aria-label="Custom Watermark Hex Color">
             </div>
             <button type="button" id="wmColorOkBtn" class="color-ok-btn">OK</button>
           </div>
@@ -296,7 +296,7 @@
     
     <div style="text-align:center; margin-top: 25px; margin-bottom: 15px; color:#b2ebf2; display: flex; flex-direction: column; align-items: center; gap: 8px;">
       <label>File Name:</label>
-      <input type="text" id="fileNameInput" placeholder="converted" style="max-width: 300px;">
+      <input type="text" id="fileNameInput" placeholder="converted" style="max-width: 300px;" aria-label="Enter output file name">
     </div>
     
     <div style="text-align:center;">
@@ -307,12 +307,12 @@
   <footer class="footer">
       <div class="footer-container">
           <div class="footer-col brand-col">
-              <h3>SArixa</h3>
+              <h2>SArixa</h2>
               <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
           </div>
 
           <div class="footer-col">
-              <h4>Company</h4>
+              <h3>Company</h3>
               <ul>
                   <li><a href="../../about.html">About Us</a></li>
                   <li><a href="../../contact.html">Contact Us</a></li>
@@ -320,7 +320,7 @@
           </div>
 
           <div class="footer-col">
-              <h4>Legal</h4>
+              <h3>Legal</h3>
               <ul>
                   <li><a href="../../privacy.html">Privacy Policy</a></li>
                   <li><a href="../../terms.html">Terms & Conditions</a></li>
