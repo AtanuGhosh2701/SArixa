@@ -931,6 +931,38 @@ window.addEventListener('scroll', function() {
 }, { passive: true });
 
 // ==========================================
+// HAMBURGER MENU LOGIC
+// ==========================================
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.getElementById('nav-links');
+
+if (hamburger && navLinks) {
+  // Toggle menu on hamburger click
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation(); // Prevents document click from firing immediately
+    navLinks.classList.toggle('active');
+    hamburger.classList.toggle('active');
+  });
+
+  // Close menu when clicking anywhere outside the navbar
+  document.addEventListener('click', (e) => {
+    if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+      navLinks.classList.remove('active');
+      hamburger.classList.remove('active');
+    }
+  });
+
+  // Close menu when a link is clicked
+  const navItems = navLinks.querySelectorAll('a');
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      navLinks.classList.remove('active');
+      hamburger.classList.remove('active');
+    });
+  });
+}
+
+// ==========================================
 // FIREBASE RATING POPUP LOGIC
 // ==========================================
 const firebaseConfig = {

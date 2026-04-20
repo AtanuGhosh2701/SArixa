@@ -86,13 +86,16 @@ input[type="number"]:focus {
   border-color: #00e676;
 }
 
-/* Browser Autofill Fix (Keeps background dark, allows default text color) */
+/* Browser Autofill Fix (Keeps background dark, allows white text color) */
 input[type="text"]:-webkit-autofill,
 input[type="text"]:-webkit-autofill:hover, 
 input[type="text"]:-webkit-autofill:focus, 
 input[type="text"]:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
   -webkit-box-shadow: 0 0 0px 1000px #012f28 inset !important;
+  box-shadow: 0 0 0px 1000px #012f28 inset !important;
   transition: background-color 5000s ease-in-out 0s;
+  caret-color: #ffffff !important;
 }
 
 /* Range Slider Customization */
