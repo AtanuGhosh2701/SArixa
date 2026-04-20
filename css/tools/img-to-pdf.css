@@ -1,6 +1,11 @@
-/* =========================================
+/* ==========================================================================
+   SArixa - Image to PDF Tool Stylesheet
+   Description: Styles for layout, settings panel, preview grid, and modals.
+   ========================================================================== */
+
+/* -----------------------------------------
    1. MAIN CONTAINER & TYPOGRAPHY
-========================================= */
+----------------------------------------- */
 .tool-container {
   width: 95%;
   max-width: 1200px;
@@ -23,24 +28,24 @@
   margin-bottom: 20px;
 }
 
-/* =========================================
-   2. BUTTONS & INPUTS
-========================================= */
+/* -----------------------------------------
+   2. GLOBAL ACTION BUTTONS
+----------------------------------------- */
 .file-btn,
 .generate-btn,
 .preview-btn,
 .action-btn {
-  padding: 12px 22px;
-  background: #00e676;
-  border: none;
-  color: #003c2f;
-  font-weight: bold;
-  border-radius: 10px;
-  cursor: pointer;
-  margin: 8px;
-  transition: background 0.2s;
   display: inline-block;
   max-width: 100%;
+  margin: 8px;
+  padding: 12px 22px;
+  background: #00e676;
+  color: #003c2f;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
 .file-btn:hover:not(:disabled),
@@ -58,18 +63,20 @@
   cursor: not-allowed;
 }
 
+/* -----------------------------------------
+   3. STANDARD FORM INPUTS
+----------------------------------------- */
 select,
 input[type="text"],
 input[type="number"],
 input[type="file"]:not(#wmImageInput) {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  max-width: 100%;
   width: 100%;
+  max-width: 100%;
+  padding: 8px 12px;
   background: #012f28;
   color: #fff;
   border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 6px;
 }
 
 select:focus,
@@ -79,17 +86,27 @@ input[type="number"]:focus {
   border-color: #00e676;
 }
 
-/* Range Slider CSS */
+/* Browser Autofill Fix (Keeps background dark, allows default text color) */
+input[type="text"]:-webkit-autofill,
+input[type="text"]:-webkit-autofill:hover, 
+input[type="text"]:-webkit-autofill:focus, 
+input[type="text"]:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #012f28 inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Range Slider Customization */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
   height: 6px;
+  margin: 10px 0;
   background: rgba(0, 255, 200, 0.2);
   border-radius: 5px;
   outline: none;
-  margin: 10px 0;
 }
+
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -100,95 +117,18 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-/* Beautiful File Input for Watermark */
-.wm-file-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 12px;
-  background: rgba(0, 230, 118, 0.05); 
-  border: 1px dashed #00e676;
-  border-radius: 6px;
-  color: #00e676;
-  cursor: pointer;
-  transition: 0.3s;
-  text-align: center;
-  font-size: 0.95rem;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.wm-file-label:hover {
-  background: rgba(0, 230, 118, 0.15);
-}
-
-/* Toggle Switch (Lever) Styles */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 52px;
-  height: 28px;
-  margin-top: 4px;
-}
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 255, 200, 0.1);
-  transition: .4s;
-  border: 1px solid rgba(0, 255, 200, 0.3);
-  border-radius: 34px;
-}
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 20px;
-  width: 20px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #b2ebf2;
-  transition: .4s;
-  border-radius: 50%;
-}
-input:checked + .slider {
-  background-color: #00e676;
-  border-color: #00e676;
-}
-input:focus + .slider {
-  box-shadow: 0 0 5px #00e676;
-}
-input:checked + .slider:before {
-  transform: translateX(24px);
-  background-color: #003c2f;
-}
-
-/* =========================================
-   3. SETTINGS PANEL & COLOR PICKER
-========================================= */
+/* -----------------------------------------
+   4. SETTINGS PANEL GRID
+----------------------------------------- */
 .settings-group {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 Items side-by-side */
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 25px;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 255, 200, 0.1);
   margin: 25px 0;
-}
-
-@media (max-width: 768px) {
-  .settings-group {
-    grid-template-columns: 1fr; /* 1 Item per row on Mobile */
-  }
-  .preview-advice {
-    display: none;
-  }
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 255, 200, 0.1);
+  border-radius: 12px;
 }
 
 .settings-group div.setting-item {
@@ -202,6 +142,190 @@ input:checked + .slider:before {
   font-size: 0.95rem;
 }
 
+@media (max-width: 768px) {
+  .settings-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -----------------------------------------
+   5. CUSTOM UI COMPONENTS
+----------------------------------------- */
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  margin-top: 4px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 255, 200, 0.1);
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 34px;
+  cursor: pointer;
+  transition: 0.4s;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  bottom: 3px;
+  height: 20px;
+  width: 20px;
+  background-color: #b2ebf2;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #00e676;
+  border-color: #00e676;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 5px #00e676;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+  background-color: #003c2f;
+}
+
+/* Custom Dropdown Menu */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  background: #012f28;
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-selected {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.dropdown-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dropdown-arrow {
+  font-size: 0.7rem;
+  color: #b2ebf2;
+  transition: transform 0.2s;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 5px;
+  background: #012f28;
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 6px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  display: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.custom-dropdown.open .dropdown-menu { display: block; }
+.custom-dropdown.open .dropdown-arrow { transform: rotate(180deg); }
+
+.font-list {
+  max-height: 130px;
+  overflow-y: auto;
+}
+
+.font-item {
+  padding: 8px 12px;
+  color: #b2ebf2;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.font-item:hover { background: rgba(0, 230, 118, 0.1); }
+.font-item.active {
+  background: #00e676;
+  color: #003c2f;
+  font-weight: bold;
+}
+
+/* Text Formatting Buttons (Bold, Italic) */
+.text-format-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.format-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #012f28;
+  color: #00e676;
+  border: 2px solid #00e676;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.format-btn svg { width: 18px; height: 18px; }
+.format-btn:hover { background: rgba(0, 230, 118, 0.1); }
+.format-btn.active {
+  background: #00e676;
+  color: #003c2f;
+}
+
+/* Custom Watermark File Label */
+.wm-file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: rgba(0, 230, 118, 0.05); 
+  color: #00e676;
+  font-size: 0.95rem;
+  border: 1px dashed #00e676;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: 0.3s;
+}
+
+.wm-file-label:hover {
+  background: rgba(0, 230, 118, 0.15);
+}
+
+/* -----------------------------------------
+   6. COLOR PICKER POPUPS
+----------------------------------------- */
 .bg-custom-wrapper {
   display: flex;
   align-items: center;
@@ -209,15 +333,15 @@ input:checked + .slider:before {
 }
 
 .color-swatch-btn {
+  flex-shrink: 0;
   width: 40px;
   height: 40px;
-  border-radius: 8px;
-  border: 2px solid rgba(0, 255, 200, 0.5);
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease, border-color 0.2s ease;
   background-color: #ffffff; 
-  flex-shrink: 0;
+  border: 2px solid rgba(0, 255, 200, 0.5);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .color-swatch-btn:hover {
@@ -238,90 +362,90 @@ input:checked + .slider:before {
   top: 60px; 
   left: 50%; 
   transform: translateX(-50%); 
-  background: #01201d; 
-  padding: 20px;
-  border-radius: 12px;
-  border: 1px solid #00e676;
   display: none; 
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  width: 260px; 
+  padding: 20px;
+  background: #01201d; 
+  border: 1px solid #00e676;
+  border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   z-index: 1001;
-  width: 260px; 
 }
 
 .panel-header {
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  margin-bottom: 5px;
+  padding-bottom: 10px;
   color: #00e676;
   font-weight: bold;
   border-bottom: 1px solid rgba(0, 255, 200, 0.2);
-  padding-bottom: 10px;
-  margin-bottom: 5px;
 }
 
 .close-picker-btn {
+  padding: 0;
   background: transparent;
-  border: none;
   color: #b2ebf2;
   font-size: 1.5rem;
-  cursor: pointer;
   line-height: 1;
-  padding: 0;
+  border: none;
+  cursor: pointer;
 }
+
 .close-picker-btn:hover { color: #ff5252; }
 
 .hex-input-box {
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 8px 12px;
-  border-radius: 8px;
   width: 100%;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(0, 255, 200, 0.2);
+  border-radius: 8px;
 }
 
 .hex-preview-circle {
+  flex-shrink: 0;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
   margin-right: 12px;
   background-color: #ffffff; 
-  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
 }
 
 .hex-input-box input {
-  border: none;
+  width: 100%;
+  padding: 0;
   background: transparent;
   color: #fff;
+  font-size: 1rem;
   font-weight: bold;
   text-transform: uppercase;
+  border: none;
   outline: none;
-  width: 100%;
-  font-size: 1rem;
-  padding: 0;
 }
 
 .color-ok-btn {
   width: 100%;
-  padding: 10px;
   margin-top: 5px;
+  padding: 10px;
   background: #00e676;
   color: #003c2f;
+  font-size: 1rem;
+  font-weight: bold;
   border: none;
   border-radius: 8px;
-  font-weight: bold;
-  font-size: 1rem;
   cursor: pointer;
   transition: background 0.2s;
 }
-.color-ok-btn:hover {
-  background: #00ff84;
-}
+
+.color-ok-btn:hover { background: #00ff84; }
 
 @media (max-width: 768px) {
   .canva-picker-panel {
@@ -334,19 +458,19 @@ input:checked + .slider:before {
   }
 }
 
-/* =========================================
-   4. PROGRESS BAR, SPINNER & OUTPUT BOX
-========================================= */
+/* -----------------------------------------
+   7. PROGRESS BAR, SPINNER & OUTPUT
+----------------------------------------- */
 .spinner {
   display: none;
   width: 18px;
   height: 18px;
-  border: 3px solid rgba(0, 60, 47, 0.3);
-  border-radius: 50%;
-  border-top-color: #003c2f;
-  animation: spin 0.8s linear infinite;
-  vertical-align: middle;
   margin-left: 8px;
+  vertical-align: middle;
+  border: 3px solid rgba(0, 60, 47, 0.3);
+  border-top-color: #003c2f;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 @keyframes spin {
@@ -355,19 +479,19 @@ input:checked + .slider:before {
 
 .progress-container {
   display: none; 
+  width: 100%;
   margin-top: 25px;
   margin-bottom: -10px; 
-  width: 100%;
 }
 
 .progress-info {
   display: flex;
   justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 0 5px;
   color: #00e676;
   font-size: 0.95rem;
   font-weight: bold;
-  margin-bottom: 8px;
-  padding: 0 5px;
 }
 
 .progress-track {
@@ -375,13 +499,13 @@ input:checked + .slider:before {
   height: 12px;
   background: rgba(0, 255, 200, 0.1);
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  overflow: hidden;
 }
 
 .progress-bar {
-  height: 100%;
   width: 0%;
+  height: 100%;
   background: #00e676;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 230, 118, 0.7); 
@@ -391,105 +515,106 @@ input:checked + .slider:before {
 .output-box {
   margin-top: 30px;
   padding: 20px;
+  color: #b2ebf2;
+  text-align: center;
+  word-break: break-word;
+  background: transparent;
   border: 2px dashed #00e676;
   border-radius: 15px;
-  text-align: center;
-  color: #b2ebf2;
-  word-break: break-word;
   overflow: hidden;
 }
 
-/* =========================================
-   5. PREVIEW BOX & IMAGE CARDS
-========================================= */
+/* -----------------------------------------
+   8. PREVIEW GRID & IMAGE CARDS
+----------------------------------------- */
 .preview-box {
   display: flex;
   flex-direction: column;
   gap: 15px;
   min-height: 200px;
+  margin-top: 30px;
+  padding: clamp(8px, 2vw, 15px);
   border: 2px dashed #00e676;
   border-radius: 15px;
-  padding: clamp(8px, 2vw, 15px);
-  margin-top: 30px;
   user-select: none;
   -webkit-user-select: none;
 }
 
-.preview-active {
-  background: rgba(0, 230, 118, 0.1);
-}
+.preview-active { background: rgba(0, 230, 118, 0.1); }
 
 .preview-empty {
   grid-column: 1 / -1;
-  text-align: center;
+  margin-top: 30px;
   color: #b2ebf2;
   font-size: 25px;
   font-weight: 500;
-  margin-top: 30px;
+  text-align: center;
 }
 
 .preview-advice {
   grid-column: 1 / -1;
-  text-align: center;
+  margin-bottom: 50px;
   color: #9be7d8;
   font-size: 14px;
-  margin-bottom: 50px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .preview-advice { display: none; }
 }
 
 .image-card {
+  position: relative;
   display: grid;
   grid-template-columns: clamp(80px, 25vw, 120px) 1fr;
   grid-template-rows: auto auto auto;
   column-gap: clamp(8px, 3vw, 15px);
+  align-items: center;
+  width: 100%;
+  height: auto;
   padding: clamp(8px, 2vw, 12px);
   background: #012f28;
   border: 2px solid #00e676;
   border-radius: 16px;
-  height: auto;
-  position: relative;
-  align-items: center;
-  width: 100%;
   user-select: none;
   -webkit-user-select: none;
 }
 
 .img-thumb {
+  grid-row: 1 / span 3;
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: clamp(8px, 2vw, 12px);
-  grid-row: 1 / span 3;
   -webkit-user-drag: none;
 }
 
-.page-badge {
-  display: none;
-}
+.page-badge { display: none; }
 
 .image-overlay {
   position: static;
-  opacity: 1 !important;
-  background: none;
+  grid-column: 2;
+  grid-row: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: clamp(4px, 1vw, 8px);
-  grid-column: 2;
-  grid-row: 1;
   width: 100%;
+  background: none;
+  opacity: 1 !important;
   z-index: 4;
 }
 
 .overlay-btn {
-  width: 100%;
-  height: clamp(35px, 9vw, 48px);
-  border-radius: clamp(6px, 1.5vw, 10px);
-  border: none;
-  background: #00e676;
-  color: #003c2f;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: clamp(35px, 9vw, 48px);
+  background: #00e676;
+  color: #003c2f;
+  border: none;
+  border-radius: clamp(6px, 1.5vw, 10px);
+  cursor: pointer;
 }
 
 .overlay-btn svg {
@@ -501,109 +626,26 @@ input:checked + .slider:before {
 .file-name {
   grid-column: 2;
   grid-row: 2;
+  margin-top: clamp(4px, 1vw, 10px);
+  color: #00e676;
   font-size: clamp(0.75rem, 3vw, 1rem); 
   font-weight: 500;
-  color: #00e676;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: clamp(4px, 1vw, 10px);
 }
 
 .page-number {
   grid-column: 2;
   grid-row: 3;
-  font-size: clamp(0.65rem, 2.5vw, 0.85rem);
-  color: #b2ebf2;
-  text-align: left;
   margin-top: 2px;
+  color: #b2ebf2;
+  font-size: clamp(0.65rem, 2.5vw, 0.85rem);
+  text-align: left;
 }
 
-/* Modals */
-.crop-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.98);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 5000;
-  padding: 20px;
-}
-
-.crop-area {
-  width: 100%;
-  max-width: 800px;
-  height: 65vh;
-  background: #000;
-  margin-bottom: 20px;
-}
-
-.crop-actions {
-  display: flex;
-  gap: 15px;
-  width: 100%;
-  max-width: 800px;
-  justify-content: center;
-}
-
-.crop-btn {
-  flex: 1;
-  max-width: 200px;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.cropper-view-box {
-  outline: 2px solid #00e676 !important;
-}
-
-.save-btn {
-  background: #00e676;
-  color: #003c2f;
-}
-
-.cancel-btn {
-  background: #ff5252;
-  color: #fff;
-}
-
-.zoom-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.95);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 6000;
-}
-
-.zoom-overlay img {
-  max-width: 90%;
-  max-height: 90%;
-}
-
-.zoom-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #00e676;
-  border: none;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: #003c2f;
-  font-weight: bold;
-}
-
-/* Desktop Grid for preview box */
+/* Desktop Grid View */
 @media (hover: hover) and (min-width: 769px) {
   .preview-box {
     display: grid;
@@ -614,27 +656,24 @@ input:checked + .slider:before {
 
   .image-card {
     display: block;
-    position: relative;
     aspect-ratio: 1 / 1;
     padding: 0;
     overflow: hidden;
   }
 
   .img-thumb {
-    width: 100%;
     height: 100%;
     aspect-ratio: auto;
     border-radius: 0;
   }
 
   .page-badge {
-    display: block;
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 8px; left: 8px;
+    display: block;
+    padding: 4px 10px;
     background: #00e676;
     color: #003c2f;
-    padding: 4px 10px;
     font-size: 0.75rem;
     font-weight: bold;
     border-radius: 20px;
@@ -644,18 +683,16 @@ input:checked + .slider:before {
   .image-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
+    background: rgba(0, 0, 0, 0.75);
     opacity: 0 !important;
-    transition: .3s;
+    transition: 0.3s;
   }
 
-  .image-card:hover .image-overlay {
-    opacity: 1 !important;
-  }
+  .image-card:hover .image-overlay { opacity: 1 !important; }
 
   .overlay-btn {
     width: 40px;
@@ -665,14 +702,13 @@ input:checked + .slider:before {
 
   .file-name {
     position: absolute;
-    bottom: 0;
-    left: 0;
+    bottom: 0; left: 0;
     width: 100%;
     padding: 10px 8px;
     background: rgba(0, 0, 0, 0.85);
-    text-align: center;
     color: #fff;
     font-size: 0.85rem;
+    text-align: center;
     opacity: 0;
     transform: translateY(100%);
     transition: all 0.3s ease;
@@ -683,7 +719,187 @@ input:checked + .slider:before {
     transform: translateY(0);
   }
   
-  .page-number {
-    display: none;
-  }
+  .page-number { display: none; }
 }
+
+/* -----------------------------------------
+   9. MODALS (CROP & ZOOM)
+----------------------------------------- */
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.98);
+  z-index: 5000;
+}
+
+.crop-area {
+  width: 100%;
+  max-width: 800px;
+  height: 65vh;
+  margin-bottom: 20px;
+  background: #000;
+}
+
+.cropper-view-box { outline: 2px solid #00e676 !important; }
+
+.crop-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.crop-btn {
+  flex: 1;
+  max-width: 200px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.save-btn { background: #00e676; color: #003c2f; }
+.cancel-btn { background: #ff5252; color: #fff; }
+
+.zoom-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 6000;
+}
+
+.zoom-overlay img {
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.zoom-close {
+  position: absolute;
+  top: 20px; right: 20px;
+  width: 45px;
+  height: 45px;
+  background: #00e676;
+  color: #003c2f;
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* -----------------------------------------
+   10. RATING POPUP
+----------------------------------------- */
+.popup-overlay {
+  display: none; 
+  position: fixed;
+  top: 0; left: 0; 
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  align-items: center; 
+  justify-content: center;
+  z-index: 9999;
+}
+
+.popup-content {
+  position: relative;
+  width: 90%;
+  max-width: 350px;
+  padding: 30px;
+  background-color: #012f28;
+  text-align: center;
+  border: 2px solid #00e676;
+  border-radius: 15px;
+  box-shadow: 0px 4px 25px rgba(0, 230, 118, 0.3);
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  color: #b2ebf2;
+  font-size: 25px; 
+  font-weight: bold;
+  cursor: pointer; 
+}
+
+.close-btn:hover { color: #ff5252; }
+.popup-content h3 { color: #00e676; margin-bottom: 5px; }
+
+.popup-btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.popup-btn {
+  flex: 1;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.popup-btn-red { background-color: #ff5252; color: #fff; }
+.popup-btn-red:hover { background-color: #e53935; }
+.popup-btn-green { background-color: #00e676; color: #003c2f; }
+.popup-btn-green:hover { background-color: #00c853; }
+
+.btn-feedback {
+  display: inline-block;
+  margin-top: 20px;
+  color: #b2ebf2;
+  font-size: 0.9rem;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.btn-feedback:hover { color: #00e676; }
+
+/* Success Checkmark SVG Animation */
+.success-svg {
+  display: block;
+  width: 80px;
+  height: 80px;
+  margin: 10px auto;
+  stroke: #00e676;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  border-radius: 50%;
+  box-shadow: inset 0px 0px 0px #00e676;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.success-circle {
+  stroke: #00e676;
+  stroke-width: 4;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.success-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke { 100% { stroke-dashoffset: 0; } }
+@keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+@keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px rgba(0, 230, 118, 0.1); } }

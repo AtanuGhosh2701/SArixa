@@ -14,7 +14,455 @@
   "applicationCategory": "UtilitiesApplication",
   "description": "Sarixa is a 100% private, free Image to PDF converter. Convert JPG, PNG, and WebP to PDF instantly in your browser. No file uploads required, ensuring complete data security.",
   "url": "https://sarixa-tools.vercel.app/",
-  "offers": {
+  "offers": {<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Image to PDF • SArixa</title>
+    <meta name="description" content="Sarixa is a 100% private, free Image to PDF converter. Convert JPG, PNG, and WebP to PDF instantly in your browser. No file uploads required.">
+    <link rel="canonical" href="https://sarixa-tools.vercel.app/tools/img-to-pdf.html">
+    
+    <meta property="og:title" content="Image to PDF • SArixa">
+    <meta property="og:description" content="Sarixa is a 100% private, free Image to PDF converter. Convert JPG, PNG, and WebP to PDF instantly in your browser without uploading files.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarixa-tools.vercel.app/tools/img-to-pdf.html">
+    <meta property="og:image" content="https://sarixa-tools.vercel.app/assets/SArixa_logo.png">
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Sarixa",
+        "operatingSystem": "Web, Windows, macOS, Android, iOS",
+        "applicationCategory": "UtilitiesApplication",
+        "description": "Sarixa is a 100% private, free Image to PDF converter. Convert JPG, PNG, and WebP to PDF instantly in your browser. No file uploads required, ensuring complete data security.",
+        "url": "https://sarixa-tools.vercel.app/",
+        "offers": {
+          "@type": "Offer",
+          "price": "0.00",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "100% Private & Secure: No files are ever uploaded to a server.",
+          "Client-Side Processing: All conversions happen directly in your browser.",
+          "Lightning Fast: Zero wait time for server responses (Score 100/100 on PageSpeed).",
+          "Completely Free: No hidden charges, no watermarks, and no registration required.",
+          "Multi-Format Support: Converts JPG, PNG, and WebP images to PDF effortlessly."
+        ]
+      }
+    </script>
+    
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <link rel="stylesheet" href="../../css/global.css">
+    <link rel="stylesheet" href="../../css/tools/img-to-pdf.css">
+    <link rel="icon" type="image/png" href="../../assets/Main_logo.png">
+    <link rel="preload" href="../../assets/SArixa_logo.png" as="image">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"></noscript>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5" defer></script>
+</head>
+  
+  <body>
+    
+    <header class="navbar">
+       <div class="logo">
+        <a href="../../index.html">
+         <img src="../../assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high">
+        </a>
+      </div>
+      
+      <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="../../index.html">Home</a>
+         <a href="img-to-pdf.html">Tools</a>
+         <a href="../../about.html">About Us</a>
+         <a href="../../contact.html">Contact Us</a>
+         <a href="../../privacy.html">Privacy Policy</a>
+         <a href="../../terms.html">Terms & Conditions</a>
+       </nav>
+    </header>
+    
+    <main class="tool-container">
+      <h1 class="tool-title">Convert Image to PDF</h1>
+      <p class="tool-desc">Fast, secure, and professional. <strong>No uploads—your files never leave your device.</strong></p>
+      
+      <div style="text-align:center;">
+        <label class="file-btn">
+          <span id="fileLabelText">Select File</span>
+          <input type="file" id="fileInput" accept="image/*" aria-label="Select Image Files" hidden multiple>
+        </label>
+      </div>
+      
+      <div id="previewBox" class="preview-box">
+        <div class="preview-empty">No file selected</div>
+        <div class="preview-advice">Select file or Drag and Drop file here</div>
+      </div>
+      
+      <div class="settings-group">
+        
+        <div class="setting-item">
+          <label>Image Quality:</label>
+        <select id="qualitySelect" aria-label="Select Image Quality">
+          <option value="1">High</option>
+          <option value="0.7" selected>Medium</option>
+          <option value="0.4">Low</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>Image Fit Mode:</label>
+        <select id="fitMode" aria-label="Select Image Fit Mode">
+          <option value="auto">Auto Fit</option>
+          <option value="width">Fit to Width</option>
+          <option value="height">Fit to Height</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>Page Size:</label>
+        <select id="pageSize" aria-label="Select Page Size">
+          <option value="original">Original Image Size</option>
+          <option value="a4">A4</option>
+          <option value="a3">A3</option>
+          <option value="letter">Letter</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>Orientation:</label>
+        <select id="orientation" aria-label="Select Orientation">
+          <option value="portrait">Portrait</option>
+          <option value="landscape">Landscape</option>
+        </select>
+      </div>
+      
+      <div class="setting-item">
+        <label>Margin (px):</label>
+        <input type="number" id="marginInput" value="10" min="0" aria-label="Margin in pixels">
+      </div>
+      
+      <div class="setting-item" style="position: relative;">
+        <label>Background Color:</label>
+        <div class="bg-custom-wrapper">
+          <select id="bgMode" style="width: 100%;" aria-label="Select Background Color Mode">
+            <option value="white">White</option>
+            <option value="black">Black</option>
+            <option value="custom">Custom Color</option>
+          </select>
+          
+          <div id="customColorSection" style="display:none; position: relative;">
+            <button id="colorSwatchBtn" type="button" class="color-swatch-btn" title="Pick a color" aria-label="Pick custom background color"></button>
+            
+            <div id="colorPopoverOverlay" class="picker-overlay"></div>
+            
+            <div id="canvaColorPickerPanel" class="canva-picker-panel">
+              <div class="panel-header">
+                <span>Solid Color</span>
+                <button type="button" id="closePickerBtn" class="close-picker-btn" aria-label="Close Color Picker">&times;</button>
+              </div>
+              <div id="iroPickerContainer"></div>
+              <div class="hex-input-box">
+                <div id="hexColorPreview" class="hex-preview-circle"></div>
+                <input type="text" id="bgCustomHex" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Custom Background Hex Color">
+              </div>
+              <button type="button" id="colorOkBtn" class="color-ok-btn">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <label>Black & White:</label>
+        <label class="switch">
+          <input type="checkbox" id="bwToggle" aria-label="Toggle Black and White Mode">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-item">
+        <label>Page Numbers:</label>
+        <label class="switch">
+          <input type="checkbox" id="pageNumToggle" aria-label="Toggle Page Numbers">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-item page-num-extra" style="display:none;">
+        <label>Number Position:</label>
+        <select id="pageNumPos" aria-label="Select Page Number Position">
+          <option value="bottom-center">Bottom Center</option>
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-center">Top Center</option>
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+        </select>
+      </div>
+
+      <div class="setting-item page-num-extra" style="display:none;">
+        <label>Number Size:</label>
+        <select id="pageNumSize" aria-label="Select Page Number Size">
+          <option value="12" selected>Small (Default)</option>
+          <option value="18">Large</option>
+        </select>
+      </div>
+      
+      <div class="setting-item page-num-extra" style="display:none; position: relative;">
+        <label>Number Color:</label>
+        <div class="bg-custom-wrapper">
+          <button id="fontColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #000000;" title="Pick a color" aria-label="Pick font color"></button>
+          
+          <div id="fontColorPopoverOverlay" class="picker-overlay"></div>
+          
+          <div id="fontColorPickerPanel" class="canva-picker-panel">
+            <div class="panel-header">
+              <span>Font Color</span>
+              <button type="button" id="fontClosePickerBtn" class="close-picker-btn" aria-label="Close Font Color Picker">&times;</button>
+            </div>
+            <div id="fontIroPickerContainer"></div>
+            <div class="hex-input-box">
+              <div id="fontHexColorPreview" class="hex-preview-circle" style="background-color: #000000;"></div>
+              <input type="text" id="fontCustomHex" value="#000000" maxlength="7" spellcheck="false" aria-label="Custom Font Hex Color">
+            </div>
+            <button type="button" id="fontColorOkBtn" class="color-ok-btn">OK</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="setting-item">
+        <label>Watermark:</label>
+        <label class="switch">
+          <input type="checkbox" id="wmToggle" aria-label="Toggle Watermark">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <div class="setting-item wm-extra" style="display:none;">
+        <label>Watermark Type:</label>
+        <select id="wmType" aria-label="Select Watermark Type">
+          <option value="text">Text</option>
+          <option value="image">Image/Logo</option>
+        </select>
+      </div>
+      
+      <div class="setting-item wm-extra wm-text-only" style="display:none;">
+        <label>Watermark Text:</label>
+        <input type="text" id="wmTextInput" value="" placeholder="Enter text..." aria-label="Watermark Text">
+      </div>
+
+      <div class="setting-item wm-extra wm-text-only" style="display:none;">
+        <label>Font Style:</label>
+        <div class="custom-dropdown" id="fontDropdown">
+          <div class="dropdown-selected">
+            <span id="selectedFontText" style="font-family: Helvetica, Arial, sans-serif;">Helvetica</span>
+            <div class="dropdown-actions">
+              <span class="dropdown-arrow">▼</span>
+            </div>
+          </div>
+          <div class="dropdown-menu" id="fontDropdownMenu">
+            <div class="font-list" id="wmFontList">
+              <div class="font-item active" data-font="helvetica" style="font-family: Helvetica, Arial, sans-serif;">Helvetica</div>
+              <div class="font-item" data-font="times" style="font-family: 'Times New Roman', Times, serif;">Times Roman</div>
+              <div class="font-item" data-font="courier" style="font-family: 'Courier New', Courier, monospace;">Courier</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-item wm-extra wm-text-only" style="display:none;">
+        <label>Text Format:</label>
+        <div class="text-format-group">
+          <button type="button" class="format-btn" data-format="bold" aria-label="Bold" title="Bold">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+          </button>
+          <button type="button" class="format-btn" data-format="italic" aria-label="Italic" title="Italic">
+            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="setting-item wm-extra wm-image-only" style="display:none;">
+        <label>Select Logo:</label>
+        <label class="wm-file-label" title="Choose a logo file">
+          <span id="wmFileNameText">Choose Logo Image</span>
+          <input type="file" id="wmImageInput" accept="image/*" aria-label="Watermark Image Input" hidden>
+        </label>
+      </div>
+      
+      <div class="setting-item wm-extra" style="display:none;">
+        <label>Watermark Position:</label>
+        <select id="wmPos" aria-label="Select Watermark Position">
+          <option value="center" selected>Center</option>
+          <option value="bottom-center">Bottom Center</option>
+          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-left">Bottom Left</option>
+          <option value="top-center">Top Center</option>
+          <option value="top-right">Top Right</option>
+          <option value="top-left">Top Left</option>
+        </select>
+      </div>
+      
+      <div class="setting-item wm-extra" style="display:none;">
+        <label>Size: <span id="wmSizeVal">50</span>%</label>
+        <input type="range" id="wmSize" min="5" max="100" value="50" aria-label="Watermark Size">
+      </div>
+      
+      <div class="setting-item wm-extra" style="display:none;">
+        <label>Opacity: <span id="wmOpacityVal">50</span>%</label>
+        <input type="range" id="wmOpacity" min="1" max="100" value="50" aria-label="Watermark Opacity">
+      </div>
+      
+      <div class="setting-item wm-extra wm-text-only" style="display:none;">
+        <label>Angle:</label>
+        <select id="wmAngle" aria-label="Select Watermark Angle">
+          <option value="45">Diagonal (45°)</option>
+          <option value="-45">Diagonal (-45°)</option>
+          <option value="0">Horizontal</option>
+          <option value="90">Vertical</option>
+        </select>
+      </div>
+      
+      <div class="setting-item wm-extra wm-text-only" style="display:none; position: relative;">
+        <label>Watermark Color:</label>
+        <div class="bg-custom-wrapper">
+          <button id="wmColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #808080;" title="Pick a color" aria-label="Pick watermark color"></button>
+          
+          <div id="wmColorPopoverOverlay" class="picker-overlay"></div>
+          
+          <div id="wmColorPickerPanel" class="canva-picker-panel">
+            <div class="panel-header">
+              <span>Watermark Color</span>
+              <button type="button" id="wmClosePickerBtn" class="close-picker-btn" aria-label="Close Watermark Color Picker">&times;</button>
+            </div>
+            <div id="wmIroPickerContainer"></div>
+            <div class="hex-input-box">
+              <div id="wmHexColorPreview" class="hex-preview-circle" style="background-color: #808080;"></div>
+              <input type="text" id="wmCustomHex" value="#808080" maxlength="7" spellcheck="false" aria-label="Custom Watermark Hex Color">
+            </div>
+            <button type="button" id="wmColorOkBtn" class="color-ok-btn">OK</button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <div style="text-align:center;">
+      <button class="generate-btn" id="generateBtn" type="button">
+        <span>Generate PDF</span>
+        <div id="loader" class="spinner"></div>
+      </button>
+    </div>
+    
+    <div id="progressContainer" class="progress-container">
+      <div class="progress-info">
+        <span>Generating PDF...</span>
+        <span id="progressText">0%</span>
+      </div>
+      <div class="progress-track">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+    </div>
+    <div id="outputBox" class="output-box">Your output will appear here</div>
+    
+    <div style="text-align:center; margin-top: 15px;">
+      <button class="preview-btn" id="previewBtn" type="button" disabled>Preview PDF</button>
+    </div>
+    
+    <div style="text-align:center; margin-top: 25px; margin-bottom: 15px; color:#b2ebf2; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+      <label>File Name:</label>
+      <input type="text" id="fileNameInput" placeholder="converted" style="max-width: 300px;" aria-label="Enter output file name">
+    </div>
+    
+    <div style="text-align:center;">
+      <button class="action-btn" id="downloadBtn" type="button" disabled>Download</button>
+    </div>
+  </main>
+  
+  <footer class="footer">
+      <div class="footer-container">
+          <div class="footer-col brand-col">
+              <h2>SArixa</h2>
+              <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+          </div>
+
+          <div class="footer-col">
+              <h3>Company</h3>
+              <ul>
+                  <li><a href="../../about.html">About Us</a></li>
+                  <li><a href="../../contact.html">Contact Us</a></li>
+              </ul>
+          </div>
+
+          <div class="footer-col">
+              <h3>Legal</h3>
+              <ul>
+                  <li><a href="../../privacy.html">Privacy Policy</a></li>
+                  <li><a href="../../terms.html">Terms & Conditions</a></li>
+              </ul>
+          </div>
+      </div>
+
+      <div class="footer-bottom">
+          © 2026 SArixa • Built by Santanu & Atanu
+      </div>
+  </footer>
+
+  <div id="rating-popup" class="popup-overlay">
+    <div class="popup-content">
+      <span id="close-popup-top" class="close-btn">&times;</span>
+      
+      <div id="rating-initial-state">
+        <h3>How was your experience?</h3>
+        <p style="font-size: 14px; color: #b2ebf2;">Rate SArixa to help us improve!</p>
+        
+        <div id="stars" style="font-size: 35px; cursor: pointer; color: #555; margin: 15px 0;">
+          <span data-value="1">☆</span>
+          <span data-value="2">☆</span>
+          <span data-value="3">☆</span>
+          <span data-value="4">☆</span>
+          <span data-value="5">☆</span>
+        </div>
+        
+        <div id="popup-action-btns" class="popup-btn-group">
+          <button id="btn-close-rating" class="popup-btn popup-btn-red">Close</button>
+          <button id="btn-submit-rating" class="popup-btn popup-btn-green">Submit</button>
+        </div>
+
+        <a href="../../contact.html" class="btn-feedback">Send your feedback</a>
+      </div>
+
+      <div id="rating-success-state" style="display: none; flex-direction: column; align-items: center; padding: 10px 0;">
+        <svg class="success-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+          <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+        <h3 style="color: #00e676; margin-top: 15px;">Rating Submitted!</h3>
+        <p style="color: #b2ebf2; font-size: 14px; margin-top: 5px;">Thanks for giving us your rating.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="../../js/global.js" defer></script>
+  <script type="module" src="../../js/tools/img-to-pdf.js"></script>
+  
+</body>
+</html>
     "@type": "Offer",
     "price": "0.00",
     "priceCurrency": "USD"

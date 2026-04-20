@@ -3,15 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#012f28">
+    
     <title>Terms & Conditions • SArixa</title>
+    <meta name="description" content="Terms and Conditions for using SArixa. Read the rules and guidelines for using our free, private, browser-based Image to PDF converter.">
+    <link rel="canonical" href="https://sarixa-tools.vercel.app/terms.html">
+    
+    <meta property="og:title" content="Terms & Conditions • SArixa">
+    <meta property="og:description" content="Terms and Conditions for using SArixa's free Image to PDF converter.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarixa-tools.vercel.app/terms.html">
+    <meta property="og:image" content="https://sarixa-tools.vercel.app/assets/SArixa_logo.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "SArixa Terms and Conditions",
+      "url": "https://sarixa-tools.vercel.app/terms.html",
+      "description": "Terms of service and usage guidelines for the SArixa Image to PDF converter."
+    }
+    </script>
     
     <link rel="stylesheet" href="css/global.css">
     <link rel="icon" type="image/png" href="assets/Main_logo.png">
-    <link rel="preload" href="assets/SArixa_logo.png" as="image">
+    <link rel="preload" href="assets/SArixa_logo.png" as="image" fetchpriority="high">
+    
     <style>
         /* =========================================
            TERMS PAGE SPECIFIC STYLES
         ========================================= */
+        body { margin: 0; padding: 0; }
+        img { max-width: 100%; height: auto; }
+
         .container {
             padding-top: 120px;
             padding-bottom: 60px;
@@ -28,7 +52,7 @@
             background: rgba(0, 230, 118, 0.02);
         }
 
-        h1, h2 { color: var(--accent-primary); margin-bottom: 15px; }
+        h1, h2 { color: var(--accent-primary, #00e676); margin-bottom: 15px; }
         h2 { margin-top: 25px; font-size: 1.4rem; }
         
         .disclaimer { 
@@ -39,12 +63,14 @@
             color: #ff8a80;
         }
 
+        p { color: #b2ebf2; line-height: 1.6; margin-bottom: 15px; }
+
         /* BUTTON STYLE */
         .contact-btn {
             display: inline-block;
             margin-top: 15px;
             padding: 12px 25px;
-            background-color: var(--accent-primary);
+            background-color: var(--accent-primary, #00e676);
             color: #021b1a;
             text-decoration: none;
             border-radius: 8px;
@@ -63,6 +89,11 @@
         @media (max-width: 600px) {
             .box { padding: 20px; }
         }
+
+        /* Footer optimization and Accessibility fix */
+        .footer { content-visibility: auto; contain-intrinsic-size: 1000px; }
+        .footer h2 { font-size: 1.5rem; color: #00e676; margin-bottom: 15px; }
+        .footer h3 { font-size: 1.1rem; margin-bottom: 15px; color: #fff; }
     </style>
 </head>
 <body>
@@ -70,14 +101,12 @@
     <header class="navbar">
        <div class="logo">
         <a href="index.html">
-         <img src="assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high" loading="eager">
         </a>
       </div>
       
-      <div class="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
+      <div class="hamburger" role="button" aria-label="Toggle navigation menu" tabindex="0">
+          <span></span><span></span><span></span>
       </div>
 
        <nav id="nav-links">
@@ -119,12 +148,12 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-col brand-col">
-                <h3>SArixa</h3>
+                <h2>SArixa</h2>
                 <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
             </div>
 
             <div class="footer-col">
-                <h4>Company</h4>
+                <h3>Company</h3>
                 <ul>
                     <li><a href="about.html">About Us</a></li>
                     <li><a href="contact.html">Contact Us</a></li>
@@ -132,7 +161,7 @@
             </div>
 
             <div class="footer-col">
-                <h4>Legal</h4>
+                <h3>Legal</h3>
                 <ul>
                     <li><a href="privacy.html">Privacy Policy</a></li>
                     <li><a href="terms.html">Terms & Conditions</a></li>
