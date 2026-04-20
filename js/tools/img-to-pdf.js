@@ -265,7 +265,7 @@ function renderPreview() {
         <button class="overlay-btn zoom" title="Zoom"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
         <button class="overlay-btn crop" title="Crop"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg></button>
         <button class="overlay-btn rotate" title="Rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
-        <button class="overlay-btn delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+        <button class="overlay-btn delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2"></path></svg></button>
       </div>
       <div class="file-name">${img.file.name}</div>
       <div class="page-number">Page ${index + 1}</div>
@@ -907,60 +907,6 @@ previewBox.addEventListener("drop", (e) => {
   renderPreview();
   fileLabelText.innerText = "Add More Files";
 });
-
-// Optimized: requestAnimationFrame used for Scroll Event to prevent main-thread blocking
-let lastScrollTop = 0;
-let ticking = false;
-const navbar = document.querySelector('.navbar');
-
-window.addEventListener('scroll', function() {
-  if (!ticking) {
-    window.requestAnimationFrame(function() {
-      let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-      if (scrollTop > lastScrollTop && scrollTop > 80) {
-          navbar.classList.add('hidden-nav');
-      } else {
-          navbar.classList.remove('hidden-nav');
-      }
-      lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-      ticking = false;
-    });
-    ticking = true;
-  }
-}, { passive: true });
-
-// ==========================================
-// HAMBURGER MENU LOGIC
-// ==========================================
-const hamburger = document.querySelector('.hamburger');
-const navLinks = document.getElementById('nav-links');
-
-if (hamburger && navLinks) {
-  // Toggle menu on hamburger click
-  hamburger.addEventListener('click', (e) => {
-    e.stopPropagation(); // Prevents document click from firing immediately
-    navLinks.classList.toggle('active');
-    hamburger.classList.toggle('active');
-  });
-
-  // Close menu when clicking anywhere outside the navbar
-  document.addEventListener('click', (e) => {
-    if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-      navLinks.classList.remove('active');
-      hamburger.classList.remove('active');
-    }
-  });
-
-  // Close menu when a link is clicked
-  const navItems = navLinks.querySelectorAll('a');
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      hamburger.classList.remove('active');
-    });
-  });
-}
 
 // ==========================================
 // FIREBASE RATING POPUP LOGIC
