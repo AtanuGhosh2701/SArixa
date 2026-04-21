@@ -84,10 +84,16 @@
       <h1 class="tool-title">Convert Image to PDF</h1>
       <p class="tool-desc">Fast, secure, and professional. <strong>No uploads—your files never leave your device.</strong></p>
       
-      <div style="text-align:center;">
+      <div class="file-input-group">
         <label class="file-btn">
           <span id="fileLabelText">Select File</span>
           <input type="file" id="fileInput" accept="image/*" aria-label="Select Image Files" hidden multiple>
+        </label>
+        
+        <label class="file-btn mobile-only-btn camera-btn" title="Take a picture with Camera">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+          <span>Camera</span>
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" aria-label="Use Camera" hidden>
         </label>
       </div>
       
@@ -100,12 +106,16 @@
         
         <div class="setting-item">
           <label>Image Quality:</label>
-        <select id="qualitySelect" aria-label="Select Image Quality">
-          <option value="1">High</option>
-          <option value="0.7" selected>Medium</option>
-          <option value="0.4">Low</option>
-        </select>
-      </div>
+          <select id="qualitySelect" aria-label="Select Image Quality">
+            <option value="1">High</option>
+            <option value="target">Target File Size</option>
+            <option value="0.7" selected>Medium</option>
+            <option value="0.4">Low</option>
+          </select>
+          <div id="targetSizeContainer" class="target-size-container" style="display:none;">
+            <input type="number" id="targetSizeInput" placeholder="Target Size (e.g. 200) KB" min="10" aria-label="Target File Size in KB">
+          </div>
+        </div>
       
       <div class="setting-item">
         <label>Image Fit Mode:</label>
@@ -125,6 +135,14 @@
           <option value="letter">Letter</option>
         </select>
       </div>
+
+      <div class="setting-item" id="autoFillContainer" style="display:none;">
+        <label>Auto-Fill Page:</label>
+        <label class="switch">
+          <input type="checkbox" id="autoFillToggle" aria-label="Toggle Auto-Fill Page">
+          <span class="slider"></span>
+        </label>
+      </div>
       
       <div class="setting-item">
         <label>Orientation:</label>
@@ -139,16 +157,16 @@
         <input type="number" id="marginInput" value="10" min="0" aria-label="Margin in pixels">
       </div>
       
-      <div class="setting-item" style="position: relative;">
+      <div class="setting-item pos-relative">
         <label>Background Color:</label>
         <div class="bg-custom-wrapper">
-          <select id="bgMode" style="width: 100%;" aria-label="Select Background Color Mode">
+          <select id="bgMode" aria-label="Select Background Color Mode">
             <option value="white">White</option>
             <option value="black">Black</option>
             <option value="custom">Custom Color</option>
           </select>
           
-          <div id="customColorSection" style="display:none; position: relative;">
+          <div id="customColorSection" class="pos-relative" style="display:none;">
             <button id="colorSwatchBtn" type="button" class="color-swatch-btn" title="Pick a color" aria-label="Pick custom background color"></button>
             
             <div id="colorPopoverOverlay" class="picker-overlay"></div>
@@ -197,7 +215,7 @@
         </select>
       </div>
       
-      <div class="setting-item page-num-extra" style="display:none; position: relative;">
+      <div class="setting-item page-num-extra pos-relative" style="display:none;">
         <label>Number Color:</label>
         <div class="bg-custom-wrapper">
           <button id="fontColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #000000;" title="Pick a color" aria-label="Pick font color"></button>
@@ -237,7 +255,7 @@
       
       <div class="setting-item wm-extra wm-text-only" style="display:none;">
         <label>Watermark Text:</label>
-        <input type="text" id="wmTextInput" value="" placeholder="Enter text..." aria-label="Watermark Text">
+        <input type="text" id="wmTextInput" value="" placeholder="Enter text..." aria-label="Watermark Text" spellcheck="false">
       </div>
 
       <div class="setting-item wm-extra wm-text-only" style="display:none;">
@@ -312,7 +330,7 @@
         </select>
       </div>
       
-      <div class="setting-item wm-extra wm-text-only" style="display:none; position: relative;">
+      <div class="setting-item wm-extra wm-text-only pos-relative" style="display:none;">
         <label>Watermark Color:</label>
         <div class="bg-custom-wrapper">
           <button id="wmColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #808080;" title="Pick a color" aria-label="Pick watermark color"></button>
@@ -336,8 +354,16 @@
       
     </div>
     
-    <div style="text-align:center;">
-      <button class="generate-btn" id="generateBtn" type="button">
+    <div class="action-group-container">
+      <div class="batch-toggle-wrapper">
+        <label for="batchToggle">Create Individual PDFs</label>
+        <label class="switch">
+          <input type="checkbox" id="batchToggle" aria-label="Toggle Batch Mode">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <button class="generate-btn generate-btn-main" id="generateBtn" type="button">
         <span>Generate PDF</span>
         <div id="loader" class="spinner"></div>
       </button>
@@ -354,16 +380,16 @@
     </div>
     <div id="outputBox" class="output-box">Your output will appear here</div>
     
-    <div style="text-align:center; margin-top: 15px;">
+    <div class="preview-btn-container">
       <button class="preview-btn" id="previewBtn" type="button" disabled>Preview PDF</button>
     </div>
     
-    <div style="text-align:center; margin-top: 25px; margin-bottom: 15px; color:#b2ebf2; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+    <div class="filename-container">
       <label>File Name:</label>
-      <input type="text" id="fileNameInput" placeholder="converted" style="max-width: 300px;" aria-label="Enter output file name">
+      <input type="text" id="fileNameInput" class="filename-input" placeholder="converted" aria-label="Enter output file name" spellcheck="false">
     </div>
     
-    <div style="text-align:center;">
+    <div class="download-btn-container">
       <button class="action-btn" id="downloadBtn" type="button" disabled>Download</button>
     </div>
   </main>
@@ -403,9 +429,9 @@
       
       <div id="rating-initial-state">
         <h3>How was your experience?</h3>
-        <p style="font-size: 14px; color: #b2ebf2;">Rate SArixa to help us improve!</p>
+        <p class="rating-subtitle">Rate SArixa to help us improve!</p>
         
-        <div id="stars" style="font-size: 35px; cursor: pointer; color: #555; margin: 15px 0;">
+        <div id="stars" class="rating-stars">
           <span data-value="1">☆</span>
           <span data-value="2">☆</span>
           <span data-value="3">☆</span>
@@ -421,13 +447,13 @@
         <a href="../../contact.html" class="btn-feedback">Send your feedback</a>
       </div>
 
-      <div id="rating-success-state" style="display: none; flex-direction: column; align-items: center; padding: 10px 0;">
+      <div id="rating-success-state" class="rating-success-state" style="display: none;">
         <svg class="success-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
           <circle class="success-circle" cx="26" cy="26" r="25" fill="none"/>
           <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
         </svg>
-        <h3 style="color: #00e676; margin-top: 15px;">Rating Submitted!</h3>
-        <p style="color: #b2ebf2; font-size: 14px; margin-top: 5px;">Thanks for giving us your rating.</p>
+        <h3 class="rating-success-title">Rating Submitted!</h3>
+        <p class="rating-success-desc">Thanks for giving us your rating.</p>
       </div>
 
     </div>

@@ -5,13 +5,23 @@ import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.
 // DOM ELEMENTS
 // ==========================================
 const fileInput = document.getElementById("fileInput");
+const cameraInput = document.getElementById("cameraInput");
 const fileLabelText = document.getElementById("fileLabelText");
 const previewBox = document.getElementById("previewBox");
 const outputBox = document.getElementById("outputBox");
 const previewBtn = document.getElementById("previewBtn");
 const downloadBtn = document.getElementById("downloadBtn");
 const qualitySelect = document.getElementById("qualitySelect");
+const targetSizeContainer = document.getElementById("targetSizeContainer");
+const targetSizeInput = document.getElementById("targetSizeInput");
 const bgMode = document.getElementById("bgMode");
+
+// AUTO-FILL ELEMENTS
+const pageSizeSelect = document.getElementById("pageSize");
+const autoFillContainer = document.getElementById("autoFillContainer");
+const autoFillToggle = document.getElementById("autoFillToggle");
+
+const batchToggle = document.getElementById("batchToggle");
 
 // TOGGLES & OPTIONS
 const bwToggle = document.getElementById("bwToggle");
@@ -37,7 +47,7 @@ const selectedFontText = document.getElementById("selectedFontText");
 const wmFontList = document.getElementById("wmFontList");
 const formatBtns = document.querySelectorAll(".format-btn");
 
-// UI ELEMENTS FOR BACKGROUND COLOR PICKER
+// UI ELEMENTS FOR COLOR PICKERS
 const customColorSection = document.getElementById("customColorSection");
 const colorSwatchBtn = document.getElementById("colorSwatchBtn");
 const canvaColorPickerPanel = document.getElementById("canvaColorPickerPanel");
@@ -47,7 +57,6 @@ const hexColorPreview = document.getElementById("hexColorPreview");
 const bgCustomHex = document.getElementById("bgCustomHex");
 const colorOkBtn = document.getElementById("colorOkBtn");
 
-// UI ELEMENTS FOR FONT COLOR PICKER
 const fontColorSwatchBtn = document.getElementById("fontColorSwatchBtn");
 const fontColorPickerPanel = document.getElementById("fontColorPickerPanel");
 const fontColorPopoverOverlay = document.getElementById("fontColorPopoverOverlay");
@@ -56,7 +65,6 @@ const fontHexColorPreview = document.getElementById("fontHexColorPreview");
 const fontCustomHex = document.getElementById("fontCustomHex");
 const fontColorOkBtn = document.getElementById("fontColorOkBtn");
 
-// UI ELEMENTS FOR WATERMARK COLOR PICKER
 const wmColorSwatchBtn = document.getElementById("wmColorSwatchBtn");
 const wmColorPickerPanel = document.getElementById("wmColorPickerPanel");
 const wmColorPopoverOverlay = document.getElementById("wmColorPopoverOverlay");
@@ -66,7 +74,6 @@ const wmCustomHex = document.getElementById("wmCustomHex");
 const wmColorOkBtn = document.getElementById("wmColorOkBtn");
 
 const generateBtn = document.getElementById("generateBtn");
-const pageSize = document.getElementById("pageSize");
 const orientation = document.getElementById("orientation");
 const marginInput = document.getElementById("marginInput");
 const fitMode = document.getElementById("fitMode");
@@ -84,27 +91,38 @@ let images = [];
 let pdfBlob = null;
 let isPreviewOpen = false;
 
-// Watermark Image & Font Setup
 let wmOriginalImageObj = null;
 let selectedFont = "helvetica";
-// Only Bold and Italic kept
 let wmFormats = { bold: false, italic: false };
 
-// Show/Hide Page Number Extra Options
-pageNumToggle.addEventListener('change', (e) => {
-  pageNumExtraFields.forEach(el => {
-    el.style.display = e.target.checked ? "block" : "none";
-  });
+// ==========================================
+// EVENT LISTENERS
+// ==========================================
+
+// Handle Show/Hide for Auto-Fill Page
+pageSizeSelect.addEventListener('change', (e) => {
+  if (e.target.value === 'original') {
+    autoFillContainer.style.display = 'none';
+    autoFillToggle.checked = false;
+  } else {
+    autoFillContainer.style.display = 'block';
+  }
 });
 
-// Show/Hide Watermark Extra Options
+pageNumToggle.addEventListener('change', (e) => {
+  pageNumExtraFields.forEach(el => el.style.display = e.target.checked ? "block" : "none");
+});
+
+qualitySelect.addEventListener('change', (e) => {
+  targetSizeContainer.style.display = e.target.value === 'target' ? 'block' : 'none';
+});
+
 wmToggle.addEventListener('change', (e) => {
   const show = e.target.checked;
   wmExtraFields.forEach(el => el.style.display = show ? "block" : "none");
   if (show) updateWmTypeFields();
 });
 
-// Switch between Text/Image Watermark options
 wmType.addEventListener('change', updateWmTypeFields);
 
 function updateWmTypeFields() {
@@ -113,22 +131,11 @@ function updateWmTypeFields() {
   document.querySelectorAll('.wm-image-only').forEach(el => el.style.display = !isText ? 'block' : 'none');
 }
 
-// Sliders value updates
 wmOpacity.addEventListener('input', (e) => { document.getElementById("wmOpacityVal").innerText = e.target.value; });
 wmSize.addEventListener('input', (e) => { document.getElementById("wmSizeVal").innerText = e.target.value; });
 
-// ==========================================
-// CUSTOM FONT DROPDOWN LOGIC
-// ==========================================
-fontDropdown.addEventListener("click", () => {
-  fontDropdown.classList.toggle("open");
-});
-
-document.addEventListener("click", (e) => {
-  if (!fontDropdown.contains(e.target)) {
-    fontDropdown.classList.remove("open");
-  }
-});
+fontDropdown.addEventListener("click", () => fontDropdown.classList.toggle("open"));
+document.addEventListener("click", (e) => { if (!fontDropdown.contains(e.target)) fontDropdown.classList.remove("open"); });
 
 wmFontList.addEventListener("click", (e) => {
   if(e.target.classList.contains("font-item")) {
@@ -136,14 +143,11 @@ wmFontList.addEventListener("click", (e) => {
     e.target.classList.add("active");
     selectedFont = e.target.getAttribute("data-font");
     selectedFontText.innerText = e.target.innerText;
-    
-    // Updates the visual font style of the selected text in the UI
     selectedFontText.style.fontFamily = e.target.style.fontFamily;
     fontDropdown.classList.remove("open");
   }
 });
 
-// Text Format Toggles (Only Bold and Italic)
 formatBtns.forEach(btn => {
   btn.addEventListener("click", () => {
     btn.classList.toggle("active");
@@ -152,24 +156,17 @@ formatBtns.forEach(btn => {
   });
 });
 
-// Load original watermark image without modifying yet
 wmImageInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) {
     wmFileNameText.innerText = file.name;
     const img = new Image();
-    img.onload = () => {
-      wmOriginalImageObj = img;
-    };
+    img.onload = () => { wmOriginalImageObj = img; };
     img.src = URL.createObjectURL(file);
   }
 });
 
-// ==========================================
-// COLOR PICKERS SETUP
-// ==========================================
-
-// 1. Background Color
+// Color Pickers Setup
 const colorPicker = new iro.ColorPicker("#iroPickerContainer", { width: 220, color: "#ffffff", borderWidth: 1, borderColor: "#00e676", layout: [ { component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } } ] });
 bgMode.onchange = () => {
   if (bgMode.value === "custom") customColorSection.style.display = "block";
@@ -182,7 +179,6 @@ colorPicker.on('color:change', function(color) { const hex = color.hexString.toU
 bgCustomHex.addEventListener('input', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; if(val.match(/^#[0-9A-Fa-f]{6}$/i)) { colorPicker.color.hexString = val; hexColorPreview.style.backgroundColor = val; colorSwatchBtn.style.backgroundColor = val; } });
 bgCustomHex.addEventListener('blur', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; e.target.value = val.toUpperCase(); });
 
-// 2. Font Color
 const fontColorPicker = new iro.ColorPicker("#fontIroPickerContainer", { width: 220, color: "#000000", borderWidth: 1, borderColor: "#00e676", layout: [ { component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } } ] });
 fontColorSwatchBtn.onclick = (e) => { e.stopPropagation(); fontColorPickerPanel.style.display = "flex"; fontColorPopoverOverlay.style.display = window.innerWidth <= 768 ? "block" : "none"; };
 function closeFontColorPopup() { fontColorPickerPanel.style.display = "none"; fontColorPopoverOverlay.style.display = "none"; }
@@ -191,7 +187,6 @@ fontColorPicker.on('color:change', function(color) { const hex = color.hexString
 fontCustomHex.addEventListener('input', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; if(val.match(/^#[0-9A-Fa-f]{6}$/i)) { fontColorPicker.color.hexString = val; fontHexColorPreview.style.backgroundColor = val; fontColorSwatchBtn.style.backgroundColor = val; } });
 fontCustomHex.addEventListener('blur', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; e.target.value = val.toUpperCase(); });
 
-// 3. Watermark Color
 const wmColorPicker = new iro.ColorPicker("#wmIroPickerContainer", { width: 220, color: "#808080", borderWidth: 1, borderColor: "#00e676", layout: [ { component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } } ] });
 wmColorSwatchBtn.onclick = (e) => { e.stopPropagation(); wmColorPickerPanel.style.display = "flex"; wmColorPopoverOverlay.style.display = window.innerWidth <= 768 ? "block" : "none"; };
 function closeWmColorPopup() { wmColorPickerPanel.style.display = "none"; wmColorPopoverOverlay.style.display = "none"; }
@@ -200,7 +195,6 @@ wmColorPicker.on('color:change', function(color) { const hex = color.hexString.t
 wmCustomHex.addEventListener('input', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; if(val.match(/^#[0-9A-Fa-f]{6}$/i)) { wmColorPicker.color.hexString = val; wmHexColorPreview.style.backgroundColor = val; wmColorSwatchBtn.style.backgroundColor = val; } });
 wmCustomHex.addEventListener('blur', function(e) { let val = e.target.value; if (!val.startsWith("#")) val = "#" + val; e.target.value = val.toUpperCase(); });
 
-// Close popups on outside click
 document.addEventListener("click", (e) => {
   if (bgMode.value === "custom" && canvaColorPickerPanel.style.display === "flex") { if (!canvaColorPickerPanel.contains(e.target) && e.target !== colorSwatchBtn) closeColorPopup(); }
   if (fontColorPickerPanel.style.display === "flex") { if (!fontColorPickerPanel.contains(e.target) && e.target !== fontColorSwatchBtn) closeFontColorPopup(); }
@@ -208,7 +202,7 @@ document.addEventListener("click", (e) => {
 });
 
 // ==========================================
-// EVENT LISTENERS & INITIALIZATION
+// CORE FUNCTIONS
 // ==========================================
 const sortable = new Sortable(previewBox, {
   animation: 200,
@@ -227,18 +221,19 @@ const sortable = new Sortable(previewBox, {
   }
 });
 
-fileInput.onchange = (e) => {
+const handleFileInput = (e) => {
+  if (!e.target.files.length) return;
   [...e.target.files].forEach(file => {
     images.push({ file, url: URL.createObjectURL(file), rotation: 0 });
   });
   renderPreview();
   fileLabelText.innerText = "Add More Files";
-  fileInput.value = "";
+  e.target.value = ""; 
 };
 
-// ==========================================
-// CORE FUNCTIONS
-// ==========================================
+fileInput.onchange = handleFileInput;
+if (cameraInput) cameraInput.onchange = handleFileInput;
+
 function renderPreview() {
   previewBox.innerHTML = "";
   
@@ -257,6 +252,7 @@ function renderPreview() {
     const card = document.createElement("div");
     card.className = "image-card";
 
+    // Reverted to exactly 4 buttons (Zoom, Crop, Rotate, Delete). No Undo/Reset.
     card.innerHTML = `
       <div class="page-badge">Page ${index + 1}</div>
       <img class="img-thumb" src="${img.url}" alt="Preview of ${img.file.name}" style="transform:rotate(${img.rotation}deg)">
@@ -293,7 +289,6 @@ function openCropper(img) {
   const modal = document.createElement("div");
   modal.className = "crop-modal";
   
-  // NEW HTML FOR TILT CONTROLS ADDED HERE
   modal.innerHTML = `
     <div class="crop-area"><img id="cropImage" alt="Crop preview image"></div>
     <div class="crop-tilt-container">
@@ -331,7 +326,6 @@ function openCropper(img) {
 
     const cropper = new Cropper(imageElement, { viewMode: 1, autoCropArea: 1, background: false, responsive: true, checkOrientation: false });
 
-    // NEW LOGIC FOR TILT SCALE/SLIDER
     const tiltSlider = modal.querySelector("#tiltSlider");
     const tiltVal = modal.querySelector("#tiltVal");
     const resetTiltBtn = modal.querySelector("#resetTiltBtn");
@@ -339,7 +333,7 @@ function openCropper(img) {
     tiltSlider.addEventListener("input", (e) => {
       const val = Number(e.target.value);
       tiltVal.innerText = val;
-      cropper.rotateTo(val); // This uses Cropper.js hardware accelerated rotate method
+      cropper.rotateTo(val); 
     });
 
     resetTiltBtn.addEventListener("click", () => {
@@ -412,13 +406,39 @@ function compressImage(imgObj, quality) {
   });
 }
 
+async function compressToTarget(imgObj, targetBytes) {
+  let minQ = 0.05;
+  let maxQ = 1.0;
+  let bestData = null;
+  let bestDiff = Infinity;
+
+  for(let i=0; i<6; i++) {
+    let q = (minQ + maxQ) / 2;
+    let res = await compressImage(imgObj, q);
+    
+    let bytes = Math.round((res.data.length - 22) * 0.75); 
+    let diff = Math.abs(bytes - targetBytes);
+
+    if(diff < bestDiff) {
+      bestDiff = diff;
+      bestData = res;
+    }
+
+    if(bytes > targetBytes) {
+      maxQ = q; 
+    } else {
+      minQ = q; 
+    }
+  }
+  return bestData;
+}
+
 // ==========================================
 // PDF GENERATION (WEB WORKER IMPLEMENTATION)
 // ==========================================
 generateBtn.onclick = async () => {
   if (!images.length) return alert("Select images first");
   
-  // Validation for missing inputs when watermark is ON
   if (wmToggle.checked) {
     if (wmType.value === 'image' && !wmOriginalImageObj) {
         return alert("Please select a Logo Image for Watermark!");
@@ -427,6 +447,21 @@ generateBtn.onclick = async () => {
         return alert("Please enter text for the Watermark!");
     }
   }
+
+  const isTargetMode = qualitySelect.value === 'target';
+  let targetBytesPerImage = 0;
+  
+  if (isTargetMode) {
+    const targetKb = parseFloat(targetSizeInput.value);
+    if (!targetKb || targetKb <= 0) return alert("Please enter a valid target size in KB!");
+    
+    const totalTargetBytes = Math.max(1024, (targetKb * 1024) - 10240);
+    targetBytesPerImage = totalTargetBytes / images.length;
+  }
+  
+  const staticQuality = isTargetMode ? 0.7 : parseFloat(qualitySelect.value); 
+  const isBatchMode = batchToggle.checked;
+  const isAutoFill = autoFillToggle.checked; 
   
   generateBtn.disabled = true;
   loader.style.display = "inline-block";
@@ -444,20 +479,17 @@ generateBtn.onclick = async () => {
     previewBtn.innerText = "Preview PDF";
   }
 
-  const formatSize = pageSize.value;
-  const quality = parseFloat(qualitySelect.value);
+  const formatSize = pageSizeSelect.value;
   const orientationVal = orientation.value;
   const margin = +marginInput.value;
   const fit = fitMode.value;
   const isBW = bwToggle.checked;
   
-  // Page Number Data
   const addPageNumbers = pageNumToggle.checked;
   const pageNumberPosition = pageNumPos.value;
-  const pageNumberSizeVal = 18; // Defaulting to Large size always
+  const pageNumberSizeVal = 18; 
   const pageNumberColorHex = fontColorPicker.color.hexString;
   
-  // Watermark Data
   const addWatermark = wmToggle.checked;
   const wmTypeVal = wmType.value;
   const wmTextVal = wmTextInput.value.trim();
@@ -469,7 +501,6 @@ generateBtn.onclick = async () => {
 
   const pdfBgColorHex = (bgMode.value === "black") ? "#000000" : (bgMode.value === "custom" ? colorPicker.color.hexString : "#ffffff");
 
-  // Prepare Image Watermark Base64 before passing to Worker
   let finalWmImageBase64 = null;
   let finalWmImageAspect = 1;
   
@@ -511,7 +542,7 @@ generateBtn.onclick = async () => {
         try {
           if (action === "addPage") {
             const { 
-              data, imgWidth, imgHeight, isFirst, formatSize, orientationVal, margin, fit, index, bgColorHex, 
+              images, isFirst, formatSize, orientationVal, margin, fit, index, bgColorHex, 
               isBW, addPageNumbers, fontColorHex, fontPos, fontNumSize,
               addWatermark, wmType, wmText, wmImage, wmImageAspect, wmPos, wmSize, wmOpacity, wmAngle, wmColorHex,
               wmFont, wmBold, wmItalic
@@ -519,19 +550,20 @@ generateBtn.onclick = async () => {
             const { jsPDF } = self.jspdf;
             
             let pw, ph;
-            let x = 0, y = 0, w = imgWidth, h = imgHeight;
-
+            
+            // Layout initialization
             if (formatSize === "original") {
-              pw = imgWidth + (margin * 2);
-              ph = imgHeight + (margin * 2);
+              let img = images[0]; 
+              pw = img.imgWidth + (margin * 2);
+              ph = img.imgHeight + (margin * 2);
               const imgOrientation = pw > ph ? "landscape" : "portrait";
+              
               if (isFirst) pdf = new jsPDF({ format: [pw, ph], orientation: imgOrientation, unit: "pt" });
               else pdf.addPage([pw, ph], imgOrientation);
               
-              x = margin;
-              y = margin;
-              w = imgWidth;
-              h = imgHeight;
+              pdf.setFillColor(bgColorHex);
+              pdf.rect(0, 0, pw, ph, "F");
+              pdf.addImage(img.data, "JPEG", margin, margin, img.imgWidth, img.imgHeight);
             } else {
               if (isFirst) pdf = new jsPDF({ format: formatSize, orientation: orientationVal, unit: "pt" });
               else pdf.addPage(formatSize, orientationVal);
@@ -539,32 +571,39 @@ generateBtn.onclick = async () => {
               pw = pdf.internal.pageSize.getWidth();
               ph = pdf.internal.pageSize.getHeight();
               
-              w = pw - margin * 2;
-              h = w * (imgHeight / imgWidth);
+              pdf.setFillColor(bgColorHex);
+              pdf.rect(0, 0, pw, ph, "F");
               
-              if (fit === "height") {
-                h = ph - margin * 2;
-                w = h * (imgWidth / imgHeight);
-              } else if (fit === "auto") {
-                const imgAspect = imgWidth / imgHeight;
-                const pageAspect = (pw - margin * 2) / (ph - margin * 2);
-                if (imgAspect > pageAspect) {
-                  w = pw - margin * 2;
-                  h = w / imgAspect;
-                } else {
-                  h = ph - margin * 2;
-                  w = h * imgAspect;
-                }
+              for(let i=0; i<images.length; i++) {
+                 let img = images[i];
+                 if(img.isOriginal) {
+                    let w = pw - margin * 2;
+                    let h = w * (img.imgHeight / img.imgWidth);
+                    
+                    if (fit === "height") {
+                      h = ph - margin * 2;
+                      w = h * (img.imgWidth / img.imgHeight);
+                    } else if (fit === "auto") {
+                      const imgAspect = img.imgWidth / img.imgHeight;
+                      const pageAspect = (pw - margin * 2) / (ph - margin * 2);
+                      if (imgAspect > pageAspect) {
+                        w = pw - margin * 2;
+                        h = w / imgAspect;
+                      } else {
+                        h = ph - margin * 2;
+                        w = h * imgAspect;
+                      }
+                    }
+                    let x = (pw - w) / 2;
+                    let y = (ph - h) / 2;
+                    pdf.addImage(img.data, "JPEG", x, y, w, h);
+                 } else {
+                    // Auto-Fill actual drawing
+                    pdf.addImage(img.data, "JPEG", img.x, img.y, img.w, img.h);
+                 }
               }
-              x = (pw - w) / 2;
-              y = (ph - h) / 2;
             }
 
-            pdf.setFillColor(bgColorHex);
-            pdf.rect(0, 0, pw, ph, "F");
-            pdf.addImage(data, "JPEG", x, y, w, h);
-
-            // ================= Add Watermark Logic =================
             if (addWatermark) {
               pdf.saveGraphicsState();
               try {
@@ -576,18 +615,15 @@ generateBtn.onclick = async () => {
               let wmPad = Math.max(20, margin);
 
               if (wmType === 'text' && wmText) {
-                
                 let finalWmColor = wmColorHex;
                 pdf.setTextColor(finalWmColor);
                 
-                // Set Font and Style
                 let fontStyle = "normal";
                 if(wmBold && wmItalic) fontStyle = "bolditalic";
                 else if(wmBold) fontStyle = "bold";
                 else if(wmItalic) fontStyle = "italic";
                 pdf.setFont(wmFont, fontStyle);
                 
-                // Anti-Clipping Size Calculation for Text
                 let safeW = pw - (wmPad * 2);
                 let safeH = ph - (wmPad * 2);
                 let targetW = safeW * wmSize;
@@ -608,11 +644,9 @@ generateBtn.onclick = async () => {
                   case "top-right": posX = pw - wmPad; posY = wmPad + wmFontSize; alignVal = "right"; break;
                   case "top-left": posX = wmPad; posY = wmPad + wmFontSize; alignVal = "left"; break;
                 }
-
                 pdf.text(wmText, posX, posY, { align: alignVal, angle: parseFloat(wmAngle) });
 
               } else if (wmType === 'image' && wmImage) {
-                
                 let maxW = (pw - wmPad * 2) * wmSize;
                 let maxH = (ph - wmPad * 2) * wmSize;
                 
@@ -633,14 +667,11 @@ generateBtn.onclick = async () => {
                   case "top-right": posX = pw - wmPad - imgW; posY = wmPad; break;
                   case "top-left": posX = wmPad; posY = wmPad; break;
                 }
-                
                 pdf.addImage(wmImage, 'PNG', posX, posY, imgW, imgH);
               }
-              
               pdf.restoreGraphicsState();
             }
 
-            // ================= Add Page Number Logic =================
             if (addPageNumbers) {
               pdf.setFont("helvetica", "normal");
               pdf.setFontSize(fontNumSize || 18); 
@@ -710,71 +741,210 @@ generateBtn.onclick = async () => {
         });
     };
 
-    for (let i = 0; i < images.length; i++) {
-      outputBox.innerHTML = `Processing Image ${i + 1} of ${images.length}...`;
-      const { data, width, height } = await compressImage(images[i], quality);
+    if (isBatchMode) {
+      for (let i = 0; i < images.length; i++) {
+        outputBox.innerHTML = `Batch Processing Image ${i + 1} of ${images.length}...`;
+        
+        let compressedRes;
+        if (isTargetMode) {
+          compressedRes = await compressToTarget(images[i], targetBytesPerImage);
+        } else {
+          compressedRes = await compressImage(images[i], staticQuality);
+        }
+        
+        const { data, width, height } = compressedRes;
+        
+        let currentPageImages = [{ data, imgWidth: width, imgHeight: height, isOriginal: true }];
+        
+        await addPageToPDF({
+            images: currentPageImages,
+            isFirst: true, 
+            formatSize: formatSize,
+            orientationVal: orientationVal,
+            margin: margin,
+            fit: fit,
+            index: 0, 
+            bgColorHex: pdfBgColorHex,
+            isBW: isBW,
+            addPageNumbers: addPageNumbers,
+            fontColorHex: pageNumberColorHex,
+            fontPos: pageNumberPosition,
+            fontNumSize: pageNumberSizeVal,
+            addWatermark: addWatermark,
+            wmType: wmTypeVal,
+            wmText: wmTextVal,
+            wmImage: finalWmImageBase64,
+            wmImageAspect: finalWmImageAspect,
+            wmPos: wmPosVal,
+            wmSize: wmSizeVal,
+            wmOpacity: wmOpacityVal,
+            wmAngle: wmAngleVal,
+            wmColorHex: wmColorHexVal,
+            wmFont: selectedFont,
+            wmBold: wmFormats.bold,
+            wmItalic: wmFormats.italic
+        });
+
+        let singlePdfBlob = await finishPDF();
+        
+        let originalName = images[i].file.name;
+        let baseName = originalName.substring(0, originalName.lastIndexOf('.')) || originalName;
+        let downloadName = baseName + ".pdf";
+
+        const url = URL.createObjectURL(singlePdfBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = downloadName;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        const percentDone = Math.round(((i + 1) / images.length) * 100);
+        progressBar.style.width = percentDone + "%";
+        progressText.innerText = percentDone + "%";
+
+        await new Promise(resolve => setTimeout(resolve, 800)); 
+      }
       
-      await addPageToPDF({
-          data: data,
-          imgWidth: width,
-          imgHeight: height,
-          isFirst: (i === 0),
-          formatSize: formatSize,
-          orientationVal: orientationVal,
-          margin: margin,
-          fit: fit,
-          index: i,
-          bgColorHex: pdfBgColorHex,
-          isBW: isBW,
-          addPageNumbers: addPageNumbers,
-          fontColorHex: pageNumberColorHex,
-          fontPos: pageNumberPosition,
-          fontNumSize: pageNumberSizeVal,
-          addWatermark: addWatermark,
-          wmType: wmTypeVal,
-          wmText: wmTextVal,
-          wmImage: finalWmImageBase64,
-          wmImageAspect: finalWmImageAspect,
-          wmPos: wmPosVal,
-          wmSize: wmSizeVal,
-          wmOpacity: wmOpacityVal,
-          wmAngle: wmAngleVal,
-          wmColorHex: wmColorHexVal,
-          wmFont: selectedFont,
-          wmBold: wmFormats.bold,
-          wmItalic: wmFormats.italic
-      });
+      pdfWorker.terminate();
+      URL.revokeObjectURL(workerUrl);
+      
+      progressBar.style.width = "100%";
+      progressText.innerText = "100%";
+      
+      outputBox.innerHTML = "<span style='color:#00e676'>Batch Conversion Complete! ✔<br><small>All files have been downloaded.</small></span>";
+      downloadBtn.disabled = true; 
+      previewBtn.disabled = true;  
 
-      const percentDone = Math.round(((i + 1) / images.length) * 100);
-      progressBar.style.width = percentDone + "%";
-      progressText.innerText = percentDone + "%";
+    } else {
+      // COMBINED PDF MODE
+      let currentPageImages = [];
+      let currentX = margin;
+      let currentY = margin;
+      let rowHeight = 0;
+      let pageIndex = 0;
+      
+      let pw = 0, ph = 0;
+      if (formatSize !== 'original') {
+          const sizes = { a4: {w:595.28, h:841.89}, a3: {w:841.89, h:1190.55}, letter: {w:612, h:792} };
+          pw = sizes[formatSize].w;
+          ph = sizes[formatSize].h;
+          if (orientationVal === 'landscape') {
+              pw = sizes[formatSize].h;
+              ph = sizes[formatSize].w;
+          }
+      }
 
-      await new Promise(resolve => setTimeout(resolve, 50));
+      for (let i = 0; i < images.length; i++) {
+        outputBox.innerHTML = `Processing Image ${i + 1} of ${images.length}...`;
+        
+        let compressedRes;
+        if (isTargetMode) {
+          compressedRes = await compressToTarget(images[i], targetBytesPerImage);
+        } else {
+          compressedRes = await compressImage(images[i], staticQuality);
+        }
+        
+        const { data, width, height } = compressedRes;
+        
+        if (isAutoFill && formatSize !== 'original') {
+            // Auto-Fill Grouping logic with exact margin spacing
+            let printW = width;
+            let printH = height;
+            let maxAllowedW = pw - margin * 2;
+            let maxAllowedH = ph - margin * 2;
+            
+            if (printW > maxAllowedW) {
+                let ratio = maxAllowedW / printW;
+                printW = maxAllowedW;
+                printH = printH * ratio;
+            }
+            if (printH > maxAllowedH) {
+                let ratio = maxAllowedH / printH;
+                printH = maxAllowedH;
+                printW = printW * ratio;
+            }
+            
+            // Check horizontal space using user defined margin
+            if (currentPageImages.length > 0 && currentX + printW > pw - margin) {
+                currentX = margin;
+                currentY += rowHeight + margin; // vertical gap is exact margin
+                rowHeight = 0;
+            }
+            
+            // Check vertical space using user defined margin
+            if (currentPageImages.length > 0 && currentY + printH > ph - margin) {
+                await addPageToPDF({
+                    images: currentPageImages,
+                    isFirst: (pageIndex === 0),
+                    formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
+                    bgColorHex: pdfBgColorHex, isBW: isBW,
+                    addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
+                    addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+                });
+                pageIndex++;
+                currentPageImages = [];
+                currentX = margin;
+                currentY = margin;
+                rowHeight = 0;
+            }
+            
+            currentPageImages.push({ data, x: currentX, y: currentY, w: printW, h: printH, isOriginal: false });
+            currentX += printW + margin; // horizontal gap is exact margin
+            rowHeight = Math.max(rowHeight, printH);
+            
+        } else {
+            // Normal 1 image per page logic
+            currentPageImages = [{ data, imgWidth: width, imgHeight: height, isOriginal: true }];
+            await addPageToPDF({
+                images: currentPageImages,
+                isFirst: (pageIndex === 0),
+                formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
+                bgColorHex: pdfBgColorHex, isBW: isBW,
+                addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
+                addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+            });
+            pageIndex++;
+            currentPageImages = [];
+        }
+
+        const percentDone = Math.round(((i + 1) / images.length) * 100);
+        progressBar.style.width = percentDone + "%";
+        progressText.innerText = percentDone + "%";
+
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      
+      if (currentPageImages.length > 0) {
+          await addPageToPDF({
+              images: currentPageImages,
+              isFirst: (pageIndex === 0),
+              formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
+              bgColorHex: pdfBgColorHex, isBW: isBW,
+              addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
+              addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+          });
+      }
+      
+      outputBox.innerHTML = "Finalizing PDF...";
+      pdfBlob = await finishPDF();
+      
+      pdfWorker.terminate();
+      URL.revokeObjectURL(workerUrl);
+      
+      progressBar.style.width = "100%";
+      progressText.innerText = "100%";
+      
+      outputBox.innerHTML = "<span style='color:#00e676'>PDF Ready ✔</span>";
+      downloadBtn.disabled = false;
+      previewBtn.disabled = false;
     }
-    
-    outputBox.innerHTML = "Finalizing PDF...";
-    pdfBlob = await finishPDF();
-    
-    pdfWorker.terminate();
-    URL.revokeObjectURL(workerUrl);
-    
-    progressBar.style.width = "100%";
-    progressText.innerText = "100%";
-    
-    outputBox.innerHTML = "<span style='color:#00e676'>PDF Ready ✔</span>";
-    downloadBtn.disabled = false;
-    previewBtn.disabled = false;
 
-    // ===============================================
-    // SHOW POPUP ONLY IF USER HAS NOT RATED YET
-    // ===============================================
     setTimeout(() => {
       const popup = document.getElementById('rating-popup');
       if (popup && !localStorage.getItem('hasInteractedWithSarixaRating')) {
         popup.style.display = 'flex';
       }
     }, 1500); 
-    // ===============================================
     
   } catch (err) {
     console.error(err);
@@ -826,7 +996,7 @@ previewBtn.onclick = async () => {
     const typedArray = new Uint8Array(arrayBuffer);
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
+    
     const loadingTask = pdfjsLib.getDocument({ data: typedArray });
     const pdf = await loadingTask.promise;
 
@@ -921,7 +1091,6 @@ downloadBtn.onclick = () => {
   setTimeout(() => URL.revokeObjectURL(url), 200);
 };
 
-// Optimized: Passive Event Listeners for Drag/Drop to prevent scroll blocking
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
   previewBox.addEventListener(eventName, e => {
     if (window.matchMedia("(pointer: coarse)").matches) return;

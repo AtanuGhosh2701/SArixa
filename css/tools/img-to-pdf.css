@@ -63,8 +63,15 @@
   cursor: not-allowed;
 }
 
+/* Hide Camera Button on PC Screens (Screens wider than 768px) */
+@media (min-width: 769px) {
+  .mobile-only-btn {
+    display: none !important;
+  }
+}
+
 /* -----------------------------------------
-   3. STANDARD FORM INPUTS
+   3. STANDARD FORM INPUTS & AUTOFILL FIX
 ----------------------------------------- */
 select,
 input[type="text"],
@@ -86,16 +93,43 @@ input[type="number"]:focus {
   border-color: #00e676;
 }
 
-/* Browser Autofill Fix (Keeps background dark, allows white text color) */
-input[type="text"]:-webkit-autofill,
-input[type="text"]:-webkit-autofill:hover, 
-input[type="text"]:-webkit-autofill:focus, 
-input[type="text"]:-webkit-autofill:active {
+/* Universal Autofill Fix for ALL Inputs (Watermark, Filename, Password) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active,
+#wmTextInput:-webkit-autofill,
+#fileNameInput:-webkit-autofill,
+#pdfPasswordInput:-webkit-autofill {
   -webkit-text-fill-color: #ffffff !important;
+  color: #ffffff !important;
   -webkit-box-shadow: 0 0 0px 1000px #012f28 inset !important;
   box-shadow: 0 0 0px 1000px #012f28 inset !important;
   transition: background-color 5000s ease-in-out 0s;
   caret-color: #ffffff !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+}
+
+/* Fix for text turning black when selected inside auto-filled input */
+input:-webkit-autofill::selection,
+#wmTextInput:-webkit-autofill::selection,
+#fileNameInput:-webkit-autofill::selection {
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: rgba(0, 230, 118, 0.4) !important;
+}
+
+/* Text Highlight/Selection Color Fix (Prevents text turning black when selected) */
+input::selection,
+textarea::selection {
+  background-color: rgba(0, 230, 118, 0.4) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Added to override default autofill text color */
+}
+::-moz-selection {
+  background-color: rgba(0, 230, 118, 0.4) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important; /* Added to override default autofill text color */
 }
 
 /* Range Slider Customization */
@@ -750,7 +784,6 @@ input:checked + .slider:before {
 
 .cropper-view-box { outline: 2px solid #00e676 !important; }
 
-/* NEW TILT CONTAINER */
 .crop-tilt-container {
   display: flex;
   align-items: center;
@@ -943,3 +976,123 @@ input:checked + .slider:before {
 @keyframes stroke { 100% { stroke-dashoffset: 0; } }
 @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
 @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 50px rgba(0, 230, 118, 0.1); } }
+
+/* -----------------------------------------
+   11. NEW STRUCTURAL CLASSES (Clean HTML)
+----------------------------------------- */
+.file-input-group {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.camera-btn {
+  background: #00b0ff !important;
+  color: #002233 !important;
+}
+
+.camera-btn svg {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.target-size-container {
+  margin-top: 10px;
+}
+
+.pos-relative {
+  position: relative;
+}
+
+.action-group-container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.batch-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #b2ebf2;
+  font-weight: bold;
+  background: #012f28;
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+}
+
+.batch-toggle-wrapper label:not(.switch) {
+  cursor: pointer;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.batch-toggle-wrapper .switch {
+  margin: 0;
+  transform: scale(0.9);
+}
+
+.generate-btn-main {
+  margin: 0 !important;
+  padding: 14px 30px !important;
+  font-size: 1.1rem !important;
+}
+
+.preview-btn-container {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.filename-container {
+  text-align: center;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #b2ebf2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.filename-input {
+  max-width: 300px;
+}
+
+.download-btn-container {
+  text-align: center;
+}
+
+.rating-subtitle {
+  font-size: 14px;
+  color: #b2ebf2;
+}
+
+.rating-stars {
+  font-size: 35px;
+  cursor: pointer;
+  color: #555;
+  margin: 15px 0;
+}
+
+.rating-success-state {
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.rating-success-title {
+  color: #00e676;
+  margin-top: 15px;
+}
+
+.rating-success-desc {
+  color: #b2ebf2;
+  font-size: 14px;
+  margin-top: 5px;
+}
