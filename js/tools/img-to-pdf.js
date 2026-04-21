@@ -17,7 +17,6 @@ const bgMode = document.getElementById("bgMode");
 const bwToggle = document.getElementById("bwToggle");
 const pageNumToggle = document.getElementById("pageNumToggle");
 const pageNumPos = document.getElementById("pageNumPos");
-const pageNumSize = document.getElementById("pageNumSize");
 const pageNumExtraFields = document.querySelectorAll(".page-num-extra");
 
 // WATERMARK ELEMENTS
@@ -455,7 +454,7 @@ generateBtn.onclick = async () => {
   // Page Number Data
   const addPageNumbers = pageNumToggle.checked;
   const pageNumberPosition = pageNumPos.value;
-  const pageNumberSizeVal = parseInt(pageNumSize.value); 
+  const pageNumberSizeVal = 18; // Defaulting to Large size always
   const pageNumberColorHex = fontColorPicker.color.hexString;
   
   // Watermark Data
@@ -644,7 +643,7 @@ generateBtn.onclick = async () => {
             // ================= Add Page Number Logic =================
             if (addPageNumbers) {
               pdf.setFont("helvetica", "normal");
-              pdf.setFontSize(fontNumSize || 12); 
+              pdf.setFontSize(fontNumSize || 18); 
               pdf.setTextColor(fontColorHex); 
 
               let xPos, yPos, alignVal;
@@ -654,9 +653,9 @@ generateBtn.onclick = async () => {
                 case "bottom-center": xPos = pw / 2; yPos = ph - pad; alignVal = "center"; break;
                 case "bottom-right": xPos = pw - pad; yPos = ph - pad; alignVal = "right"; break;
                 case "bottom-left": xPos = pad; yPos = ph - pad; alignVal = "left"; break;
-                case "top-center": xPos = pw / 2; yPos = pad + (fontNumSize === 18 ? 15 : 10); alignVal = "center"; break;
-                case "top-right": xPos = pw - pad; yPos = pad + (fontNumSize === 18 ? 15 : 10); alignVal = "right"; break;
-                case "top-left": xPos = pad; yPos = pad + (fontNumSize === 18 ? 15 : 10); alignVal = "left"; break;
+                case "top-center": xPos = pw / 2; yPos = pad + 15; alignVal = "center"; break;
+                case "top-right": xPos = pw - pad; yPos = pad + 15; alignVal = "right"; break;
+                case "top-left": xPos = pad; yPos = pad + 15; alignVal = "left"; break;
               }
               
               pdf.text("Page - " + (index + 1), xPos, yPos, { align: alignVal });
