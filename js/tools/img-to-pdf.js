@@ -262,10 +262,10 @@ function renderPreview() {
       <div class="page-badge">Page ${index + 1}</div>
       <img class="img-thumb" src="${img.url}" alt="Preview of ${img.file.name}" style="transform:rotate(${img.rotation}deg)">
       <div class="image-overlay">
-        <button class="overlay-btn zoom" title="Zoom"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
-        <button class="overlay-btn crop" title="Crop"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg></button>
-        <button class="overlay-btn rotate" title="Rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
-        <button class="overlay-btn delete" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2 2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+        <button class="overlay-btn zoom" type="button" aria-label="Zoom Image" title="Zoom"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
+        <button class="overlay-btn crop" type="button" aria-label="Crop Image" title="Crop"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg></button>
+        <button class="overlay-btn rotate" type="button" aria-label="Rotate Image" title="Rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
+        <button class="overlay-btn delete" type="button" aria-label="Delete Image" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
       </div>
       <div class="file-name">${img.file.name}</div>
       <div class="page-number">Page ${index + 1}</div>
@@ -285,7 +285,7 @@ function renderPreview() {
 function openZoom(img) {
   const overlay = document.createElement("div");
   overlay.className = "zoom-overlay";
-  overlay.innerHTML = `<button class="zoom-close">✕</button><img src="${img.url}" alt="Zoomed image preview" style="transform:rotate(${img.rotation}deg)">`;
+  overlay.innerHTML = `<button class="zoom-close" type="button" aria-label="Close Zoom">✕</button><img src="${img.url}" alt="Zoomed image preview" style="transform:rotate(${img.rotation}deg)">`;
   overlay.querySelector(".zoom-close").onclick = () => overlay.remove();
   document.body.appendChild(overlay);
 }
@@ -293,7 +293,20 @@ function openZoom(img) {
 function openCropper(img) {
   const modal = document.createElement("div");
   modal.className = "crop-modal";
-  modal.innerHTML = `<div class="crop-area"><img id="cropImage" alt="Crop preview image"></div><div class="crop-actions"><button class="crop-btn cancel-btn">Cancel</button><button class="crop-btn save-btn">Save Crop</button></div>`;
+  
+  // NEW HTML FOR TILT CONTROLS ADDED HERE
+  modal.innerHTML = `
+    <div class="crop-area"><img id="cropImage" alt="Crop preview image"></div>
+    <div class="crop-tilt-container">
+      <label for="tiltSlider">Tilt: <span id="tiltVal">0</span>°</label>
+      <input type="range" id="tiltSlider" min="-180" max="180" value="0" step="1" aria-label="Tilt Image slider">
+      <button id="resetTiltBtn" type="button" class="reset-tilt-btn" aria-label="Reset Tilt">Reset</button>
+    </div>
+    <div class="crop-actions">
+      <button type="button" class="crop-btn cancel-btn" aria-label="Cancel Crop">Cancel</button>
+      <button type="button" class="crop-btn save-btn" aria-label="Save Crop">Save Crop</button>
+    </div>
+  `;
   document.body.appendChild(modal);
   
   const imageElement = modal.querySelector("#cropImage");
@@ -319,9 +332,33 @@ function openCropper(img) {
 
     const cropper = new Cropper(imageElement, { viewMode: 1, autoCropArea: 1, background: false, responsive: true, checkOrientation: false });
 
+    // NEW LOGIC FOR TILT SCALE/SLIDER
+    const tiltSlider = modal.querySelector("#tiltSlider");
+    const tiltVal = modal.querySelector("#tiltVal");
+    const resetTiltBtn = modal.querySelector("#resetTiltBtn");
+
+    tiltSlider.addEventListener("input", (e) => {
+      const val = Number(e.target.value);
+      tiltVal.innerText = val;
+      cropper.rotateTo(val); // This uses Cropper.js hardware accelerated rotate method
+    });
+
+    resetTiltBtn.addEventListener("click", () => {
+      tiltSlider.value = 0;
+      tiltVal.innerText = "0";
+      cropper.rotateTo(0);
+    });
+
     modal.querySelector(".save-btn").onclick = () => {
       const croppedCanvas = cropper.getCroppedCanvas({ imageSmoothingEnabled: true, imageSmoothingQuality: 'medium' });
-      croppedCanvas.toBlob((blob) => { URL.revokeObjectURL(img.url); img.url = URL.createObjectURL(blob); img.rotation = 0; cropper.destroy(); modal.remove(); renderPreview(); }, "image/jpeg", 0.9);
+      croppedCanvas.toBlob((blob) => { 
+        URL.revokeObjectURL(img.url); 
+        img.url = URL.createObjectURL(blob); 
+        img.rotation = 0; 
+        cropper.destroy(); 
+        modal.remove(); 
+        renderPreview(); 
+      }, "image/jpeg", 0.9);
     };
   };
   

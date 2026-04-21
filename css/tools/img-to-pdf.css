@@ -750,6 +750,43 @@ input:checked + .slider:before {
 
 .cropper-view-box { outline: 2px solid #00e676 !important; }
 
+/* NEW TILT CONTAINER */
+.crop-tilt-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 20px;
+  color: #00e676;
+  font-size: 1rem;
+}
+
+.crop-tilt-container label {
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.crop-tilt-container input[type="range"] {
+  flex-grow: 1;
+  margin: 0;
+}
+
+.reset-tilt-btn {
+  background: transparent;
+  border: 1px solid #00e676;
+  color: #00e676;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.reset-tilt-btn:hover {
+  background: rgba(0, 230, 118, 0.1);
+}
+
 .crop-actions {
   display: flex;
   justify-content: center;
