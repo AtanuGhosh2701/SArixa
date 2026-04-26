@@ -96,6 +96,22 @@ let selectedFont = "helvetica";
 let wmFormats = { bold: false, italic: false };
 
 // ==========================================
+// BOOKMARK BUTTON LOGIC
+// ==========================================
+const bookmarkBtn = document.getElementById("bookmark-btn");
+const toastMsg = document.getElementById("toast-msg");
+
+if (bookmarkBtn) {
+  bookmarkBtn.addEventListener('click', () => {
+    toastMsg.innerText = "Feature Coming Soon! 🚀";
+    toastMsg.classList.add("show");
+    setTimeout(() => {
+      toastMsg.classList.remove("show");
+    }, 3000);
+  });
+}
+
+// ==========================================
 // EVENT LISTENERS
 // ==========================================
 
@@ -1093,7 +1109,12 @@ downloadBtn.onclick = () => {
       // Show on 2nd time, OR every multiple of 5 (5, 10, 15, 20...)
       if (count === 2 || (count >= 5 && count % 5 === 0)) {
         const popup = document.getElementById('rating-popup');
-        if (popup) popup.style.display = 'flex';
+        const reminder = document.getElementById('rating-reminder-bar');
+        
+        if (popup) {
+            popup.style.display = 'flex';
+            if (reminder) reminder.style.display = 'none'; // Hide reminder when popup is open
+        }
       }
     }
   }, 800);
@@ -1173,12 +1194,25 @@ const resetPopupUI = () => {
     selectedRating = 0;
     feedbackText.value = "";
     copyLinkBtn.innerText = "Copy Link";
-    stars.forEach(s => { s.innerHTML = '☆'; s.style.color = '#555'; });
+    
+    // Clear star selections
+    stars.forEach(s => { 
+        s.innerHTML = '☆'; 
+        s.style.color = '#555';
+        s.classList.remove('selected');
+    });
 };
 
 // FULL CLOSE LOGIC
 const completeClose = () => {
     popup.style.display = 'none';
+    
+    // JODI RATING SUBMIT NA HOYE THAKE, TAHOLE REMINDER BAR ABAR DEKHAO
+    if (!localStorage.getItem('hasSubmittedSarixaRating')) {
+        localStorage.setItem('sarixaRatingDismissed', 'true');
+        if(reminderBar) reminderBar.style.display = 'flex'; 
+    }
+    
     setTimeout(resetPopupUI, 500);
 };
 
@@ -1189,10 +1223,13 @@ stars.forEach(star => {
   star.addEventListener('click', function() {
     selectedRating = parseInt(this.getAttribute('data-value'));
 
-    // Visual update
+    // Visual update (Clarity Polish)
     stars.forEach(s => {
-      s.innerHTML = (parseInt(s.getAttribute('data-value')) <= selectedRating) ? '⭐' : '☆';
-      s.style.color = (parseInt(s.getAttribute('data-value')) <= selectedRating) ? '#ffc107' : '#555';
+      const sVal = parseInt(s.getAttribute('data-value'));
+      s.innerHTML = (sVal <= selectedRating) ? '⭐' : '☆';
+      s.style.color = (sVal <= selectedRating) ? '#ffc107' : '#555';
+      if(sVal <= selectedRating) s.classList.add('selected');
+      else s.classList.remove('selected');
     });
 
     // Save initial star rating immediately to DB so we don't lose it
@@ -1211,11 +1248,12 @@ stars.forEach(star => {
         step1.style.display = 'none';
         if(selectedRating >= 4) {
             stepHappy.style.display = 'block';
-            document.getElementById('whatsapp-share-btn').href = "https://wa.me/?text=Try this free Image to PDF tool (100% private): https://sarixa-tools.vercel.app/";
+            const shareText = "I found the best Image to PDF tool! It's 100% private (no server uploads) and completely free without watermarks. Try SArixa here: https://sarixa-tools.vercel.app/";
+            document.getElementById('whatsapp-share-btn').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         } else {
             stepSad.style.display = 'block';
         }
-    }, 300);
+    }, 400); // slightly slower for them to see the glowing stars
   });
 });
 
@@ -1248,6 +1286,9 @@ btnSubmitFeedback.addEventListener('click', () => {
 });
 
 // REMINDER BAR LOGIC
-openReminderBtn.addEventListener('click', () => {
-    popup.style.display = 'flex';
-});
+if(openReminderBtn) {
+    openReminderBtn.addEventListener('click', () => {
+        popup.style.display = 'flex';
+        if(reminderBar) reminderBar.style.display = 'none'; // Hide reminder when popup is open
+    });
+}
