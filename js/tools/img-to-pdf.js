@@ -252,7 +252,6 @@ function renderPreview() {
     const card = document.createElement("div");
     card.className = "image-card";
 
-    // Reverted to exactly 4 buttons (Zoom, Crop, Rotate, Delete). No Undo/Reset.
     card.innerHTML = `
       <div class="page-badge">Page ${index + 1}</div>
       <img class="img-thumb" src="${img.url}" alt="Preview of ${img.file.name}" style="transform:rotate(${img.rotation}deg)">
@@ -646,7 +645,7 @@ generateBtn.onclick = async () => {
                 }
                 pdf.text(wmText, posX, posY, { align: alignVal, angle: parseFloat(wmAngle) });
 
-              } else if (wmType === 'image' && wmImage) {
+               } else if (wmType === 'image' && wmImage) {
                 let maxW = (pw - wmPad * 2) * wmSize;
                 let maxH = (ph - wmPad * 2) * wmSize;
                 
@@ -938,14 +937,6 @@ generateBtn.onclick = async () => {
       downloadBtn.disabled = false;
       previewBtn.disabled = false;
     }
-
-    setTimeout(() => {
-      const popup = document.getElementById('rating-popup');
-      if (popup && !localStorage.getItem('hasInteractedWithSarixaRating')) {
-        popup.style.display = 'flex';
-      }
-    }, 1500); 
-    
   } catch (err) {
     console.error(err);
     outputBox.innerHTML = `<span style='color:#ff5252'>Error: ${err.message || "Memory Error! Try lower quality."}</span>`;
@@ -1089,6 +1080,23 @@ downloadBtn.onclick = () => {
   a.click();
   
   setTimeout(() => URL.revokeObjectURL(url), 200);
+
+  // MASTER PLAN: NEVER-ENDING LOOP LOGIC
+  setTimeout(() => {
+    const hasSubmitted = localStorage.getItem('hasSubmittedSarixaRating');
+    
+    if (!hasSubmitted) {
+      let count = parseInt(localStorage.getItem('sarixaDownloadCount') || '0');
+      count++; 
+      localStorage.setItem('sarixaDownloadCount', count.toString());
+
+      // Show on 2nd time, OR every multiple of 5 (5, 10, 15, 20...)
+      if (count === 2 || (count >= 5 && count % 5 === 0)) {
+        const popup = document.getElementById('rating-popup');
+        if (popup) popup.style.display = 'flex';
+      }
+    }
+  }, 800);
 };
 
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
@@ -1133,70 +1141,113 @@ const database = getDatabase(app);
 let selectedRating = 0;
 const popup = document.getElementById('rating-popup');
 const closeTopBtn = document.getElementById('close-popup-top');
-const closeBtn = document.getElementById('btn-close-rating');
-const submitBtn = document.getElementById('btn-submit-rating');
-const initialState = document.getElementById('rating-initial-state');
-const successState = document.getElementById('rating-success-state');
 const stars = document.querySelectorAll('#stars span');
 
-const closePopup = () => { 
-  popup.style.display = 'none'; 
-  setTimeout(() => {
-    initialState.style.display = 'block';
+// UI States
+const step1 = document.getElementById('rating-step-1');
+const stepHappy = document.getElementById('rating-step-happy');
+const stepSad = document.getElementById('rating-step-sad');
+const successState = document.getElementById('rating-success-state');
+
+// Buttons
+const copyLinkBtn = document.getElementById('copy-link-btn');
+const btnSubmitFeedback = document.getElementById('btn-submit-feedback');
+const feedbackText = document.getElementById('feedback-text');
+
+// Permanent Reminder Bar
+const reminderBar = document.getElementById('rating-reminder-bar');
+const openReminderBtn = document.getElementById('open-reminder-btn');
+
+// Show reminder bar on page load if rating NOT submitted yet
+if(!localStorage.getItem('hasSubmittedSarixaRating')) {
+    if(reminderBar) reminderBar.style.display = 'flex';
+} else {
+    if(reminderBar) reminderBar.style.display = 'none';
+}
+
+const resetPopupUI = () => {
+    step1.style.display = 'block';
+    stepHappy.style.display = 'none';
+    stepSad.style.display = 'none';
     successState.style.display = 'none';
     selectedRating = 0;
-    stars.forEach(s => {
-      s.innerHTML = '☆';
-      s.style.color = '#555';
-    });
-  }, 500); 
+    feedbackText.value = "";
+    copyLinkBtn.innerText = "Copy Link";
+    stars.forEach(s => { s.innerHTML = '☆'; s.style.color = '#555'; });
 };
 
-const closeAndSave = () => {
-  localStorage.setItem('hasInteractedWithSarixaRating', 'true');
-  closePopup();
+// FULL CLOSE LOGIC
+const completeClose = () => {
+    popup.style.display = 'none';
+    setTimeout(resetPopupUI, 500);
 };
 
-closeTopBtn.addEventListener('click', closeAndSave);
-closeBtn.addEventListener('click', closeAndSave);
+closeTopBtn.addEventListener('click', completeClose);
 
+// STAR CLICK LOGIC
 stars.forEach(star => {
   star.addEventListener('click', function() {
-    selectedRating = this.getAttribute('data-value');
+    selectedRating = parseInt(this.getAttribute('data-value'));
 
+    // Visual update
     stars.forEach(s => {
-      s.innerHTML = (s.getAttribute('data-value') <= selectedRating) ? '⭐' : '☆';
-      s.style.color = (s.getAttribute('data-value') <= selectedRating) ? '#ffc107' : '#555';
+      s.innerHTML = (parseInt(s.getAttribute('data-value')) <= selectedRating) ? '⭐' : '☆';
+      s.style.color = (parseInt(s.getAttribute('data-value')) <= selectedRating) ? '#ffc107' : '#555';
     });
+
+    // Save initial star rating immediately to DB so we don't lose it
+    push(ref(database, 'sarixa_ratings'), {
+        rating: selectedRating,
+        timestamp: Date.now(),
+        type: 'initial_click'
+    });
+
+    // Submitting makes the popup and banner go away forever
+    localStorage.setItem('hasSubmittedSarixaRating', 'true');
+    if(reminderBar) reminderBar.style.display = 'none'; 
+
+    // UX Transition (Step 2)
+    setTimeout(() => {
+        step1.style.display = 'none';
+        if(selectedRating >= 4) {
+            stepHappy.style.display = 'block';
+            document.getElementById('whatsapp-share-btn').href = "https://wa.me/?text=Try this free Image to PDF tool (100% private): https://sarixa-tools.vercel.app/";
+        } else {
+            stepSad.style.display = 'block';
+        }
+    }, 300);
   });
 });
 
-submitBtn.addEventListener('click', function() {
-  if (selectedRating == 0) {
-    alert("Please select a star rating first!");
-    return;
-  }
-
-  push(ref(database, 'sarixa_ratings'), {
-    rating: parseInt(selectedRating),
-    timestamp: Date.now()
-  }).then(() => {
-    localStorage.setItem('hasInteractedWithSarixaRating', 'true');
-    
-    initialState.style.display = 'none';
-    successState.style.display = 'flex';
-    
+// HAPPY FLOW - COPY LINK
+copyLinkBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText("https://sarixa-tools.vercel.app/");
+    copyLinkBtn.innerText = "Copied! ✔";
     setTimeout(() => {
-        closePopup();
-    }, 3500);
+        completeClose(); // Close entirely
+    }, 1500);
+});
 
-  }).catch((error) => {
-    console.error("Error saving rating: ", error);
+// SAD FLOW - SUBMIT FEEDBACK
+btnSubmitFeedback.addEventListener('click', () => {
+    const feedback = feedbackText.value.trim();
+    btnSubmitFeedback.innerText = "Sending...";
     
-    localStorage.setItem('hasInteractedWithSarixaRating', 'true');
-    
-    initialState.style.display = 'none';
-    successState.style.display = 'flex';
-    setTimeout(() => { closePopup(); }, 3500);
-  });
+    push(ref(database, 'sarixa_feedback'), {
+        rating: selectedRating,
+        feedback: feedback || "No text provided",
+        timestamp: Date.now()
+    }).then(() => {
+        stepSad.style.display = 'none';
+        successState.style.display = 'flex';
+        setTimeout(completeClose, 2500);
+    }).catch(err => {
+        console.error(err);
+        completeClose();
+    });
+});
+
+// REMINDER BAR LOGIC
+openReminderBtn.addEventListener('click', () => {
+    popup.style.display = 'flex';
 });

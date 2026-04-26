@@ -124,12 +124,12 @@ input::selection,
 textarea::selection {
   background-color: rgba(0, 230, 118, 0.4) !important;
   color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important; /* Added to override default autofill text color */
+  -webkit-text-fill-color: #ffffff !important;
 }
 ::-moz-selection {
   background-color: rgba(0, 230, 118, 0.4) !important;
   color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important; /* Added to override default autofill text color */
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Range Slider Customization */
@@ -871,7 +871,7 @@ input:checked + .slider:before {
 }
 
 /* -----------------------------------------
-   10. RATING POPUP
+   10. RATING POPUP & UX ELEMENTS
 ----------------------------------------- */
 .popup-overlay {
   display: none; 
@@ -931,16 +931,91 @@ input:checked + .slider:before {
 .popup-btn-green { background-color: #00e676; color: #003c2f; }
 .popup-btn-green:hover { background-color: #00c853; }
 
-.btn-feedback {
-  display: inline-block;
-  margin-top: 20px;
-  color: #b2ebf2;
-  font-size: 0.9rem;
-  text-decoration: underline;
-  cursor: pointer;
-  transition: color 0.2s;
+/* Feedback Textarea */
+#feedback-text {
+    width: 100%;
+    height: 80px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 255, 200, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    resize: none;
+    font-family: inherit;
 }
-.btn-feedback:hover { color: #00e676; }
+#feedback-text:focus { outline: none; border-color: #00e676; }
+
+.share-btns { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    margin-top: 15px; 
+}
+
+/* WhatsApp Share Button */
+.whatsapp-btn {
+  display: inline-block;
+  background-color: #25D366;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-btn:hover {
+  background-color: #128C7E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+  color: #ffffff;
+}
+
+/* Bonus Reminder Bar (Static position between tool and FAQ) */
+.reminder-bar {
+    width: 95%;
+    max-width: 1200px;
+    margin: -40px auto 60px auto; 
+    background: rgba(0, 230, 118, 0.1);
+    border: 2px dashed #00e676;
+    padding: 15px 25px;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+#open-reminder-btn { 
+    background: #00e676; 
+    color: #012f28; 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#open-reminder-btn:hover { 
+    background: #00ff84; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 10px rgba(0, 230, 118, 0.3); 
+}
+
+@media (max-width: 500px) {
+    .reminder-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        margin-top: -20px;
+    }
+}
 
 /* Success Checkmark SVG Animation */
 .success-svg {
@@ -1095,4 +1170,78 @@ input:checked + .slider:before {
   color: #b2ebf2;
   font-size: 14px;
   margin-top: 5px;
+}
+
+/* -----------------------------------------
+   12. FAQ SECTION
+----------------------------------------- */
+.faq-section {
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto 80px auto; 
+  background: rgba(0, 255, 200, 0.05);
+  border: 2px solid rgba(0, 255, 200, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.faq-title {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #00e676;
+  margin-bottom: 25px;
+}
+
+.faq-item {
+  background: #012f28;
+  border: 1px solid rgba(0, 255, 200, 0.3);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  border-color: #00e676;
+}
+
+.faq-item summary {
+  padding: 16px 20px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  list-style: none;
+  position: relative;
+  user-select: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "▼";
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #00e676;
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-content {
+  padding: 0 20px 20px 20px;
+  color: #b2ebf2;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.faq-content strong {
+  color: #00e676;
 }
