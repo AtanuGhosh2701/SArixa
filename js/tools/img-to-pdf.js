@@ -1086,7 +1086,7 @@ previewBtn.onclick = async () => {
 };
 
 downloadBtn.onclick = () => {
-  let name = fileNameInput.value.trim() || "converted";
+  let name = fileNameInput.value.trim() || "SArixa-converted";
   if (!name.toLowerCase().endsWith(".pdf")) name += ".pdf";
   
   const url = URL.createObjectURL(pdfBlob);
