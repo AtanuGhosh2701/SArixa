@@ -14,18 +14,93 @@
   border: 2px solid rgba(0, 255, 200, 0.2);
   border-radius: 20px;
   padding: 30px;
+  position: relative;
+}
+
+/* NEW: Tool Header Wrapper to hold Bookmark button inline */
+.tool-header-wrapper {
+  position: relative;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* NEW: Bookmark Button */
+.bookmark-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(0, 230, 118, 0.1);
+  color: #00e676;
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.bookmark-btn:hover {
+  background: rgba(0, 230, 118, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 230, 118, 0.2);
+}
+
+@media (max-width: 600px) {
+  .bookmark-text { display: none; }
+  .bookmark-btn { padding: 8px; right: 0; top: -10px;}
+}
+
+/* NEW: Toast Notification for "Coming Soon" */
+.toast {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00e676;
+  color: #012f28;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+  z-index: 10000;
+  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+  bottom: 30px;
 }
 
 .tool-title {
   text-align: center;
   font-size: 2rem;
   color: #00e676;
+  margin-bottom: 5px;
 }
 
 .tool-desc {
   text-align: center;
   color: #b2ebf2;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+/* NEW: Trust Line Badge (CENTERED) */
+.trust-badge {
+  display: flex;
+  margin: 10px auto 0 auto;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(178, 235, 242, 0.05);
+  color: #9be7d8;
+  font-size: 0.85rem;
+  padding: 6px 15px;
+  border-radius: 20px;
+  border: 1px dashed rgba(0, 255, 200, 0.2);
 }
 
 /* -----------------------------------------
@@ -908,6 +983,29 @@ input:checked + .slider:before {
 .close-btn:hover { color: #ff5252; }
 .popup-content h3 { color: #00e676; margin-bottom: 5px; }
 
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 40px;
+  cursor: pointer;
+  color: #555;
+  margin: 15px 0;
+}
+
+.rating-stars span {
+  transition: transform 0.2s ease, text-shadow 0.2s ease;
+}
+
+.rating-stars span:hover {
+  transform: scale(1.2);
+}
+
+.rating-stars span.selected {
+  color: #ffc107 !important;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+}
+
 .popup-btn-group {
   display: flex;
   justify-content: center;
@@ -931,7 +1029,6 @@ input:checked + .slider:before {
 .popup-btn-green { background-color: #00e676; color: #003c2f; }
 .popup-btn-green:hover { background-color: #00c853; }
 
-/* Feedback Textarea */
 #feedback-text {
     width: 100%;
     height: 80px;
@@ -953,7 +1050,6 @@ input:checked + .slider:before {
     margin-top: 15px; 
 }
 
-/* WhatsApp Share Button */
 .whatsapp-btn {
   display: inline-block;
   background-color: #25D366;
@@ -973,7 +1069,6 @@ input:checked + .slider:before {
   color: #ffffff;
 }
 
-/* Bonus Reminder Bar (Static position between tool and FAQ) */
 .reminder-bar {
     width: 95%;
     max-width: 1200px;
@@ -1017,7 +1112,6 @@ input:checked + .slider:before {
     }
 }
 
-/* Success Checkmark SVG Animation */
 .success-svg {
   display: block;
   width: 80px;
@@ -1148,13 +1242,6 @@ input:checked + .slider:before {
   color: #b2ebf2;
 }
 
-.rating-stars {
-  font-size: 35px;
-  cursor: pointer;
-  color: #555;
-  margin: 15px 0;
-}
-
 .rating-success-state {
   flex-direction: column;
   align-items: center;
@@ -1245,3 +1332,73 @@ input:checked + .slider:before {
 .faq-content strong {
   color: #00e676;
 }
+
+/* -----------------------------------------
+   13. SEO CONTENT SECTION
+----------------------------------------- */
+.seo-content {
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto 80px auto; 
+  padding: 0;
+}
+
+.seo-intro {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.seo-intro h2 {
+  color: #00e676;
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.seo-intro p {
+  color: #b2ebf2;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.seo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.seo-card {
+  background: #012f28;
+  border: 1px solid rgba(0, 255, 200, 0.2);
+  border-radius: 12px;
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.seo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 230, 118, 0.15);
+  border-color: #00e676;
+}
+
+.seo-card h3 {
+  color: #00e676;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.seo-card p, .seo-card li {
+  color: #9be7d8;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.seo-card ol, .seo-card ul {
+  padding-left: 20px;
+  color: #9be7d8;
+}
+
+.seo-card li { margin-bottom: 8px; }
+.seo-card strong { color: #b2ebf2; }
