@@ -17,14 +17,14 @@
   position: relative;
 }
 
-/* NEW: Tool Header Wrapper to hold Bookmark button inline */
+/* Tool Header Wrapper to hold Bookmark button inline */
 .tool-header-wrapper {
   position: relative;
   text-align: center;
   margin-bottom: 30px;
 }
 
-/* NEW: Bookmark Button */
+/* Bookmark Button */
 .bookmark-btn {
   position: absolute;
   top: 0;
@@ -53,7 +53,7 @@
   .bookmark-btn { padding: 8px; right: 0; top: -10px;}
 }
 
-/* NEW: Toast Notification for "Coming Soon" */
+/* Toast Notification */
 .toast {
   position: fixed;
   bottom: -100px;
@@ -68,6 +68,9 @@
   box-shadow: 0 5px 15px rgba(0,0,0,0.4);
   z-index: 10000;
   transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  text-align: center;
+  width: max-content;
+  max-width: 90%;
 }
 
 .toast.show {
@@ -87,11 +90,12 @@
   margin-bottom: 10px;
 }
 
-/* NEW: Trust Line Badge (CENTERED) */
+/* Trust Line Badge (MOBILE FIXED) */
 .trust-badge {
   display: flex;
   margin: 10px auto 0 auto;
   width: fit-content;
+  max-width: 95%; /* Prevents overflow on very small screens */
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -101,6 +105,17 @@
   padding: 6px 15px;
   border-radius: 20px;
   border: 1px dashed rgba(0, 255, 200, 0.2);
+  flex-wrap: wrap; /* Fix for mobile wrapping */
+  text-align: center;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .trust-badge {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+    gap: 5px;
+  }
 }
 
 /* -----------------------------------------
@@ -138,7 +153,6 @@
   cursor: not-allowed;
 }
 
-/* Hide Camera Button on PC Screens (Screens wider than 768px) */
 @media (min-width: 769px) {
   .mobile-only-btn {
     display: none !important;
@@ -168,7 +182,6 @@ input[type="number"]:focus {
   border-color: #00e676;
 }
 
-/* Universal Autofill Fix for ALL Inputs (Watermark, Filename, Password) */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
 input:-webkit-autofill:focus, 
@@ -186,7 +199,6 @@ input:-webkit-autofill:active,
   font-size: inherit !important;
 }
 
-/* Fix for text turning black when selected inside auto-filled input */
 input:-webkit-autofill::selection,
 #wmTextInput:-webkit-autofill::selection,
 #fileNameInput:-webkit-autofill::selection {
@@ -194,7 +206,6 @@ input:-webkit-autofill::selection,
   background-color: rgba(0, 230, 118, 0.4) !important;
 }
 
-/* Text Highlight/Selection Color Fix (Prevents text turning black when selected) */
 input::selection,
 textarea::selection {
   background-color: rgba(0, 230, 118, 0.4) !important;
@@ -207,7 +218,6 @@ textarea::selection {
   -webkit-text-fill-color: #ffffff !important;
 }
 
-/* Range Slider Customization */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -263,7 +273,6 @@ input[type="range"]::-webkit-slider-thumb {
 /* -----------------------------------------
    5. CUSTOM UI COMPONENTS
 ----------------------------------------- */
-/* Toggle Switch */
 .switch {
   position: relative;
   display: inline-block;
@@ -314,7 +323,6 @@ input:checked + .slider:before {
   background-color: #003c2f;
 }
 
-/* Custom Dropdown Menu */
 .custom-dropdown {
   position: relative;
   width: 100%;
@@ -384,7 +392,6 @@ input:checked + .slider:before {
   font-weight: bold;
 }
 
-/* Text Formatting Buttons (Bold, Italic) */
 .text-format-group {
   display: flex;
   gap: 10px;
@@ -412,7 +419,6 @@ input:checked + .slider:before {
   color: #003c2f;
 }
 
-/* Custom Watermark File Label */
 .wm-file-label {
   display: flex;
   align-items: center;
@@ -1086,6 +1092,7 @@ input:checked + .slider:before {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Glowing Button Animation */
 #open-reminder-btn { 
     background: #00e676; 
     color: #012f28; 
@@ -1095,12 +1102,20 @@ input:checked + .slider:before {
     border: none;
     cursor: pointer;
     transition: 0.2s;
+    animation: glowing-btn 1.5s infinite;
+}
+
+@keyframes glowing-btn {
+    0% { box-shadow: 0 0 5px rgba(0, 230, 118, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 230, 118, 0.9), 0 0 30px rgba(0, 230, 118, 0.5); }
+    100% { box-shadow: 0 0 5px rgba(0, 230, 118, 0.3); }
 }
 
 #open-reminder-btn:hover { 
     background: #00ff84; 
     transform: translateY(-2px); 
     box-shadow: 0 4px 10px rgba(0, 230, 118, 0.3); 
+    animation: none; 
 }
 
 @media (max-width: 500px) {

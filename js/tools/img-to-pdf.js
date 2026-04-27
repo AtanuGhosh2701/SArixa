@@ -91,6 +91,9 @@ let images = [];
 let pdfBlob = null;
 let isPreviewOpen = false;
 
+// Flags for one-time actions per session
+let hasShownDownloadToast = false; 
+
 let wmOriginalImageObj = null;
 let selectedFont = "helvetica";
 let wmFormats = { bold: false, italic: false };
@@ -830,6 +833,19 @@ generateBtn.onclick = async () => {
       downloadBtn.disabled = true; 
       previewBtn.disabled = true;  
 
+      // SHOW TOAST MESSAGE ONCE PER PAGE LOAD (For Batch Mode)
+      if (!hasShownDownloadToast) {
+        const toastEl = document.getElementById("toast-msg");
+        if (toastEl) {
+          toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: Compress PDF (Coming Soon)";
+          toastEl.classList.add("show");
+          setTimeout(() => {
+            toastEl.classList.remove("show");
+          }, 4000);
+          hasShownDownloadToast = true;
+        }
+      }
+
     } else {
       // COMBINED PDF MODE
       let currentPageImages = [];
@@ -1097,7 +1113,20 @@ downloadBtn.onclick = () => {
   
   setTimeout(() => URL.revokeObjectURL(url), 200);
 
-  // MASTER PLAN: NEVER-ENDING LOOP LOGIC
+  // SHOW TOAST MESSAGE ONCE PER PAGE LOAD
+  if (!hasShownDownloadToast) {
+    const toastEl = document.getElementById("toast-msg");
+    if (toastEl) {
+      toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: Compress PDF (Coming Soon)";
+      toastEl.classList.add("show");
+      setTimeout(() => {
+        toastEl.classList.remove("show");
+      }, 4000);
+      hasShownDownloadToast = true; // Set flag to true so it doesn't show again until page reload
+    }
+  }
+
+  // NEVER-ENDING LOOP LOGIC FOR RATING POPUP
   setTimeout(() => {
     const hasSubmitted = localStorage.getItem('hasSubmittedSarixaRating');
     
@@ -1117,7 +1146,7 @@ downloadBtn.onclick = () => {
         }
       }
     }
-  }, 800);
+  }, 1500); // Wait 1.5s so toast message is read before popup shows
 };
 
 ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
@@ -1207,7 +1236,7 @@ const resetPopupUI = () => {
 const completeClose = () => {
     popup.style.display = 'none';
     
-    // JODI RATING SUBMIT NA HOYE THAKE, TAHOLE REMINDER BAR ABAR DEKHAO
+    // IF RATING IS NOT SUBMITTED, SHOW REMINDER BAR AGAIN
     if (!localStorage.getItem('hasSubmittedSarixaRating')) {
         localStorage.setItem('sarixaRatingDismissed', 'true');
         if(reminderBar) reminderBar.style.display = 'flex'; 
@@ -1253,7 +1282,7 @@ stars.forEach(star => {
         } else {
             stepSad.style.display = 'block';
         }
-    }, 400); // slightly slower for them to see the glowing stars
+    }, 400); // Slightly slower for them to see the glowing stars
   });
 });
 
