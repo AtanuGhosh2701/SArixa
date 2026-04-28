@@ -91,6 +91,11 @@ const closeCameraPopup = document.getElementById("close-camera-popup");
 const btnOpenGallery = document.getElementById("btn-open-gallery");
 const btnUseCameraAnyway = document.getElementById("btn-use-camera-anyway");
 
+// DELETE CONFIRMATION POPUP ELEMENTS
+const deleteConfirmPopup = document.getElementById("delete-confirm-popup");
+const btnCancelDelete = document.getElementById("btn-cancel-delete");
+const btnConfirmDelete = document.getElementById("btn-confirm-delete");
+
 // ==========================================
 // STATE VARIABLES
 // ==========================================
@@ -100,6 +105,9 @@ let isPreviewOpen = false;
 
 // Flags for one-time actions per session
 let hasShownDownloadToast = false; 
+let hasShownCameraWarning = false;
+
+let imageIndexToDelete = null; 
 
 let wmOriginalImageObj = null;
 let selectedFont = "helvetica";
@@ -112,7 +120,12 @@ let wmFormats = { bold: false, italic: false };
 // Camera Warning Popup Logic
 if (cameraBtnTrigger && cameraWarningPopup) {
   cameraBtnTrigger.addEventListener("click", () => {
-    cameraWarningPopup.style.display = "flex";
+    if (!hasShownCameraWarning) {
+      cameraWarningPopup.style.display = "flex";
+      hasShownCameraWarning = true; // Set flag so it only shows once per load
+    } else {
+      cameraInput.click(); // Open camera directly on subsequent clicks
+    }
   });
 
   closeCameraPopup.addEventListener("click", () => {
@@ -133,6 +146,31 @@ if (cameraBtnTrigger && cameraWarningPopup) {
   cameraWarningPopup.addEventListener("click", (e) => {
     if (e.target === cameraWarningPopup) {
       cameraWarningPopup.style.display = "none";
+    }
+  });
+}
+
+// Delete Confirmation Popup Logic
+if (deleteConfirmPopup) {
+  btnCancelDelete.addEventListener("click", () => {
+    deleteConfirmPopup.style.display = "none";
+    imageIndexToDelete = null; // Reset
+  });
+
+  btnConfirmDelete.addEventListener("click", () => {
+    if (imageIndexToDelete !== null) {
+      URL.revokeObjectURL(images[imageIndexToDelete].url); 
+      images.splice(imageIndexToDelete, 1); 
+      renderPreview(); 
+    }
+    deleteConfirmPopup.style.display = "none";
+    imageIndexToDelete = null; // Reset
+  });
+
+  deleteConfirmPopup.addEventListener("click", (e) => {
+    if (e.target === deleteConfirmPopup) {
+      deleteConfirmPopup.style.display = "none";
+      imageIndexToDelete = null; // Reset
     }
   });
 }
@@ -306,7 +344,10 @@ function renderPreview() {
     card.querySelector(".zoom").onclick = () => openZoom(img);
     card.querySelector(".crop").onclick = () => openCropper(img);
     card.querySelector(".rotate").onclick = () => { img.rotation += 90; renderPreview(); };
-    card.querySelector(".delete").onclick = () => { URL.revokeObjectURL(images[index].url); images.splice(index, 1); renderPreview(); };
+    card.querySelector(".delete").onclick = () => { 
+      imageIndexToDelete = index;
+      deleteConfirmPopup.style.display = "flex";
+    };
     
     fragment.appendChild(card);
   });

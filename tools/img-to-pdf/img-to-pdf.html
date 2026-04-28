@@ -225,7 +225,7 @@
         <label>Number Position:</label>
         <select id="pageNumPos" aria-label="Select Page Number Position">
           <option value="bottom-center">Bottom Center</option>
-          <option value="bottom-right">Bottom Right</option>
+          <option value="bottom-right" selected>Bottom Right</option>
           <option value="bottom-left">Bottom Left</option>
           <option value="top-center">Top Center</option>
           <option value="top-right">Top Right</option>
@@ -535,6 +535,17 @@
       <div style="display: flex; flex-direction: column; gap: 12px;">
         <button id="btn-open-gallery" class="popup-btn popup-btn-green" style="margin: 0;">Open Gallery (Recommended)</button>
         <button id="btn-use-camera-anyway" class="popup-btn popup-btn-outline-red" style="margin: 0;">Use Camera Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="delete-confirm-popup" class="popup-overlay">
+    <div class="popup-content">
+      <h3 style="color: #ff5252; margin-bottom: 10px;">⚠️ Delete Image?</h3>
+      <p style="color: #b2ebf2; font-size: 0.95rem; margin-bottom: 20px;">Are you sure you want to remove this image from your list?</p>
+      <div style="display: flex; gap: 12px;">
+        <button id="btn-cancel-delete" class="popup-btn popup-btn-green" style="margin: 0;">Cancel</button>
+        <button id="btn-confirm-delete" class="popup-btn popup-btn-red" style="margin: 0;">Delete</button>
       </div>
     </div>
   </div>

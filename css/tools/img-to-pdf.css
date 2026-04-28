@@ -24,8 +24,6 @@
   margin-bottom: 30px;
 }
 
-
-
 @media (max-width: 600px) {
 }
 
@@ -907,6 +905,7 @@ input:checked + .slider:before {
   align-items: center;
   background: rgba(0, 0, 0, 0.95);
   z-index: 6000;
+  overflow: auto; /* Allows scrolling for huge images */
 }
 
 .zoom-overlay img {
@@ -915,7 +914,7 @@ input:checked + .slider:before {
 }
 
 .zoom-close {
-  position: absolute;
+  position: fixed; /* Fixes button on screen regardless of image size/scroll */
   top: 20px; right: 20px;
   width: 45px;
   height: 45px;
@@ -925,6 +924,8 @@ input:checked + .slider:before {
   border: none;
   border-radius: 50%;
   cursor: pointer;
+  z-index: 6001; /* Ensures it stays above the zoomed image */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 /* -----------------------------------------
@@ -1011,7 +1012,7 @@ input:checked + .slider:before {
 .popup-btn-green { background-color: #00e676; color: #003c2f; }
 .popup-btn-green:hover { background-color: #00c853; }
 
-/* Camera Warning Red Button */
+/* Camera Warning & Delete Red Button */
 .popup-btn-outline-red {
   background-color: transparent;
   border: 2px solid #ff5252;
