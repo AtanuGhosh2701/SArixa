@@ -84,6 +84,13 @@ const progressContainer = document.getElementById("progressContainer");
 const progressBar = document.getElementById("progressBar");
 const progressText = document.getElementById("progressText");
 
+// CAMERA WARNING POPUP ELEMENTS
+const cameraBtnTrigger = document.getElementById("cameraBtnTrigger");
+const cameraWarningPopup = document.getElementById("camera-warning-popup");
+const closeCameraPopup = document.getElementById("close-camera-popup");
+const btnOpenGallery = document.getElementById("btn-open-gallery");
+const btnUseCameraAnyway = document.getElementById("btn-use-camera-anyway");
+
 // ==========================================
 // STATE VARIABLES
 // ==========================================
@@ -99,24 +106,36 @@ let selectedFont = "helvetica";
 let wmFormats = { bold: false, italic: false };
 
 // ==========================================
-// BOOKMARK BUTTON LOGIC
-// ==========================================
-const bookmarkBtn = document.getElementById("bookmark-btn");
-const toastMsg = document.getElementById("toast-msg");
-
-if (bookmarkBtn) {
-  bookmarkBtn.addEventListener('click', () => {
-    toastMsg.innerText = "Feature Coming Soon! 🚀";
-    toastMsg.classList.add("show");
-    setTimeout(() => {
-      toastMsg.classList.remove("show");
-    }, 3000);
-  });
-}
-
-// ==========================================
 // EVENT LISTENERS
 // ==========================================
+
+// Camera Warning Popup Logic
+if (cameraBtnTrigger && cameraWarningPopup) {
+  cameraBtnTrigger.addEventListener("click", () => {
+    cameraWarningPopup.style.display = "flex";
+  });
+
+  closeCameraPopup.addEventListener("click", () => {
+    cameraWarningPopup.style.display = "none";
+  });
+
+  btnOpenGallery.addEventListener("click", () => {
+    cameraWarningPopup.style.display = "none";
+    fileInput.click(); // Trigger default gallery/file selection
+  });
+
+  btnUseCameraAnyway.addEventListener("click", () => {
+    cameraWarningPopup.style.display = "none";
+    cameraInput.click(); // Trigger actual camera capture
+  });
+  
+  // Close popup if clicked outside the content box
+  cameraWarningPopup.addEventListener("click", (e) => {
+    if (e.target === cameraWarningPopup) {
+      cameraWarningPopup.style.display = "none";
+    }
+  });
+}
 
 // Handle Show/Hide for Auto-Fill Page
 pageSizeSelect.addEventListener('change', (e) => {

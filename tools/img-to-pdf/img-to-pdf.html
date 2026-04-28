@@ -98,7 +98,7 @@
         
         <div class="trust-badge">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-          <span>100% Private &bull; Trusted by Students & Professionals</span>
+          <span>100% Private &bull; No Server Uploads &bull; Built specially for Students</span>
         </div>
       </div>
       
@@ -108,11 +108,11 @@
           <input type="file" id="fileInput" accept="image/*" aria-label="Select Image Files" hidden multiple>
         </label>
         
-        <label class="file-btn mobile-only-btn camera-btn" title="Take a picture with Camera">
+        <button type="button" id="cameraBtnTrigger" class="file-btn mobile-only-btn camera-btn" title="Take a picture with Camera">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
           <span>Camera</span>
-          <input type="file" id="cameraInput" accept="image/*" capture="environment" aria-label="Use Camera" hidden>
-        </label>
+        </button>
+        <input type="file" id="cameraInput" accept="image/*" capture="environment" aria-label="Use Camera" hidden>
       </div>
       
       <div id="previewBox" class="preview-box">
@@ -523,6 +523,21 @@
           © 2026 SArixa • Built by Santanu & Atanu
       </div>
   </footer>
+
+  <div id="camera-warning-popup" class="popup-overlay">
+    <div class="popup-content">
+      <span id="close-camera-popup" class="close-btn">&times;</span>
+      <h3 style="color: #ff5252; margin-bottom: 10px;">⚠️ Camera Warning</h3>
+      <p style="color: #b2ebf2; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+        High-resolution cameras might cause the browser to crash or reload due to memory limits.<br><br>
+        For the best experience, please take photos with your phone's default camera app first, then upload them from your gallery.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button id="btn-open-gallery" class="popup-btn popup-btn-green" style="margin: 0;">Open Gallery (Recommended)</button>
+        <button id="btn-use-camera-anyway" class="popup-btn popup-btn-outline-red" style="margin: 0;">Use Camera Anyway</button>
+      </div>
+    </div>
+  </div>
 
   <div id="rating-popup" class="popup-overlay">
     <div class="popup-content">
