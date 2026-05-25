@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#012f28">
+    
+    <title>Contact Us • SArixa</title>
+    <meta name="description" content="Get in touch with SArixa. Have a question, feedback, or facing a glitch with our free Image to PDF converter? Drop us a message today!">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sarixa-tools.vercel.app/contact.html">
+    
+    <meta property="og:title" content="Contact Us • SArixa">
+    <meta property="og:description" content="Get in touch with SArixa. Have a question, feedback, or facing a glitch? Drop us a message today!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarixa-tools.vercel.app/contact.html">
+    <meta property="og:image" content="https://sarixa-tools.vercel.app/assets/SArixa_logo.png">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "SArixa Contact Support",
+      "url": "https://sarixa-tools.vercel.app/contact.html",
+      "description": "Contact page for SArixa Image to PDF converter. Send us your feedback or support requests."
+    }
+    </script>
+
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC8FR721KT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-TC8FR721KT');
+    </script>
+    
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="icon" type="image/png" href="assets/Main_logo.png">
+    <link rel="preload" href="assets/SArixa_logo.png" as="image" fetchpriority="high">
+    
+    <style>
+        /* =========================================
+           CONTACT PAGE SPECIFIC STYLES
+        ========================================= */
+        body { margin: 0; padding: 0; }
+        img { max-width: 100%; height: auto; }
+
+           :root {
+            --input-bg: rgba(2, 27, 26, 0.8);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+        }
+
+        h1 {
+            color: var(--accent-primary, #00e676);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .intro-text {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #b2ebf2;
+            line-height: 1.6;
+        }
+
+        .contact-container {
+            background: rgba(0, 255, 200, 0.05);
+            border: 1px solid rgba(0, 255, 200, 0.15);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .email-info {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(0, 255, 200, 0.15);
+            color: #fff;
+        }
+
+        .email-info a {
+            color: #00e676;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-form label {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .contact-form input, 
+        .contact-form textarea {
+            width: 100%;
+            padding: 14px;
+            background-color: rgba(2, 27, 26, 0.8);
+            border: 1px solid rgba(0, 255, 200, 0.15);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form input:focus, 
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: #00e676;
+            box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
+        }
+
+        .submit-btn {
+            background-color: #00e676;
+            color: #021b1a;
+            border: none;
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: #00c853;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.2);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #status {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Added Styles for Checkmark Animation inside the button --- */
+        .success-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .checkmark-anim {
+            display: inline-block;
+            font-size: 1.2em;
+            /* Smooth pop-in animation for the checkmark */
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        /* -------------------------------------------------------------- */
+
+        @media (max-width: 900px) {
+            .contact-container { padding: 25px 20px; }
+        }
+
+        /* Footer optimization */
+        .footer { content-visibility: auto; contain-intrinsic-size: 1000px; }
+        .footer h2 { font-size: 1.5rem; color: #00e676; margin-bottom: 15px; }
+        .footer h3 { font-size: 1.1rem; margin-bottom: 15px; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+      <div class="logo">
+        <a href="index.html">
+         <img src="assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high">
+        </a>
+      </div>
+      
+      <div class="hamburger" id="hamburger-btn">
+          <span></span>
+          <span></span>
+          <span></span>
+      </div>
+
+       <nav id="nav-links">
+         <a href="index.html">Home</a>
+         
+         <div class="dropdown">
+           <a href="javascript:void(0);" class="dropdown-trigger" id="toolsBtn">
+             Tools <span class="arrow">▼</span>
+           </a>
+           <div class="dropdown-menu" id="toolsMenu">
+              <a href="./tools/img-to-pdf.html" class="dropdown-item">Image to PDF</a>
+              <a href="./tools/compress-pdf.html" class="dropdown-item">Compress PDF</a>
+              <div class="dropdown-footer">More tools coming soon... ✨</div>
+           </div>
+         </div>
+
+         <a href="about.html">About Us</a>
+         <a href="contact.html" class="active">Contact Us</a>
+         <a href="privacy.html">Privacy Policy</a>
+         <a href="terms.html">Terms & Conditions</a>
+       </nav>
+    </header>
+
+    <main class="container">
+        <h1>Contact Us</h1>
+        <p class="intro-text">Got a question, a brilliant idea for a new feature, or facing a sudden technical glitch? We’re all ears! 💡 SArixa is built for users like you, and your feedback is what helps us grow. Drop us a message below—we'd absolutely love to hear from you and promise to reply as fast as we can!</p>
+
+        <div class="contact-container">
+            <div class="email-info">
+                📧 Email us directly at: <a href="mailto:officialsarixa@gmail.com">officialsarixa@gmail.com</a>
+            </div>
+
+            <form id="my-form" class="contact-form" action="https://formspree.io/f/xqegoynd" method="POST">
+                
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required autocomplete="name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email address" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="How can we help?" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+                </div>
+
+                <button type="submit" id="submit-btn" class="submit-btn">Send Message</button>
+                
+                <div id="status"></div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-col brand-col">
+                <h2>SArixa</h2>
+                <p>100% Free & Private. Convert your images to PDF directly in your browser. No files are ever uploaded to our servers.</p>
+            </div>
+
+            <div class="footer-col">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms & Conditions</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            © 2026 SArixa • Built by Santanu & Atanu
+        </div>
+    </footer>
+
+    <script>
+        var form = document.getElementById("my-form");
+        
+        async function handleSubmit(event) {
+            event.preventDefault();
+            var status = document.getElementById("status");
+            var button = document.getElementById("submit-btn");
+            var data = new FormData(event.target);
+            
+            button.disabled = true;
+            button.innerHTML = "Sending...";
+
+            fetch(event.target.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    status.innerHTML = "✅ Success! Your message has been sent to our team.";
+                    status.style.display = "block";
+                    status.style.backgroundColor = "rgba(0, 230, 118, 0.15)";
+                    status.style.color = "#00e676";
+                    status.style.border = "1px solid #00e676";
+                    form.reset(); 
+                    
+                    // Injecting the animated checkmark and professional success message
+                    button.innerHTML = '<div class="success-content"><span class="checkmark-anim">✔</span> Message Sent Successfully!</div>';
+                } else {
+                    response.json().then(data => {
+                        status.style.display = "block";
+                        status.style.backgroundColor = "rgba(255, 82, 82, 0.15)";
+                        status.style.color = "#ff5252";
+                        if (Object.hasOwn(data, 'errors')) {
+                            status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                        } else {
+                            status.innerHTML = "Oops! There was a problem submitting your form";
+                        }
+                    })
+                }
+            }).catch(error => {
+                status.style.display = "block";
+                status.innerHTML = "Oops! Connection error. Please try again.";
+            }).finally(() => {
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = "Send Message";
+                }, 3000);
+            });
+        }
+        form.addEventListener("submit", handleSubmit);
+    </script>
+    
+    <script src="js/global.js" defer></script>
+
+</body>
+</html>
