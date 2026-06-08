@@ -897,7 +897,7 @@ generateBtn.onclick = async () => {
       if (!hasShownDownloadToast) {
         const toastEl = document.getElementById("toast-msg");
         if (toastEl) {
-          toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: IMG to PDF (Coming Soon)";
+          toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)";
           toastEl.classList.add("show");
           setTimeout(() => {
             toastEl.classList.remove("show");
@@ -1177,7 +1177,7 @@ downloadBtn.onclick = () => {
   if (!hasShownDownloadToast) {
     const toastEl = document.getElementById("toast-msg");
     if (toastEl) {
-      toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: IMG to PDF (Coming Soon)";
+      toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)";
       toastEl.classList.add("show");
       setTimeout(() => {
         toastEl.classList.remove("show");
