@@ -24,6 +24,46 @@ document.addEventListener("DOMContentLoaded", () => {
     let originalSizeBytes = 0;
     let compressedBlob = null;
     let isPreviewOpen = false;
+    
+    // 🔥 NEW: Variable to track if download message has been shown
+    let hasShownDownloadMsg = false;
+
+    // --- TOAST NOTIFICATION FUNCTION ---
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: #00e676; 
+            color: #012f28; 
+            padding: 12px 24px; 
+            border-radius: 50px; 
+            font-weight: 700; 
+            font-size: 0.95rem;
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4); 
+            z-index: 99999; 
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        `;
+        document.body.appendChild(toast);
+        
+        // Trigger reflow & fade in
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(-10px)';
+        }, 10);
+
+        // Fade out after 4 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
 
     // --- NUMBER COUNTER ANIMATION FUNCTION ---
     function animateValue(objId, start, end, duration, suffix = "") {
@@ -244,7 +284,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- COMMON FINALIZE FUNCTION ---
     function finalizeCompression(compressedBuffer, originalBuffer, isForceMode) {
         let compressedSize = compressedBuffer.byteLength;
-        let finalBufferToUse = compressedBuffer;
 
         let savedPercentage = (((originalSizeBytes - compressedSize) / originalSizeBytes) * 100);
         
@@ -252,11 +291,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (savedPercentage < 1) {
             savedPercentage = 0; 
             compressedSize = originalSizeBytes; 
-            finalBufferToUse = originalBuffer; 
+            // 🔥 THE FIX: Use the original pristine file perfectly for preview!
+            compressedBlob = currentFile; 
+        } else {
+            compressedBlob = new Blob([compressedBuffer], { type: 'application/pdf' });
         }
         
-        savedPercentage = savedPercentage.toFixed(2);
-        compressedBlob = new Blob([finalBufferToUse], { type: 'application/pdf' });
+        savedPercentage = Number(savedPercentage).toFixed(2);
         
         const originalMb = (originalSizeBytes / (1024 * 1024)).toFixed(2);
         const finalMb = (compressedSize / (1024 * 1024)).toFixed(2);
@@ -319,6 +360,12 @@ document.addEventListener("DOMContentLoaded", () => {
             a.download = name;
             a.click();
             setTimeout(() => URL.revokeObjectURL(url), 200);
+
+            // 🔥 NEW: Show Download Success Toast ONCE per page load
+            if (!hasShownDownloadMsg) {
+                showToast("PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)");
+                hasShownDownloadMsg = true;
+            }
 
             // MAGIC: TRIGGER RATING POPUP LOOP LOGIC
             setTimeout(() => {
