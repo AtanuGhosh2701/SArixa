@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#012f28">
+    <title>Compress PDF • SArixa</title>
+    
+    <meta name="description" content="SArixa is a 100% private, free PDF Compressor. Reduce PDF file size instantly and securely in your browser. No file uploads required.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://sarixa-tools.vercel.app/tools/compress-pdf.html">
+    
+    <meta property="og:title" content="Compress PDF • SArixa">
+    <meta property="og:description" content="SArixa is a 100% private, free PDF Compressor. Reduce PDF file size instantly in your browser without uploading files.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sarixa-tools.vercel.app/tools/compress-pdf.html">
+    <meta property="og:image" content="https://sarixa-tools.vercel.app/assets/SArixa_logo.png">
+
+    <link rel="icon" type="image/png" href="../assets/Main_logo.png">
+
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preload" href="../assets/SArixa_logo.png" as="image" fetchpriority="high">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/tools/compress-pdf.css">
+    
+    <link rel="stylesheet" href="../css/tools/rating.css">
+
+    <style>
+        @media (max-width: 900px) {
+            .footer-col ul li { margin-bottom: 16px; }
+            .footer-col ul li a { display: block; padding: 10px 0; }
+            .dropdown-item { min-height: 48px; }
+        }
+    </style>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC8FR721KT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TC8FR721KT');
+    </script>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <main class="tool-container pt-24">
+        
+        <div class="tool-header-wrapper">
+            <h1 class="tool-title">Compress PDF File</h1>
+            <p class="tool-desc">Reduce PDF file size locally without losing quality. <strong>No uploads.</strong></p>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>100% Private &bull; Zero Server Uploads</span>
+            </div>
+        </div>
+
+        <div class="file-input-group">
+            <label class="file-btn" for="fileInput">
+                <span>Select PDF File</span>
+                <input type="file" id="fileInput" accept="application/pdf" hidden aria-label="Upload PDF File">
+            </label>
+        </div>
+
+        <div id="previewBox" class="preview-box">
+            <div id="emptyState">
+                <div class="preview-empty">No file selected</div>
+                <div class="preview-advice">Select a PDF file <span class="hide-mobile-text">or Drag & Drop here</span></div>
+            </div>
+            
+            <div id="fileCard" class="file-card">
+                <div class="file-info">
+                    <div class="file-icon" aria-hidden="true">PDF</div>
+                    <div class="file-details">
+                        <h4 id="displayFileName">document.pdf</h4>
+                        <p id="displayFileSize">2.5 MB</p>
+                    </div>
+                </div>
+                <button class="remove-btn" id="removeFileBtn" title="Remove File" aria-label="Remove Selected PDF">&times;</button>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <div class="setting-item">
+                <label for="compressionLevel">Compression Level:</label>
+                <select id="compressionLevel" aria-label="Select Compression Level">
+                    <option value="extreme">Extreme Compression (Max Size Reduction)</option>
+                    <option value="recommended" selected>Recommended (Good Balance)</option>
+                    <option value="low">Less Compression (High Quality)</option>
+                </select>
+            </div>
+            
+            <div class="setting-item">
+                <label for="engineSelect">Processing Mode:</label>
+                <select id="engineSelect" aria-label="Select Processing Mode">
+                    <option value="canvas" selected>Scanned Document (Maximum Size Reduction)</option>
+                    <option value="wasm">Standard Document (Keeps Text Selectable)</option>
+                </select>
+            </div>
+            
+            <div class="setting-item">
+                <label for="metaToggle">Remove Metadata:</label>
+                <label class="switch">
+                    <input type="checkbox" id="metaToggle" checked aria-label="Toggle Metadata Removal">
+                    <span class="slider" aria-hidden="true"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="action-group-container">
+            <button class="generate-btn" id="compressBtn" disabled aria-label="Start Compression">Compress PDF Now</button>
+            
+            <div id="progressContainer" class="progress-container" aria-live="polite">
+                <div class="progress-info">
+                    <span id="progressStatus">Starting Engine...</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+            </div>
+
+            <div id="outputBox" class="output-box" aria-live="polite"></div>
+        </div>
+
+        <div id="finalActionArea" style="display: none;">
+            <div class="preview-btn-container">
+                <button class="preview-btn" id="previewBtn" type="button" aria-label="Preview Compressed PDF">Preview PDF</button>
+            </div>
+            
+            <div class="filename-container">
+                <label for="fileNameInput">File Name:</label>
+                <input type="text" id="fileNameInput" class="filename-input" placeholder="sarixa-compressed" spellcheck="false" aria-label="Final File Name">
+            </div>
+            
+            <div class="download-btn-container">
+                <button class="action-btn" id="downloadBtn" type="button" aria-label="Download PDF">Download PDF</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="rating-placeholder"></div>
+
+    <section class="faq-section">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      
+      <details class="faq-item">
+        <summary>Are my documents really safe? Do you upload them anywhere?</summary>
+        <div class="faq-content">
+          <p>Yes, they are 100% safe! We <strong>never upload</strong> your PDFs to any server. The whole PDF compression happens right inside your own browser. Your files stay on your device the entire time.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is this actually free? Will you add a watermark to my PDF?</summary>
+        <div class="faq-content">
+          <p>It's completely free, forever. No hidden fees, no required sign-ups, and absolutely <strong>no watermarks</strong> on your exported PDFs.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Will compressing the PDF ruin the document quality?</summary>
+        <div class="faq-content">
+          <p>Not at all! We use smart compression algorithms that reduce the file size significantly while keeping the text clear and images readable. You can even choose the compression level that suits your needs.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if my PDF file is really big?</summary>
+        <div class="faq-content">
+          <p>Since the processing uses your own device and not our servers, there aren't any strict size limits. It might take your device a few extra seconds to process very large files.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this work on my phone too?</summary>
+        <div class="faq-content">
+          <p>Absolutely! It works perfectly on Androids, iPhones, and tablets.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="seo-content">
+      <div class="seo-intro">
+        <h2>Best Free PDF Compressor Online</h2>
+        <p>SArixa is one of the best free PDF compressors available online. It offers fast performance, strong privacy, and a simple user experience. Whether you are a student, professional, or everyday user, you can reduce PDF file sizes quickly without any signup or installation.</p>
+      </div>
+      
+      <div class="seo-grid">
+        <div class="seo-card">
+          <h3>What is a PDF Compressor?</h3>
+          <p>A PDF compressor is a tool that reduces the file size of your PDF documents by optimizing images and removing unnecessary metadata, making them easier to email, share, and upload.</p>
+        </div>
+        
+        <div class="seo-card">
+          <h3>How to Compress a PDF?</h3>
+          <ol>
+            <li>Select your PDF file</li>
+            <li>Choose a compression level</li>
+            <li>Click on "Compress PDF Now"</li>
+            <li>Download your smaller PDF instantly</li>
+          </ol>
+          <p>SArixa makes the process fast, simple, and completely secure with no uploads required.</p>
+        </div>
+
+        <div class="seo-card">
+          <h3>Compress Without Upload</h3>
+          <p>Many online compressors require you to upload your files to a server, which can be risky for sensitive documents. SArixa solves this problem by processing everything directly in your browser. Your documents stay on your device.</p>
+        </div>
+
+        <div class="seo-card">
+          <h3>Why Choose SArixa?</h3>
+          <ul>
+            <li>🔒 <strong>100% Private</strong> – Your files never leave your device</li>
+            <li>⚡ <strong>Instant Processing</strong> – Fast compression in your browser</li>
+            <li>📱 <strong>Mobile Friendly</strong> – Works smoothly on all devices</li>
+            <li>🆓 <strong>Completely Free</strong> – No watermark, no hidden charges</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" defer></script>
+    <script defer>
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.pdfjsLib) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+            }
+        });
+    </script>
+    
+    <script src="../js/global.js" defer></script>
+    <script type="module" src="../js/tools/compress-pdf/compress-pdf.js" defer></script>
+    
+    <script type="module" src="../js/tools/rating.js"></script>
+
+</body>
+</html>
