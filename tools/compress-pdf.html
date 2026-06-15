@@ -28,7 +28,6 @@
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/tools/compress-pdf.css">
-    
     <link rel="stylesheet" href="../css/tools/rating.css">
 
     <style>
@@ -94,7 +93,14 @@
                     <option value="extreme">Extreme Compression (Max Size Reduction)</option>
                     <option value="recommended" selected>Recommended (Good Balance)</option>
                     <option value="low">Less Compression (High Quality)</option>
+                    <option value="target">Target File Size</option>
                 </select>
+                <div id="targetSizeContainer" class="target-size-container" style="display:none;">
+                    <div class="target-size-wrapper">
+                        <input type="number" id="targetSizeInput" placeholder="Target Size (e.g. 500)" min="10" aria-label="Target File Size in KB">
+                        <span class="unit-badge" aria-hidden="true">KB</span>
+                    </div>
+                </div>
             </div>
             
             <div class="setting-item">
@@ -241,7 +247,6 @@
     
     <script src="../js/global.js" defer></script>
     <script type="module" src="../js/tools/compress-pdf/compress-pdf.js" defer></script>
-    
     <script type="module" src="../js/tools/rating.js"></script>
 
 </body>

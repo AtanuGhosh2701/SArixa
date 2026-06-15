@@ -6,11 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const displayFileName = document.getElementById('displayFileName');
     const displayFileSize = document.getElementById('displayFileSize');
     const removeFileBtn = document.getElementById('removeFileBtn');
+    
     const compressBtn = document.getElementById('compressBtn');
     const compressionLevel = document.getElementById('compressionLevel');
-    const engineSelect = document.getElementById('engineSelect'); // THE MASTER SWITCH
+    const engineSelect = document.getElementById('engineSelect');
+    
+    const targetSizeContainer = document.getElementById('targetSizeContainer');
+    const targetSizeInput = document.getElementById('targetSizeInput');
 
-    // UI Elements for Preview & Download
     const finalActionArea = document.getElementById('finalActionArea');
     const previewBtn = document.getElementById('previewBtn');
     const fileNameInput = document.getElementById('fileNameInput');
@@ -21,48 +24,24 @@ document.addEventListener("DOMContentLoaded", () => {
     let originalSizeBytes = 0;
     let compressedBlob = null;
     let isPreviewOpen = false;
-    
-    // 🔥 NEW: Variable to track if download message has been shown
     let hasShownDownloadMsg = false;
 
-    // --- TOAST NOTIFICATION FUNCTION ---
+    // Toast Notification
     function showToast(message) {
         const toast = document.createElement('div');
         toast.textContent = message;
         toast.style.cssText = `
-            position: fixed; 
-            bottom: 30px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: #00e676; 
-            color: #012f28; 
-            padding: 12px 24px; 
-            border-radius: 50px; 
-            font-weight: 700; 
-            font-size: 0.95rem;
-            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4); 
-            z-index: 99999; 
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            background: #00e676; color: #012f28; padding: 12px 24px; border-radius: 50px; 
+            font-weight: 700; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4); 
+            z-index: 99999; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none;
         `;
         document.body.appendChild(toast);
-        
-        // Trigger reflow & fade in
-        setTimeout(() => {
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateX(-50%) translateY(-10px)';
-        }, 10);
-
-        // Fade out after 4 seconds
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateX(-50%) translateY(0)';
-            setTimeout(() => toast.remove(), 300);
-        }, 4000);
+        setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(-10px)'; }, 10);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(0)'; setTimeout(() => toast.remove(), 300); }, 4000);
     }
 
-    // --- NUMBER COUNTER ANIMATION FUNCTION ---
+    // Number Counter Animation
     function animateValue(objId, start, end, duration, suffix = "") {
         const obj = document.getElementById(objId);
         if (!obj) return;
@@ -80,15 +59,28 @@ document.addEventListener("DOMContentLoaded", () => {
         window.requestAnimationFrame(step);
     }
 
-    // --- FILE HANDLING LOGIC ---
+    // UI Logic: Target Size Dropdown
+    if (compressionLevel) {
+        compressionLevel.addEventListener('change', (e) => {
+            if (e.target.value === 'target') {
+                targetSizeContainer.style.display = 'block';
+                if (engineSelect && engineSelect.value !== 'canvas') {
+                    engineSelect.value = 'canvas'; // Force to Scanned mode
+                    showToast("Target Size requires 'Scanned Document' mode. Switched automatically.");
+                }
+            } else {
+                targetSizeContainer.style.display = 'none';
+            }
+        });
+    }
+
+    // File Handling
     function processSelectedFile(file) {
         if (file && file.type === "application/pdf") {
             currentFile = file;
             originalSizeBytes = file.size;
-            
             displayFileName.textContent = file.name;
             displayFileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-            
             if (fileNameInput) fileNameInput.value = file.name.replace(/\.[^/.]+$/, "") + "-compressed";
 
             emptyState.style.display = "none";
@@ -107,31 +99,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    if (fileInput) {
-        fileInput.addEventListener('change', (e) => processSelectedFile(e.target.files[0]));
-    }
+    if (fileInput) fileInput.addEventListener('change', (e) => processSelectedFile(e.target.files[0]));
 
-    // --- DRAG AND DROP LOGIC FOR PC ---
     if (previewBox) {
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            previewBox.addEventListener(eventName, preventDefaults, false);
+            previewBox.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
         });
-
-        function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
         ['dragenter', 'dragover'].forEach(eventName => {
             previewBox.addEventListener(eventName, () => {
                 if (window.matchMedia("(pointer: coarse)").matches) return; 
                 previewBox.classList.add('drag-active');
             }, false);
         });
-
         ['dragleave', 'drop'].forEach(eventName => {
-            previewBox.addEventListener(eventName, () => {
-                previewBox.classList.remove('drag-active');
-            }, false);
+            previewBox.addEventListener(eventName, () => previewBox.classList.remove('drag-active'), false);
         });
-
         previewBox.addEventListener('drop', (e) => {
             if (window.matchMedia("(pointer: coarse)").matches) return; 
             processSelectedFile(e.dataTransfer.files[0]);
@@ -155,7 +137,37 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // --- 3. DUAL COMPRESSION ENGINE 🔥 ---
+    // Binary Search Compression for Target Size (For Canvas Mode)
+    async function compressToTargetSizeCanvas(canvas, targetBytes) {
+        let minQ = 0.05, maxQ = 0.95, quality = 0.8;
+        let dataURL = canvas.toDataURL('image/jpeg', quality);
+        let size = Math.round((dataURL.length * 3) / 4);
+
+        if (size <= targetBytes) return dataURL;
+
+        for (let i = 0; i < 6; i++) {
+            quality = (minQ + maxQ) / 2;
+            dataURL = canvas.toDataURL('image/jpeg', quality);
+            size = Math.round((dataURL.length * 3) / 4);
+            if (size > targetBytes) maxQ = quality;
+            else minQ = quality;
+        }
+
+        size = Math.round((dataURL.length * 3) / 4);
+        if (size > targetBytes) {
+            let ratio = Math.sqrt(targetBytes / size);
+            if (ratio < 0.1) ratio = 0.1;
+            let scCanvas = document.createElement('canvas');
+            scCanvas.width = canvas.width * ratio;
+            scCanvas.height = canvas.height * ratio;
+            let scCtx = scCanvas.getContext('2d');
+            scCtx.drawImage(canvas, 0, 0, scCanvas.width, scCanvas.height);
+            dataURL = scCanvas.toDataURL('image/jpeg', quality);
+        }
+        return dataURL;
+    }
+
+    // Main Compression Logic
     if (compressBtn) {
         compressBtn.addEventListener('click', async () => {
             if (!currentFile) return;
@@ -164,6 +176,20 @@ document.addEventListener("DOMContentLoaded", () => {
             const progressBar = document.getElementById('progressBar');
             const progressText = document.getElementById('progressText');
             const progressStatus = document.getElementById('progressStatus');
+
+            const compLevel = compressionLevel ? compressionLevel.value : 'recommended';
+            let selectedEngine = engineSelect ? engineSelect.value : 'wasm';
+            let targetKB = null;
+
+            // Validate Target Input
+            if (compLevel === 'target') {
+                selectedEngine = 'canvas'; // Force canvas mode 
+                targetKB = parseFloat(targetSizeInput.value);
+                if (!targetKB || targetKB <= 0) {
+                    alert("Please enter a valid target size in KB!");
+                    return;
+                }
+            }
 
             compressBtn.disabled = true;
             if (progressContainer) progressContainer.style.display = "block";
@@ -179,14 +205,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 const arrayBuffer = await currentFile.arrayBuffer();
-                const compLevel = compressionLevel ? compressionLevel.value : 'recommended';
-                const selectedEngine = engineSelect ? engineSelect.value : 'wasm';
 
                 if (selectedEngine === 'canvas') {
                     // ==========================================
-                    // 🔥 ENGINE 1: FORCE JPG (Memory Optimized)
+                    // ENGINE 1: SCANNED DOCUMENT (CANVAS/TARGET)
                     // ==========================================
-                    if (progressStatus) progressStatus.textContent = "Rasterizing with Force Engine...";
+                    if (progressStatus) progressStatus.textContent = "Rasterizing Document...";
                     if (progressBar) progressBar.style.width = "15%";
 
                     const loadingTask = pdfjsLib.getDocument(arrayBuffer);
@@ -202,17 +226,25 @@ document.addEventListener("DOMContentLoaded", () => {
                         newPdf.setCreator('SArixa Core');
                     }
 
-                    // Super Aggressive Downscaling
+                    // Configuration
                     let scaleFactor = 1.5; 
                     let imageQuality = 0.8;
+                    let targetBytesPerPage = 0;
+
                     if (compLevel === 'extreme') { scaleFactor = 1.0; imageQuality = 0.5; } 
                     else if (compLevel === 'low') { scaleFactor = 2.0; imageQuality = 0.9; }
+                    else if (compLevel === 'target') {
+                        scaleFactor = 1.5; // Fixed base scale for target calculations
+                        // Aim 2KB below target for safety margin against PDF structural overhead
+                        const safeTargetBytes = Math.max(1024, (targetKB * 1024) - 2048);
+                        targetBytesPerPage = safeTargetBytes / totalPages;
+                    }
 
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
                     for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-                        if (progressStatus) progressStatus.textContent = `Rasterizing Page ${pageNum} of ${totalPages}...`;
+                        if (progressStatus) progressStatus.textContent = `Processing Page ${pageNum} of ${totalPages}...`;
                         let currentProgress = 15 + ((pageNum / totalPages) * 70);
                         if (progressBar) progressBar.style.width = `${currentProgress}%`;
                         if (progressText) progressText.textContent = Math.round(currentProgress) + "%";
@@ -225,7 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         await page.render({ canvasContext: ctx, viewport: viewport }).promise;
 
-                        const imgDataUrl = canvas.toDataURL('image/jpeg', imageQuality);
+                        let imgDataUrl;
+                        if (compLevel === 'target') {
+                             imgDataUrl = await compressToTargetSizeCanvas(canvas, targetBytesPerPage);
+                        } else {
+                             imgDataUrl = canvas.toDataURL('image/jpeg', imageQuality);
+                        }
+
                         const jpgImage = await newPdf.embedJpg(imgDataUrl);
                         const newPage = newPdf.addPage([viewport.width, viewport.height]);
                         newPage.drawImage(jpgImage, { x: 0, y: 0, width: viewport.width, height: viewport.height });
@@ -240,13 +278,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (progressBar) progressBar.style.width = "95%";
                     
                     const pdfBytes = await newPdf.save();
-                    finalizeCompression(pdfBytes.buffer, arrayBuffer, true);
+                    finalizeCompression(pdfBytes.buffer, arrayBuffer, true, compLevel === 'target');
 
                 } else {
                     // ==========================================
-                    // 🔥 ENGINE 2: SMART WASM (Original Text Kept)
+                    // ENGINE 2: SMART WASM (Original Text Kept)
                     // ==========================================
                     if (progressStatus) progressStatus.textContent = "Waking up Smart Engine...";
+                    const removeMeta = document.getElementById('metaToggle').checked;
                     
                     const worker = new Worker('../js/tools/compress-pdf/compress-worker.js');
 
@@ -258,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             if (progressText) progressText.textContent = data.percent + '%';
                         } else if (data.status === 'done') {
                             worker.terminate();
-                            finalizeCompression(data.compressedBuffer, arrayBuffer, false);
+                            finalizeCompression(data.compressedBuffer, arrayBuffer, false, false);
                         } else if (data.status === 'error') {
                             worker.terminate();
                             throw new Error(data.error);
@@ -279,16 +318,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- COMMON FINALIZE FUNCTION ---
-    function finalizeCompression(compressedBuffer, originalBuffer, isForceMode) {
+    function finalizeCompression(compressedBuffer, originalBuffer, isForceMode, isTargetMode) {
         let compressedSize = compressedBuffer.byteLength;
-
         let savedPercentage = (((originalSizeBytes - compressedSize) / originalSizeBytes) * 100);
         
-        // Prevent fake success or size increase
-        if (savedPercentage < 1) {
+        if (savedPercentage < 1 && !isTargetMode) {
             savedPercentage = 0; 
             compressedSize = originalSizeBytes; 
-            // 🔥 THE FIX: Use the original pristine file perfectly for preview!
             compressedBlob = currentFile; 
         } else {
             compressedBlob = new Blob([compressedBuffer], { type: 'application/pdf' });
@@ -308,14 +344,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (finalActionArea) finalActionArea.style.display = "block";
             
             let successCardHTML = "";
-            if (savedPercentage > 0) {
+            if (savedPercentage > 0 || isTargetMode) {
                 successCardHTML = `
                     <div class="success-card">
                         <div class="success-header">🎉 Compression Successful!</div>
-                        <p style="color: #b2ebf2; font-size: 0.95rem;">${isForceMode ? 'Rasterized and forced to reduce file size significantly.' : 'File optimized keeping text original and selectable.'}</p>
+                        <p style="color: #b2ebf2; font-size: 0.95rem;">${isForceMode ? 'Rasterized and forced to reduce file size.' : 'Optimized keeping text selectable.'}</p>
                         <div class="stats-grid">
                             <div class="stat-box"><div class="stat-value" id="animOriginalSize">0</div><div class="stat-label">Original</div></div>
-                            <div class="stat-box"><div class="stat-value highlight" id="animSavedPercent">0</div><div class="stat-label">Reduced</div></div>
+                            <div class="stat-box"><div class="stat-value highlight" id="animSavedPercent">0</div><div class="stat-label">${isTargetMode ? 'Optimized' : 'Reduced'}</div></div>
                             <div class="stat-box"><div class="stat-value" id="animNewSize">0</div><div class="stat-label">New Size</div></div>
                         </div>
                     </div>
@@ -325,16 +361,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     <div class="success-card" style="border-color: #ffb300;">
                         <div class="success-header" style="color: #ffb300;">⚡ Structurally Optimized!</div>
                         <p style="color: #b2ebf2; font-size: 0.95rem;">This file is already highly optimized. Our engine couldn't compress it further without losing quality.<br><br>
-                        <span style="color:#00e676; font-weight:bold;">💡 Pro Tip:</span> Select <b>"Scanned Document"</b> mode to forcibly shrink the file by converting pages to images!</p>
+                        <span style="color:#00e676; font-weight:bold;">💡 Pro Tip:</span> Select <b>"Scanned Document"</b> mode to forcibly shrink the file.</p>
                     </div>
                 `;
             }
 
             outputBox.innerHTML = successCardHTML;
 
-            if (savedPercentage > 0) {
+            if (savedPercentage > 0 || isTargetMode) {
                 animateValue("animOriginalSize", 0, originalMb, 1500, "MB");
-                animateValue("animSavedPercent", 0, savedPercentage, 1500, " %");
+                animateValue("animSavedPercent", 0, savedPercentage > 0 ? savedPercentage : 0, 1500, " %");
                 animateValue("animNewSize", 0, finalMb, 1500, "MB");
             }
             
@@ -344,7 +380,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 500);
     }
 
-    // 4. Download Logic & Popup Trigger
+    // Download Logic
     if (downloadBtn) {
         downloadBtn.addEventListener('click', () => {
             if (!compressedBlob) return;
@@ -359,18 +395,17 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => URL.revokeObjectURL(url), 200);
 
             if (!hasShownDownloadMsg) {
-                showToast("PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)");
+                showToast("PDF Downloaded! 🎉 Next Tool: Merge PDF(Coming Soon)");
                 hasShownDownloadMsg = true;
             }
 
-            // MAGIC: TRIGGER GLOBAL RATING POPUP LOGIC
             setTimeout(() => {
                 if (window.triggerGlobalRatingPopup) window.triggerGlobalRatingPopup();
             }, 1000); 
         });
     }
 
-    // 5. Preview PDF on the Same Page
+    // Preview Logic
     if (previewBtn) {
         previewBtn.addEventListener('click', async () => {
             if (!compressedBlob) return;
@@ -399,11 +434,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
                 let arrayBuf;
-                // Check if compressedBlob is a File object (unmodified original file)
                 if (compressedBlob instanceof File) {
                     arrayBuf = await compressedBlob.arrayBuffer();
                 } else {
-                    // It's a standard Blob
                     arrayBuf = await compressedBlob.arrayBuffer();
                 }
                 const typedArray = new Uint8Array(arrayBuf);

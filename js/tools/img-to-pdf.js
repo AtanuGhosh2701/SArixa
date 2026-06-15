@@ -29,6 +29,9 @@ const pageNumExtraFields = document.querySelectorAll(".page-num-extra");
 // WATERMARK ELEMENTS
 const wmToggle = document.getElementById("wmToggle");
 const wmType = document.getElementById("wmType");
+const wmMosaicToggle = document.getElementById("wmMosaicToggle");
+const wmDensity = document.getElementById("wmDensity");
+const wmDensityVal = document.getElementById("wmDensityVal");
 const wmTextInput = document.getElementById("wmTextInput");
 const wmImageInput = document.getElementById("wmImageInput");
 const wmFileNameText = document.getElementById("wmFileNameText");
@@ -37,6 +40,7 @@ const wmSize = document.getElementById("wmSize");
 const wmOpacity = document.getElementById("wmOpacity");
 const wmAngle = document.getElementById("wmAngle");
 const wmExtraFields = document.querySelectorAll(".wm-extra");
+const wmMosaicExtraFields = document.querySelectorAll(".wm-mosaic-extra");
 
 // FONT AND FORMATTING ELEMENTS
 const fontDropdown = document.getElementById("fontDropdown");
@@ -188,10 +192,14 @@ qualitySelect.addEventListener('change', (e) => {
   targetSizeContainer.style.display = e.target.value === 'target' ? 'block' : 'none';
 });
 
+// Watermark Logic Handlers
 wmToggle.addEventListener('change', (e) => {
   const show = e.target.checked;
   wmExtraFields.forEach(el => el.style.display = show ? "block" : "none");
-  if (show) updateWmTypeFields();
+  if (show) {
+      updateWmTypeFields();
+      wmMosaicToggle.dispatchEvent(new Event('change')); // Trigger mosaic UI update
+  }
 });
 
 wmType.addEventListener('change', updateWmTypeFields);
@@ -201,6 +209,22 @@ function updateWmTypeFields() {
   document.querySelectorAll('.wm-text-only').forEach(el => el.style.display = isText ? 'block' : 'none');
   document.querySelectorAll('.wm-image-only').forEach(el => el.style.display = !isText ? 'block' : 'none');
 }
+
+// Mosaic Logic Handlers
+wmMosaicToggle.addEventListener('change', (e) => {
+    const isMosaic = e.target.checked;
+    wmMosaicExtraFields.forEach(el => el.style.display = isMosaic ? "block" : "none");
+    
+    // Hide standard position selector when mosaic is on
+    const posWrapper = document.getElementById("wmPosContainer");
+    if (posWrapper) {
+        posWrapper.style.display = isMosaic ? "none" : "block";
+    }
+});
+
+wmDensity.addEventListener('input', (e) => {
+    wmDensityVal.innerText = e.target.value;
+});
 
 wmOpacity.addEventListener('input', (e) => { document.getElementById("wmOpacityVal").innerText = e.target.value; });
 wmSize.addEventListener('input', (e) => { document.getElementById("wmSizeVal").innerText = e.target.value; });
@@ -285,6 +309,7 @@ const sortable = new Sortable(previewBox, {
   delay: 200,              
   delayOnTouchOnly: true,  
   touchStartThreshold: 5,  
+  draggable: ".image-card", // Restrict sorting to actual cards
   onEnd: function(evt) {
     const moved = images.splice(evt.oldIndex, 1)[0];
     images.splice(evt.newIndex, 0, moved);
@@ -327,19 +352,20 @@ function renderPreview() {
       <div class="page-badge">Page ${index + 1}</div>
       <img class="img-thumb" src="${img.url}" alt="Preview of ${img.file.name}" style="transform:rotate(${img.rotation}deg)">
       <div class="image-overlay">
-        <button class="overlay-btn zoom" type="button" aria-label="Zoom Image" title="Zoom"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
-        <button class="overlay-btn crop" type="button" aria-label="Crop Image" title="Crop"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg></button>
-        <button class="overlay-btn rotate" type="button" aria-label="Rotate Image" title="Rotate"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg></button>
-        <button class="overlay-btn delete" type="button" aria-label="Delete Image" title="Delete"><svg viewBox="0 0 24 24" fill="none" stroke="#003c2f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
+        <button class="overlay-btn zoom" type="button" aria-label="Zoom Image" title="Zoom"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg></button>
+        <button class="overlay-btn crop" type="button" aria-label="Crop Image" title="Crop"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg></button>
+        <button class="overlay-btn rotate" type="button" aria-label="Rotate Image" title="Rotate"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg></button>
+        <button class="overlay-btn delete" type="button" aria-label="Delete Image" title="Delete" style="background:#ff5252; color:#fff; border:none;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
       </div>
       <div class="file-name">${img.file.name}</div>
       <div class="page-number">Page ${index + 1}</div>
     `;
 
-    card.querySelector(".zoom").onclick = () => openZoom(img);
-    card.querySelector(".crop").onclick = () => openCropper(img);
-    card.querySelector(".rotate").onclick = () => { img.rotation += 90; renderPreview(); };
-    card.querySelector(".delete").onclick = () => { 
+    card.querySelector(".zoom").onclick = (e) => { e.stopPropagation(); openZoom(img); };
+    card.querySelector(".crop").onclick = (e) => { e.stopPropagation(); openCropper(img); };
+    card.querySelector(".rotate").onclick = (e) => { e.stopPropagation(); img.rotation += 90; renderPreview(); };
+    card.querySelector(".delete").onclick = (e) => { 
+      e.stopPropagation();
       imageIndexToDelete = index;
       deleteConfirmPopup.style.display = "flex";
     };
@@ -358,17 +384,31 @@ function openZoom(img) {
   document.body.appendChild(overlay);
 }
 
+// 🚀 ADVANCED CROP MODAL WITH SMOOTH TILT
 function openCropper(img) {
   const modal = document.createElement("div");
   modal.className = "crop-modal";
   
   modal.innerHTML = `
     <div class="crop-area"><img id="cropImage" alt="Crop preview image"></div>
-    <div class="crop-tilt-container">
-      <label for="tiltSlider">Tilt: <span id="tiltVal">0</span>°</label>
-      <input type="range" id="tiltSlider" min="-180" max="180" value="0" step="1" aria-label="Tilt Image slider">
-      <button id="resetTiltBtn" type="button" class="reset-tilt-btn" aria-label="Reset Tilt">Reset</button>
+    
+    <div class="crop-tilt-wrapper">
+        <div class="crop-tilt-header">
+            <label>Tilt: <span id="tiltVal">0</span>°</label>
+            <div class="step-input-group">
+                <label for="tiltStepInput">Step:</label>
+                <input type="number" id="tiltStepInput" value="1" min="0.1" max="90" step="0.1">
+                <span>°</span>
+            </div>
+        </div>
+        <div class="crop-tilt-controls">
+            <button type="button" id="btnTiltMinus" class="tilt-step-btn">-1°</button>
+            <input type="range" id="tiltSlider" min="-180" max="180" value="0" step="0.1" aria-label="Tilt Image slider">
+            <button type="button" id="btnTiltPlus" class="tilt-step-btn">+1°</button>
+            <button id="resetTiltBtn" type="button" class="reset-tilt-btn" aria-label="Reset Tilt">Reset</button>
+        </div>
     </div>
+
     <div class="crop-actions">
       <button type="button" class="crop-btn cancel-btn" aria-label="Cancel Crop">Cancel</button>
       <button type="button" class="crop-btn save-btn" aria-label="Save Crop">Save Crop</button>
@@ -401,18 +441,48 @@ function openCropper(img) {
 
     const tiltSlider = modal.querySelector("#tiltSlider");
     const tiltVal = modal.querySelector("#tiltVal");
+    const tiltStepInput = modal.querySelector("#tiltStepInput");
+    const btnTiltMinus = modal.querySelector("#btnTiltMinus");
+    const btnTiltPlus = modal.querySelector("#btnTiltPlus");
     const resetTiltBtn = modal.querySelector("#resetTiltBtn");
 
+    let currentTilt = 0;
+
+    function updateTiltUI() {
+        if (currentTilt > 180) currentTilt = 180;
+        if (currentTilt < -180) currentTilt = -180;
+        
+        tiltSlider.value = currentTilt;
+        tiltVal.innerText = (Math.round(currentTilt * 10) / 10);
+        cropper.rotateTo(currentTilt);
+    }
+
+    tiltStepInput.addEventListener("input", (e) => {
+        let step = parseFloat(e.target.value) || 1;
+        btnTiltMinus.innerText = "-" + step + "°";
+        btnTiltPlus.innerText = "+" + step + "°";
+    });
+
+    btnTiltMinus.addEventListener("click", () => {
+        let step = parseFloat(tiltStepInput.value) || 1;
+        currentTilt -= step;
+        updateTiltUI();
+    });
+
+    btnTiltPlus.addEventListener("click", () => {
+        let step = parseFloat(tiltStepInput.value) || 1;
+        currentTilt += step;
+        updateTiltUI();
+    });
+
     tiltSlider.addEventListener("input", (e) => {
-      const val = Number(e.target.value);
-      tiltVal.innerText = val;
-      cropper.rotateTo(val); 
+        currentTilt = parseFloat(e.target.value);
+        updateTiltUI();
     });
 
     resetTiltBtn.addEventListener("click", () => {
-      tiltSlider.value = 0;
-      tiltVal.innerText = "0";
-      cropper.rotateTo(0);
+        currentTilt = 0;
+        updateTiltUI();
     });
 
     modal.querySelector(".save-btn").onclick = () => {
@@ -563,7 +633,10 @@ generateBtn.onclick = async () => {
   const pageNumberSizeVal = 18; 
   const pageNumberColorHex = fontColorPicker.color.hexString;
   
+  // Watermark variables payload setup
   const addWatermark = wmToggle.checked;
+  const wmMosaicVal = wmMosaicToggle.checked;
+  const wmDensityValNum = parseInt(wmDensity.value);
   const wmTypeVal = wmType.value;
   const wmTextVal = wmTextInput.value.trim();
   const wmPosVal = wmPos.value;
@@ -617,9 +690,10 @@ generateBtn.onclick = async () => {
             const { 
               images, isFirst, formatSize, orientationVal, margin, fit, index, bgColorHex, 
               isBW, addPageNumbers, fontColorHex, fontPos, fontNumSize,
-              addWatermark, wmType, wmText, wmImage, wmImageAspect, wmPos, wmSize, wmOpacity, wmAngle, wmColorHex,
+              addWatermark, wmMosaic, wmDensity, wmType, wmText, wmImage, wmImageAspect, wmPos, wmSize, wmOpacity, wmAngle, wmColorHex,
               wmFont, wmBold, wmItalic
             } = payload;
+            
             const { jsPDF } = self.jspdf;
             
             let pw, ph;
@@ -671,7 +745,6 @@ generateBtn.onclick = async () => {
                     let y = (ph - h) / 2;
                     pdf.addImage(img.data, "JPEG", x, y, w, h);
                  } else {
-                    // Auto-Fill actual drawing
                     pdf.addImage(img.data, "JPEG", img.x, img.y, img.w, img.h);
                  }
               }
@@ -682,14 +755,13 @@ generateBtn.onclick = async () => {
               try {
                 pdf.setGState(new self.jspdf.GState({opacity: parseFloat(wmOpacity)}));
               } catch (e) {
-                console.log("GState not supported in this context");
+                console.log("GState not supported");
               }
 
               let wmPad = Math.max(20, margin);
 
               if (wmType === 'text' && wmText) {
-                let finalWmColor = wmColorHex;
-                pdf.setTextColor(finalWmColor);
+                pdf.setTextColor(wmColorHex);
                 
                 let fontStyle = "normal";
                 if(wmBold && wmItalic) fontStyle = "bolditalic";
@@ -697,29 +769,44 @@ generateBtn.onclick = async () => {
                 else if(wmItalic) fontStyle = "italic";
                 pdf.setFont(wmFont, fontStyle);
                 
-                let safeW = pw - (wmPad * 2);
-                let safeH = ph - (wmPad * 2);
-                let targetW = safeW * wmSize;
-                
-                let wmFontSize = targetW / Math.max(1, wmText.length * 0.45); 
-                wmFontSize = Math.min(wmFontSize, safeH * 0.8);
+                // 🚀 FIXED: SAFE FONT SIZE CALCULATION
+                let targetW = pw * wmSize * 1.5; 
+                let wmFontSize = targetW / Math.max(1, wmText.length * 0.4);
+                wmFontSize = Math.min(wmFontSize, ph * 0.7); // Cap to prevent layout break
                 pdf.setFontSize(wmFontSize);
-                
-                let posX, posY;
-                let alignVal = "center";
 
-                switch(wmPos) {
-                  case "center": posX = pw/2; posY = ph/2 + (wmFontSize * 0.3); break;
-                  case "bottom-center": posX = pw/2; posY = ph - wmPad; break;
-                  case "bottom-right": posX = pw - wmPad; posY = ph - wmPad; alignVal = "right"; break;
-                  case "bottom-left": posX = wmPad; posY = ph - wmPad; alignVal = "left"; break;
-                  case "top-center": posX = pw/2; posY = wmPad + wmFontSize; break;
-                  case "top-right": posX = pw - wmPad; posY = wmPad + wmFontSize; alignVal = "right"; break;
-                  case "top-left": posX = wmPad; posY = wmPad + wmFontSize; alignVal = "left"; break;
+                if (wmMosaic) {
+                    let steps = Math.max(2, parseInt(wmDensity));
+                    let stepX = pw / steps;
+                    let stepY = ph / steps;
+
+                    for (let r = -1; r <= steps + 1; r++) {
+                        for (let c = -1; c <= steps + 1; c++) {
+                            let posX = c * stepX;
+                            let posY = r * stepY;
+                            if (r % 2 !== 0) posX += stepX / 2;
+
+                            pdf.text(wmText, posX, posY, { align: 'center', baseline: 'middle', angle: parseFloat(wmAngle) });
+                        }
+                    }
+                } else {
+                    let posX, posY;
+                    let alignVal = "center";
+                    let baseLineVal = "middle"; // 🚀 FIXED: Exact vertical centering
+
+                    switch(wmPos) {
+                      case "center": posX = pw/2; posY = ph/2; break;
+                      case "bottom-center": posX = pw/2; posY = ph - wmPad; baseLineVal = "bottom"; break;
+                      case "bottom-right": posX = pw - wmPad; posY = ph - wmPad; alignVal = "right"; baseLineVal = "bottom"; break;
+                      case "bottom-left": posX = wmPad; posY = ph - wmPad; alignVal = "left"; baseLineVal = "bottom"; break;
+                      case "top-center": posX = pw/2; posY = wmPad; baseLineVal = "top"; break;
+                      case "top-right": posX = pw - wmPad; posY = wmPad; alignVal = "right"; baseLineVal = "top"; break;
+                      case "top-left": posX = wmPad; posY = wmPad; alignVal = "left"; baseLineVal = "top"; break;
+                    }
+                    pdf.text(wmText, posX, posY, { align: alignVal, baseline: baseLineVal, angle: parseFloat(wmAngle) });
                 }
-                pdf.text(wmText, posX, posY, { align: alignVal, angle: parseFloat(wmAngle) });
 
-               } else if (wmType === 'image' && wmImage) {
+              } else if (wmType === 'image' && wmImage) {
                 let maxW = (pw - wmPad * 2) * wmSize;
                 let maxH = (ph - wmPad * 2) * wmSize;
                 
@@ -730,17 +817,35 @@ generateBtn.onclick = async () => {
                    imgW = imgH * wmImageAspect;
                 }
 
-                let posX, posY;
-                switch(wmPos) {
-                  case "center": posX = (pw - imgW)/2; posY = (ph - imgH)/2; break;
-                  case "bottom-center": posX = (pw - imgW)/2; posY = ph - wmPad - imgH; break;
-                  case "bottom-right": posX = pw - wmPad - imgW; posY = ph - wmPad - imgH; break;
-                  case "bottom-left": posX = wmPad; posY = ph - wmPad - imgH; break;
-                  case "top-center": posX = (pw - imgW)/2; posY = wmPad; break;
-                  case "top-right": posX = pw - wmPad - imgW; posY = wmPad; break;
-                  case "top-left": posX = wmPad; posY = wmPad; break;
+                if (wmMosaic) {
+                    let steps = Math.max(2, parseInt(wmDensity));
+                    let stepX = pw / steps;
+                    let stepY = ph / steps;
+
+                    for (let r = -1; r <= steps + 1; r++) {
+                        for (let c = -1; c <= steps + 1; c++) {
+                            let posX = c * stepX;
+                            let posY = r * stepY;
+                            if (r % 2 !== 0) posX += stepX / 2;
+
+                            let drawX = posX - (imgW / 2);
+                            let drawY = posY - (imgH / 2);
+                            pdf.addImage(wmImage, 'PNG', drawX, drawY, imgW, imgH);
+                        }
+                    }
+                } else {
+                    let posX, posY;
+                    switch(wmPos) {
+                      case "center": posX = (pw - imgW)/2; posY = (ph - imgH)/2; break;
+                      case "bottom-center": posX = (pw - imgW)/2; posY = ph - wmPad - imgH; break;
+                      case "bottom-right": posX = pw - wmPad - imgW; posY = ph - wmPad - imgH; break;
+                      case "bottom-left": posX = wmPad; posY = ph - wmPad - imgH; break;
+                      case "top-center": posX = (pw - imgW)/2; posY = wmPad; break;
+                      case "top-right": posX = pw - wmPad - imgW; posY = wmPad; break;
+                      case "top-left": posX = wmPad; posY = wmPad; break;
+                    }
+                    pdf.addImage(wmImage, 'PNG', posX, posY, imgW, imgH);
                 }
-                pdf.addImage(wmImage, 'PNG', posX, posY, imgW, imgH);
               }
               pdf.restoreGraphicsState();
             }
@@ -855,7 +960,9 @@ generateBtn.onclick = async () => {
             wmColorHex: wmColorHexVal,
             wmFont: selectedFont,
             wmBold: wmFormats.bold,
-            wmItalic: wmFormats.italic
+            wmItalic: wmFormats.italic,
+            wmMosaic: wmMosaicVal,
+            wmDensity: wmDensityValNum
         });
 
         let singlePdfBlob = await finishPDF();
@@ -888,11 +995,10 @@ generateBtn.onclick = async () => {
       downloadBtn.disabled = true; 
       previewBtn.disabled = true;  
 
-      // SHOW TOAST MESSAGE ONCE PER PAGE LOAD (For Batch Mode)
       if (!hasShownDownloadToast) {
         const toastEl = document.getElementById("toast-msg");
         if (toastEl) {
-          toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)";
+          toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: Merge PDF(Coming Soon)";
           toastEl.classList.add("show");
           setTimeout(() => {
             toastEl.classList.remove("show");
@@ -902,7 +1008,6 @@ generateBtn.onclick = async () => {
       }
 
     } else {
-      // COMBINED PDF MODE
       let currentPageImages = [];
       let currentX = margin;
       let currentY = margin;
@@ -933,7 +1038,6 @@ generateBtn.onclick = async () => {
         const { data, width, height } = compressedRes;
         
         if (isAutoFill && formatSize !== 'original') {
-            // Auto-Fill Grouping logic with exact margin spacing
             let printW = width;
             let printH = height;
             let maxAllowedW = pw - margin * 2;
@@ -950,14 +1054,12 @@ generateBtn.onclick = async () => {
                 printW = printW * ratio;
             }
             
-            // Check horizontal space using user defined margin
             if (currentPageImages.length > 0 && currentX + printW > pw - margin) {
                 currentX = margin;
-                currentY += rowHeight + margin; // vertical gap is exact margin
+                currentY += rowHeight + margin; 
                 rowHeight = 0;
             }
             
-            // Check vertical space using user defined margin
             if (currentPageImages.length > 0 && currentY + printH > ph - margin) {
                 await addPageToPDF({
                     images: currentPageImages,
@@ -965,7 +1067,7 @@ generateBtn.onclick = async () => {
                     formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
                     bgColorHex: pdfBgColorHex, isBW: isBW,
                     addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
-                    addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+                    addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic, wmMosaic: wmMosaicVal, wmDensity: wmDensityValNum
                 });
                 pageIndex++;
                 currentPageImages = [];
@@ -975,11 +1077,10 @@ generateBtn.onclick = async () => {
             }
             
             currentPageImages.push({ data, x: currentX, y: currentY, w: printW, h: printH, isOriginal: false });
-            currentX += printW + margin; // horizontal gap is exact margin
+            currentX += printW + margin; 
             rowHeight = Math.max(rowHeight, printH);
             
         } else {
-            // Normal 1 image per page logic
             currentPageImages = [{ data, imgWidth: width, imgHeight: height, isOriginal: true }];
             await addPageToPDF({
                 images: currentPageImages,
@@ -987,7 +1088,7 @@ generateBtn.onclick = async () => {
                 formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
                 bgColorHex: pdfBgColorHex, isBW: isBW,
                 addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
-                addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+                addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic, wmMosaic: wmMosaicVal, wmDensity: wmDensityValNum
             });
             pageIndex++;
             currentPageImages = [];
@@ -1007,7 +1108,7 @@ generateBtn.onclick = async () => {
               formatSize: formatSize, orientationVal: orientationVal, margin: margin, fit: fit, index: pageIndex,
               bgColorHex: pdfBgColorHex, isBW: isBW,
               addPageNumbers: addPageNumbers, fontColorHex: pageNumberColorHex, fontPos: pageNumberPosition, fontNumSize: pageNumberSizeVal,
-              addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic
+              addWatermark: addWatermark, wmType: wmTypeVal, wmText: wmTextVal, wmImage: finalWmImageBase64, wmImageAspect: finalWmImageAspect, wmPos: wmPosVal, wmSize: wmSizeVal, wmOpacity: wmOpacityVal, wmAngle: wmAngleVal, wmColorHex: wmColorHexVal, wmFont: selectedFont, wmBold: wmFormats.bold, wmItalic: wmFormats.italic, wmMosaic: wmMosaicVal, wmDensity: wmDensityValNum
           });
       }
       
@@ -1171,7 +1272,7 @@ downloadBtn.onclick = () => {
   if (!hasShownDownloadToast) {
     const toastEl = document.getElementById("toast-msg");
     if (toastEl) {
-      toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: PDF to IMG (Coming Soon)";
+      toastEl.innerText = "PDF Downloaded! 🎉 Next Tool: Merge PDF(Coming Soon)";
       toastEl.classList.add("show");
       setTimeout(() => {
         toastEl.classList.remove("show");
@@ -1180,7 +1281,6 @@ downloadBtn.onclick = () => {
     }
   }
 
-  // CONNECTED TO GLOBAL RATING SYSTEM
   setTimeout(() => {
     if (window.triggerGlobalRatingPopup) window.triggerGlobalRatingPopup();
   }, 1500); 

@@ -31,7 +31,7 @@
         "featureList": [
           "100% Private & Secure: No files are ever uploaded to a server.",
           "Client-Side Processing: All conversions happen directly in your browser.",
-          "Lightning Fast: Zero wait time for server responses (Score 100/100 on PageSpeed).",
+          "Lightning Fast: Zero wait time for server responses.",
           "Completely Free: No hidden charges, no watermarks, and no registration required.",
           "Multi-Format Support: Converts JPG, PNG, and WebP images to PDF effortlessly."
         ]
@@ -43,7 +43,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-TC8FR721KT');
     </script>
     
@@ -56,7 +55,9 @@
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/tools/img-to-pdf.css">
-    <link rel="stylesheet" href="../css/tools/rating.css"> <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="../css/tools/rating.css"> 
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"></noscript>
     
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
@@ -68,7 +69,6 @@
   <body>
     
     <div id="navbar-placeholder"></div>
-    
     <div id="toast-msg" class="toast"></div>
 
     <main class="tool-container pt-24">
@@ -166,9 +166,7 @@
           
           <div id="customColorSection" class="pos-relative" style="display:none;">
             <button id="colorSwatchBtn" type="button" class="color-swatch-btn" title="Pick a color" aria-label="Pick custom background color"></button>
-            
             <div id="colorPopoverOverlay" class="picker-overlay"></div>
-            
             <div id="canvaColorPickerPanel" class="canva-picker-panel">
               <div class="panel-header">
                 <span>Solid Color</span>
@@ -217,9 +215,7 @@
         <label>Number Color:</label>
         <div class="bg-custom-wrapper">
           <button id="fontColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #000000;" title="Pick a color" aria-label="Pick font color"></button>
-          
           <div id="fontColorPopoverOverlay" class="picker-overlay"></div>
-          
           <div id="fontColorPickerPanel" class="canva-picker-panel">
             <div class="panel-header">
               <span>Font Color</span>
@@ -250,7 +246,7 @@
           <option value="image">Image/Logo</option>
         </select>
       </div>
-      
+
       <div class="setting-item wm-extra wm-text-only" style="display:none;">
         <label>Watermark Text:</label>
         <input type="text" id="wmTextInput" value="" placeholder="Enter text..." aria-label="Watermark Text" spellcheck="false">
@@ -294,8 +290,20 @@
           <input type="file" id="wmImageInput" accept="image/*" aria-label="Watermark Image Input" hidden>
         </label>
       </div>
-      
+
       <div class="setting-item wm-extra" style="display:none;">
+        <label>Mosaic Watermark:</label>
+        <label class="switch">
+          <input type="checkbox" id="wmMosaicToggle" aria-label="Toggle Mosaic Pattern Watermark">
+          <span class="slider"></span>
+        </label>
+        <small style="display:block; color:#9be7d8; font-size:0.75rem; margin-top:8px; line-height:1.4;">
+          <svg style="vertical-align: middle; margin-right: 3px;" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Repeats the watermark across the entire page to protect against unauthorized cropping or removal.
+        </small>
+      </div>
+      
+      <div class="setting-item wm-extra" id="wmPosContainer" style="display:none;">
         <label>Watermark Position:</label>
         <select id="wmPos" aria-label="Select Watermark Position">
           <option value="center" selected>Center</option>
@@ -307,10 +315,15 @@
           <option value="top-left">Top Left</option>
         </select>
       </div>
+
+      <div class="setting-item wm-extra wm-mosaic-extra" style="display:none;">
+        <label>Mosaic Density: <span id="wmDensityVal">4</span></label>
+        <input type="range" id="wmDensity" min="2" max="10" value="4" aria-label="Watermark Mosaic Density">
+      </div>
       
       <div class="setting-item wm-extra" style="display:none;">
-        <label>Size: <span id="wmSizeVal">50</span>%</label>
-        <input type="range" id="wmSize" min="5" max="100" value="50" aria-label="Watermark Size">
+        <label>Size: <span id="wmSizeVal">30</span>%</label>
+        <input type="range" id="wmSize" min="5" max="100" value="30" aria-label="Watermark Size">
       </div>
       
       <div class="setting-item wm-extra" style="display:none;">
@@ -332,9 +345,7 @@
         <label>Watermark Color:</label>
         <div class="bg-custom-wrapper">
           <button id="wmColorSwatchBtn" type="button" class="color-swatch-btn" style="background-color: #808080;" title="Pick a color" aria-label="Pick watermark color"></button>
-          
           <div id="wmColorPopoverOverlay" class="picker-overlay"></div>
-          
           <div id="wmColorPickerPanel" class="canva-picker-panel">
             <div class="panel-header">
               <span>Watermark Color</span>
@@ -493,7 +504,7 @@
     <div class="popup-content">
       <h3 style="color: #ff5252; margin-bottom: 10px;">⚠️ Delete Image?</h3>
       <p style="color: #b2ebf2; font-size: 0.95rem; margin-bottom: 20px;">Are you sure you want to remove this image from your list?</p>
-      <div style="display: flex; gap: 12px;">
+      <div style="display: flex; gap: 12px; width: 100%;">
         <button id="btn-cancel-delete" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
         <button id="btn-confirm-delete" class="popup-btn popup-btn-red" style="margin: 0; flex: 1;">Delete</button>
       </div>
@@ -503,5 +514,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
   <script src="../js/global.js" defer></script>
   <script type="module" src="../js/tools/img-to-pdf.js"></script>
-  <script type="module" src="../js/tools/rating.js"></script> </body>
+  <script type="module" src="../js/tools/rating.js"></script>
+  
+</body>
 </html>

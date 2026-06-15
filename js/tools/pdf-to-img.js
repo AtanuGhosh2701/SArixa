@@ -257,7 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
         card.className = 'image-card';
         card.dataset.page = pageNum;
 
-        // FIXED: SVG elements styled directly
         const zoomIcon = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>`;
         const cropIcon = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"></path><path d="M18 22V8a2 2 0 0 0-2-2H2"></path></svg>`;
         const downloadIcon = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
@@ -279,7 +278,6 @@ document.addEventListener("DOMContentLoaded", () => {
         card.querySelector('.btn-crop').onclick = () => openCropModal(pageNum, card.querySelector('.img-thumb'));
         card.querySelector('.btn-dl').onclick = () => { downloadSingle(pageNum, format); triggerDownloadSuccess(); };
         
-        // Setup Delete Modal Connection
         card.querySelector('.btn-del').onclick = () => {
             const delPopup = document.getElementById("delete-confirm-popup");
             delPopup.style.display = "flex";
@@ -321,6 +319,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    pageSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            pageSearch.blur();  
+        }
+    });
+
     function openZoomModal(src) {
         const overlay = document.createElement("div");
         overlay.className = "zoom-overlay";
@@ -329,19 +334,85 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.appendChild(overlay);
     }
 
+    // 🚀 ADVANCED CROP MODAL IMPLEMENTED WITH SMOOTH TILT FOR PDF-TO-IMG
     function openCropModal(pageNum, imgElement) {
         const modal = document.createElement("div");
         modal.className = "crop-modal";
         modal.innerHTML = `
-            <div class="crop-area" style="width: 100%; max-width: 800px; height: 65vh; margin-bottom: 20px; background: #000;"><img id="cropTarget" src="${pageDataMap.get(pageNum)}" alt="Crop target"></div>
-            <div class="crop-actions" style="display:flex; gap:15px; width: 100%; max-width: 800px;">
-                <button class="crop-btn cancel-btn" style="flex: 1; max-width: 200px; padding: 14px; font-size: 1rem; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; background:#ff5252; color:#fff;" aria-label="Cancel Cropping">Cancel</button>
-                <button class="crop-btn save-btn" style="flex: 1; max-width: 200px; padding: 14px; font-size: 1rem; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; background:#00e676; color:#003c2f;" aria-label="Save Cropped Image">Apply Crop</button>
+            <div class="crop-area"><img id="cropTarget" src="${pageDataMap.get(pageNum)}" alt="Crop target"></div>
+            
+            <div class="crop-tilt-wrapper">
+                <div class="crop-tilt-header">
+                    <label>Tilt: <span id="tiltVal">0</span>°</label>
+                    <div class="step-input-group">
+                        <label for="tiltStepInput">Step:</label>
+                        <input type="number" id="tiltStepInput" value="1" min="0.1" max="90" step="0.1">
+                        <span>°</span>
+                    </div>
+                </div>
+                <div class="crop-tilt-controls">
+                    <button type="button" id="btnTiltMinus" class="tilt-step-btn">-1°</button>
+                    <input type="range" id="tiltSlider" min="-180" max="180" value="0" step="0.1" aria-label="Tilt Image slider">
+                    <button type="button" id="btnTiltPlus" class="tilt-step-btn">+1°</button>
+                    <button id="resetTiltBtn" type="button" class="reset-tilt-btn" aria-label="Reset Tilt">Reset</button>
+                </div>
+            </div>
+
+            <div class="crop-actions">
+                <button type="button" class="crop-btn cancel-btn" aria-label="Cancel Cropping">Cancel</button>
+                <button type="button" class="crop-btn save-btn" aria-label="Save Cropped Image">Save Crop</button>
             </div>
         `;
         document.body.appendChild(modal);
 
-        const cropper = new Cropper(modal.querySelector('#cropTarget'), { viewMode: 1, autoCropArea: 1, background: false });
+        const targetImage = modal.querySelector('#cropTarget');
+        const cropper = new Cropper(targetImage, { viewMode: 1, autoCropArea: 1, background: false, responsive: true, checkOrientation: false });
+
+        const tiltSlider = modal.querySelector("#tiltSlider");
+        const tiltVal = modal.querySelector("#tiltVal");
+        const tiltStepInput = modal.querySelector("#tiltStepInput");
+        const btnTiltMinus = modal.querySelector("#btnTiltMinus");
+        const btnTiltPlus = modal.querySelector("#btnTiltPlus");
+        const resetTiltBtn = modal.querySelector("#resetTiltBtn");
+
+        let currentTilt = 0;
+
+        function updateTiltUI() {
+            if (currentTilt > 180) currentTilt = 180;
+            if (currentTilt < -180) currentTilt = -180;
+            
+            tiltSlider.value = currentTilt;
+            tiltVal.innerText = (Math.round(currentTilt * 10) / 10);
+            cropper.rotateTo(currentTilt);
+        }
+
+        tiltStepInput.addEventListener("input", (e) => {
+            let step = parseFloat(e.target.value) || 1;
+            btnTiltMinus.innerText = "-" + step + "°";
+            btnTiltPlus.innerText = "+" + step + "°";
+        });
+
+        btnTiltMinus.addEventListener("click", () => {
+            let step = parseFloat(tiltStepInput.value) || 1;
+            currentTilt -= step;
+            updateTiltUI();
+        });
+
+        btnTiltPlus.addEventListener("click", () => {
+            let step = parseFloat(tiltStepInput.value) || 1;
+            currentTilt += step;
+            updateTiltUI();
+        });
+
+        tiltSlider.addEventListener("input", (e) => {
+            currentTilt = parseFloat(e.target.value);
+            updateTiltUI();
+        });
+
+        resetTiltBtn.addEventListener("click", () => {
+            currentTilt = 0;
+            updateTiltUI();
+        });
 
         modal.querySelector('.cancel-btn').onclick = () => { cropper.destroy(); modal.remove(); };
         modal.querySelector('.save-btn').onclick = () => {
@@ -390,12 +461,12 @@ document.addEventListener("DOMContentLoaded", () => {
         triggerDownloadSuccess();
     });
 
-    // Rating trigger logic connected to Global UI
+    // Rating trigger & Comming soon toast logic
     function triggerDownloadSuccess() {
         if (!hasShownDownloadToast) {
             const t = document.getElementById("toast-msg");
             if (t) {
-                t.innerText = "Images Downloaded! 🎉";
+                t.innerText = "Images Downloaded! 🎉 Next Tool: Merge PDF (Coming Soon)";
                 t.classList.add("show");
                 setTimeout(() => t.classList.remove("show"), 4000);
                 hasShownDownloadToast = true;

@@ -28,7 +28,6 @@ html, body {
     -webkit-font-smoothing: antialiased;
 }
 
-
 /* ==========================================================================
    2. NAVBAR SYSTEM (Desktop Active Shapes Look)
    ========================================================================== */
@@ -52,7 +51,13 @@ html, body {
     transform: translateY(-100%);
 }
 
-.logo img { height: 40px; width: 160px; object-fit: contain; aspect-ratio: 4 / 1; }
+.logo img { 
+    height: 40px; 
+    width: 160px; 
+    object-fit: contain; 
+    aspect-ratio: 4 / 1; 
+}
+
 .logo h2 {
     color: var(--text-bright); 
     font-size: 24px; 
@@ -62,18 +67,18 @@ html, body {
 .navbar nav {
     display: flex; 
     align-items: center; 
-    gap: 15px; /* Optimised spacing for button elements */
+    gap: 15px; 
 }
 
-/* PC BUTTON STYLES (Fixed Layout Shift Glitch) */
+/* PC BUTTON STYLES */
 .navbar nav a,
 .dropdown-trigger {
     color: var(--text-main); 
     text-decoration: none; 
     font-size: 1.1rem;
     position: relative; 
-    padding: 8px 16px; /* Base padding matching active state */
-    border: 1px solid transparent; /* Transparent border prevents sizing jumps */
+    padding: 8px 16px; 
+    border: 1px solid transparent; 
     border-radius: 8px;
     transition: all 0.3s ease;
     background: transparent;
@@ -83,20 +88,28 @@ html, body {
 /* Magic Line (Hover State Adjustment) */
 .navbar nav a::after,
 .dropdown-trigger::after {
-    content: ''; position: absolute; bottom: 4px; left: 50%;
-    transform: translateX(-50%); width: 0; height: 2px;
-    background-color: var(--accent-primary); transition: 0.3s;
+    content: ''; 
+    position: absolute; 
+    bottom: 4px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    width: 0; 
+    height: 2px;
+    background-color: var(--accent-primary); 
+    transition: 0.3s;
 }
 
 .navbar nav a:hover::after,
-.dropdown-trigger:hover::after { width: 70%; }
+.dropdown-trigger:hover::after { 
+    width: 70%; 
+}
 
 .navbar nav a:hover,
 .dropdown-trigger:hover { 
     color: var(--accent-primary); 
 }
 
-/* Distinct Active State for Main Navbar Items (Pixel-Perfect) */
+/* Distinct Active State for Main Navbar Items */
 .navbar nav a.active,
 .dropdown-trigger.active {
     color: var(--accent-primary) !important; 
@@ -110,7 +123,6 @@ html, body {
 .dropdown-trigger.active::after {
     display: none; 
 }
-
 
 /* ==========================================================================
    3. DROPDOWN PLATFORM SUBS (PC Version Styles)
@@ -211,7 +223,6 @@ html, body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-
 /* ==========================================================================
    4. HAMBURGER MOBILE MENU BUTTONS
    ========================================================================== */
@@ -234,7 +245,6 @@ html, body {
     border-radius: 3px; 
     transition: 0.3s ease-in-out;
 }
-
 
 /* ==========================================================================
    5. GLOBAL FOOTER PLATFORM (Structured Column Grids)
@@ -262,8 +272,15 @@ html, body {
 .footer p, .footer a { color: var(--text-main); text-decoration: none; opacity: 0.8; transition: 0.3s; }
 .footer a:hover { color: var(--accent-primary); opacity: 1; }
 .footer ul { list-style: none; line-height: 2; }
-.footer-bottom { max-width: 1000px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid rgba(0, 255, 200, 0.2); text-align: center; font-size: 13px; opacity: 0.7; }
-
+.footer-bottom { 
+    max-width: 1000px; 
+    margin: 40px auto 0; 
+    padding-top: 20px; 
+    border-top: 1px solid rgba(0, 255, 200, 0.2); 
+    text-align: center; 
+    font-size: 13px; 
+    opacity: 0.7; 
+}
 
 /* ==========================================================================
    6. RESPONSIVE MEDIA BREAKPOINTS (Responsive Shape Updates)
@@ -298,7 +315,7 @@ html, body {
     }
     
     .navbar nav.active:has(.dropdown.active) {
-        max-height: 680px !important;
+        max-height: 750px !important; /* Extra space for expanded drawer */
     }
 
     /* MOBILE BUTTON STYLES */
@@ -306,7 +323,7 @@ html, body {
     .dropdown-trigger {
         width: 80%; 
         text-align: center; 
-        padding: 10px; 
+        padding: 12px; /* Slightly taller for touch */
         border: 1px solid rgba(0, 255, 200, 0.4);
         border-radius: 8px; 
         background: rgba(0, 255, 200, 0.05); 
@@ -327,7 +344,7 @@ html, body {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
         width: 80%;
         margin: 0 auto;
     }
@@ -350,63 +367,60 @@ html, body {
     .dropdown-trigger.active { 
         background: rgba(0, 230, 118, 0.2) !important; 
         border-color: var(--accent-primary) !important; 
-        transform: scale(1.05); 
+        transform: scale(1.02); 
     }
 
-    /* Mobile Accordion Drawer Shell Layout */
+    /* 🔥 FIXED: Mobile Accordion Drawer Shell Layout */
     .dropdown-menu {
         position: static;
-        width: 75%; 
-        max-width: 240px; 
+        width: 80%; /* Match trigger button width exactly */
+        max-width: none; 
         margin: 0 auto; 
         box-sizing: border-box;
-        box-shadow: none;
-        background: rgba(0, 230, 118, 0.04); 
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.4); /* Inner shadow for nested depth */
+        background: rgba(0, 0, 0, 0.3); /* Darker background to feel like a drawer */
         border: none;
         border-radius: 8px;
-        
         padding: 0;
         max-height: 0;
         opacity: 0;
         overflow: hidden;
-        display: block; 
-        transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out, margin 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        gap: 6px; /* Spacing between tool buttons */
+        transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out, margin 0.3s ease-in-out, padding 0.3s ease-in-out;
     }
 
     .dropdown.active .dropdown-menu {
-        max-height: 200px; 
+        max-height: 300px; 
         opacity: 1;
-        padding: 6px; 
-        margin: 8px auto;
-        border: 1px solid rgba(0, 230, 118, 0.15);
+        padding: 12px; /* Generous padding inside drawer */
+        margin: 8px auto 10px auto; /* Margin from the trigger button */
+        border: 1px solid rgba(0, 255, 200, 0.15);
     }
 
     .dropdown-item {
         display: flex;
         justify-content: center; 
         align-items: center;
-        padding: 12px 10px;
-        margin-bottom: 4px; 
+        padding: 12px 15px;
+        margin: 0;
         width: 100%;
-        color: #fff;
+        color: #b2ebf2;
         font-size: 0.95rem;
         box-sizing: border-box;
         text-align: center;
-        border: 1px solid transparent; 
-        background: transparent;
-        margin: 0 auto 4px auto;
+        border: 1px solid rgba(0, 255, 200, 0.05); /* Subtle border for items */
+        background: rgba(0, 255, 200, 0.02);
         transform: none; 
         border-radius: 6px;
         transition: all 0.3s ease;
     }
     
-    .dropdown-item:last-child {
-        margin-bottom: 0; 
-    }
-    
     .dropdown-item:hover {
-        transform: none; 
-        background: rgba(0, 230, 118, 0.08);
+        background: rgba(0, 255, 200, 0.1);
+        color: var(--accent-primary);
+        border-color: rgba(0, 255, 200, 0.2);
     }
 
     /* Magic Glow For Mobile Dropdown Item Switch */
@@ -416,11 +430,14 @@ html, body {
         background: rgba(0, 230, 118, 0.15) !important;
         border: 1px solid rgba(0, 230, 118, 0.3) !important;
         box-shadow: 0 0 10px rgba(0, 230, 118, 0.15);
-        transform: scale(1.03) !important;
+        transform: scale(1.02) !important;
     }
 
     .dropdown-footer {
-        padding: 10px 0 2px 0;
+        padding: 8px 0 0 0;
         text-align: center;
+        border-top: 1px dashed rgba(0, 230, 118, 0.15);
+        margin-top: 4px;
+        font-size: 0.8rem;
     }
 }
