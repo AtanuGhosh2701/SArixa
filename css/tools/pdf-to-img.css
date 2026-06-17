@@ -659,6 +659,12 @@ input:checked + .slider:before {
     background: #000;
 }
 
+/* Make sure image fits */
+.crop-area img {
+    display: block;
+    max-width: 100%;
+}
+
 .cropper-view-box {
     outline: 2px solid #00e676 !important;
 }
@@ -838,25 +844,64 @@ input:checked + .slider:before {
     text-align: center; 
     border: 2px solid #00e676; 
     border-radius: 15px; 
+    box-shadow: 0px 4px 25px rgba(0, 230, 118, 0.3);
+}
+
+.close-btn { 
+    position: absolute; 
+    top: 10px; 
+    right: 15px; 
+    color: #b2ebf2; 
+    font-size: 25px; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
+.close-btn:hover { 
+    color: #ff5252; 
+}
+
+.popup-content h3 { 
+    color: #00e676; 
+    margin-bottom: 5px; 
 }
 
 .popup-btn { 
     padding: 10px 20px; 
+    font-size: 1rem; 
     font-weight: bold; 
     border: none; 
     border-radius: 8px; 
     cursor: pointer; 
-    transition: 0.2s; 
-}
-
-.popup-btn-green { 
-    background: #00e676; 
-    color: #003c2f; 
+    transition: background 0.2s; 
 }
 
 .popup-btn-red { 
-    background: #ff5252; 
+    background-color: #ff5252; 
     color: #fff; 
+}
+
+.popup-btn-red:hover { 
+    background-color: #e53935; 
+}
+
+.popup-btn-green { 
+    background-color: #00e676; 
+    color: #003c2f; 
+}
+
+.popup-btn-green:hover { 
+    background-color: #00c853; 
+}
+
+.popup-btn-outline-red { 
+    background-color: transparent; 
+    border: 2px solid #ff5252; 
+    color: #ff5252; 
+}
+
+.popup-btn-outline-red:hover { 
+    background-color: rgba(255, 82, 82, 0.1); 
 }
 
 /* -----------------------------------------
@@ -884,7 +929,8 @@ input:checked + .slider:before {
     border: 1px solid rgba(0, 255, 200, 0.3); 
     border-radius: 8px; 
     margin-bottom: 12px; 
-    transition: 0.3s; 
+    overflow: hidden; 
+    transition: all 0.3s ease; 
 }
 
 .faq-item:hover { 
@@ -897,12 +943,39 @@ input:checked + .slider:before {
     font-weight: bold; 
     color: #fff; 
     cursor: pointer; 
+    list-style: none; 
+    position: relative; 
+    user-select: none; 
+}
+
+.faq-item summary::-webkit-details-marker { 
+    display: none; 
+}
+
+.faq-item summary::after { 
+    content: "▼"; 
+    position: absolute; 
+    right: 20px; 
+    top: 50%; 
+    transform: translateY(-50%); 
+    color: #00e676; 
+    font-size: 0.8rem; 
+    transition: transform 0.3s ease; 
+}
+
+.faq-item[open] summary::after { 
+    transform: translateY(-50%) rotate(180deg); 
 }
 
 .faq-content { 
     padding: 0 20px 20px 20px; 
     color: #b2ebf2; 
     line-height: 1.6; 
+    font-size: 0.95rem; 
+}
+
+.faq-content strong { 
+    color: #00e676; 
 }
 
 /* -----------------------------------------
@@ -926,6 +999,14 @@ input:checked + .slider:before {
     margin-bottom: 15px; 
 }
 
+.seo-intro p { 
+    color: #b2ebf2; 
+    font-size: 1.05rem; 
+    line-height: 1.6; 
+    max-width: 800px; 
+    margin: 0 auto; 
+}
+
 .seo-grid { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
@@ -937,12 +1018,19 @@ input:checked + .slider:before {
     border: 1px solid rgba(0, 255, 200, 0.2); 
     border-radius: 12px; 
     padding: 25px; 
-    transition: 0.3s; 
+    transition: transform 0.3s ease, box-shadow 0.3s ease; 
 }
 
 .seo-card:hover { 
     transform: translateY(-5px); 
+    box-shadow: 0 8px 20px rgba(0, 230, 118, 0.15); 
     border-color: #00e676; 
+}
+
+.seo-card h3 { 
+    color: #00e676; 
+    font-size: 1.3rem; 
+    margin-bottom: 15px; 
 }
 
 .seo-card p, 
@@ -950,10 +1038,21 @@ input:checked + .slider:before {
     color: #9be7d8; 
     font-size: 0.95rem; 
     line-height: 1.6; 
+    margin-bottom: 10px; 
 }
 
-.seo-card h3 { 
-    color: #00e676; 
+.seo-card ol, 
+.seo-card ul { 
+    padding-left: 20px; 
+    color: #9be7d8; 
+}
+
+.seo-card li { 
+    margin-bottom: 8px; 
+}
+
+.seo-card strong { 
+    color: #b2ebf2; 
 }
 
 /* -----------------------------------------
@@ -1054,5 +1153,55 @@ input:checked + .slider:before {
         transform: translate(-50%, -50%); 
         width: 90%; 
         max-width: 320px; 
+    }
+
+    /* 🚀 CROP MODAL MOBILE RESPONSIVENESS FIX */
+    .crop-modal {
+        padding: 15px 10px;
+    }
+
+    .crop-area {
+        height: 45vh; /* Gives more room for controls */
+        margin-bottom: 15px;
+    }
+
+    .crop-tilt-wrapper {
+        margin-bottom: 15px;
+    }
+
+    .crop-tilt-controls {
+        gap: 6px;
+    }
+
+    .tilt-step-btn, 
+    .reset-tilt-btn {
+        padding: 6px 8px;
+        min-width: 40px;
+        font-size: 0.85rem;
+    }
+
+    .step-input-group {
+        padding: 4px 6px;
+    }
+
+    .step-input-group input {
+        width: 35px;
+    }
+
+    .crop-actions {
+        gap: 10px;
+    }
+
+    .crop-btn {
+        padding: 12px 10px;
+        font-size: 0.95rem;
+    }
+    
+    .zoom-close {
+        top: 10px;
+        right: 10px;
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
     }
 }
