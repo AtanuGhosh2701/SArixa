@@ -2,11 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 // ==========================================
-// RATING HTML TEMPLATE (Direct Injection - No Fetch needed!)
+// RATING HTML TEMPLATE (Direct Injection)
 // ==========================================
+// Emoji Unicode mapping to completely avoid encoding errors
 const ratingHTMLTemplate = `
 <div id="rating-reminder-bar" class="reminder-bar">
-    <span>Enjoying SArixa? Give a quick rating ⭐</span>
+    <span>Enjoying SArixa? Give a quick rating \u{2B50}</span>
     <button id="open-reminder-btn" aria-label="Rate SArixa Application">Rate Now</button>
 </div>
 
@@ -15,19 +16,26 @@ const ratingHTMLTemplate = `
         <span id="close-popup-top" class="close-btn" aria-label="Close rating popup" role="button" tabindex="0">&times;</span>
         
         <div id="rating-step-1">
-            <h3 id="rating-title">Did SArixa save your time? ❤️</h3>
+            <h3 id="rating-title">Did SArixa save your time? \u{2764}\u{FE0F}</h3>
             <div id="stars" class="rating-stars" aria-label="Rate SArixa from 1 to 5 stars">
-                <span data-value="1" aria-label="1 Star" role="button" tabindex="0">☆</span>
-                <span data-value="2" aria-label="2 Stars" role="button" tabindex="0">☆</span>
-                <span data-value="3" aria-label="3 Stars" role="button" tabindex="0">☆</span>
-                <span data-value="4" aria-label="4 Stars" role="button" tabindex="0">☆</span>
-                <span data-value="5" aria-label="5 Stars" role="button" tabindex="0">☆</span>
+                <span data-value="1" aria-label="1 Star" role="button" tabindex="0">\u{2606}</span>
+                <span data-value="2" aria-label="2 Stars" role="button" tabindex="0">\u{2606}</span>
+                <span data-value="3" aria-label="3 Stars" role="button" tabindex="0">\u{2606}</span>
+                <span data-value="4" aria-label="4 Stars" role="button" tabindex="0">\u{2606}</span>
+                <span data-value="5" aria-label="5 Stars" role="button" tabindex="0">\u{2606}</span>
             </div>
         </div>
 
-        <div id="rating-step-happy" style="display: none;">
-            <h3 style="margin-bottom: 5px;">You just saved time using SArixa ❤️ Help your friends too!</h3>
-            <p style="color: #b2ebf2; font-size: 0.9rem; margin-bottom: 15px;">Share with your friends 🚀</p>
+        <div id="rating-step-2" style="display: none;">
+            <h3 style="margin-bottom: 5px;">Thanks for your feedback! \u{1F64F}</h3>
+            
+            <p style="color: #b2ebf2; font-size: 0.9rem; margin-bottom: 10px;">What can we improve?</p>
+            <textarea id="feedback-text" placeholder="Tell us about any bugs or feature ideas..." aria-label="Enter your feedback here"></textarea>
+            <button id="btn-submit-feedback" class="popup-btn popup-btn-green" style="margin-top: 10px; width: 100%;" aria-label="Submit feedback">Submit</button>
+            
+            <hr style="border: 0; border-top: 1px dashed rgba(0, 255, 200, 0.3); margin: 20px 0 15px 0;">
+            
+            <p style="color: #b2ebf2; font-size: 0.9rem; margin-bottom: 10px;">Share SArixa with friends \u{1F680}</p>
             <div class="share-btns">
                 <a id="whatsapp-share-btn" href="#" target="_blank" class="whatsapp-btn" aria-label="Share via WhatsApp">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" style="vertical-align: middle; margin-right: 5px;" aria-hidden="true">
@@ -37,14 +45,6 @@ const ratingHTMLTemplate = `
                 </a>
                 <button id="copy-link-btn" class="popup-btn popup-btn-green" style="margin: 0;" aria-label="Copy website link">Copy Link</button>
             </div>
-        </div>
-
-        <div id="rating-step-sad" style="display: none;">
-            <h3 style="margin-bottom: 5px;">Thanks for your feedback 🙏</h3>
-            <p style="color: #b2ebf2; font-size: 0.9rem; margin-bottom: 10px;">What can we improve?</p>
-            <textarea id="feedback-text" placeholder="Tell us about any bugs or feature ideas..." aria-label="Enter your feedback here"></textarea>
-            <button id="btn-submit-feedback" class="popup-btn popup-btn-green" style="margin-top: 10px; width: 100%;" aria-label="Submit feedback">Submit</button>
-            <p style="color: #9be7d8; font-size: 0.8rem; margin-top: 10px;">We’re constantly improving SArixa ❤️</p>
         </div>
 
         <div id="rating-success-state" class="rating-success-state" style="display: none;">
@@ -63,9 +63,7 @@ const ratingHTMLTemplate = `
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     const placeholder = document.getElementById("rating-placeholder");
-    
     if (placeholder) {
-        // Direct injection (No fetch error possible!)
         placeholder.innerHTML = ratingHTMLTemplate;
         initRatingSystem();
     }
@@ -93,36 +91,35 @@ function initRatingSystem() {
     const popup = document.getElementById('rating-popup');
     const closeTopBtn = document.getElementById('close-popup-top');
     const stars = document.querySelectorAll('#stars span');
-
+    
     const step1 = document.getElementById('rating-step-1');
-    const stepHappy = document.getElementById('rating-step-happy');
-    const stepSad = document.getElementById('rating-step-sad');
+    const step2 = document.getElementById('rating-step-2');
     const successState = document.getElementById('rating-success-state');
 
     const copyLinkBtn = document.getElementById('copy-link-btn');
     const btnSubmitFeedback = document.getElementById('btn-submit-feedback');
     const feedbackText = document.getElementById('feedback-text');
-
     const reminderBar = document.getElementById('rating-reminder-bar');
     const openReminderBtn = document.getElementById('open-reminder-btn');
+    const whatsappBtn = document.getElementById('whatsapp-share-btn');
 
-    if(!localStorage.getItem('hasSubmittedSarixaRating')) {
-        if(reminderBar) reminderBar.style.display = 'flex';
-    } else {
-        if(reminderBar) reminderBar.style.display = 'none';
+    // Setup Initial State
+    if (!localStorage.getItem('hasSubmittedSarixaRating') && reminderBar) {
+        reminderBar.style.display = 'flex';
+    } else if (reminderBar) {
+        reminderBar.style.display = 'none';
     }
 
     const resetPopupUI = () => {
         step1.style.display = 'block';
-        stepHappy.style.display = 'none';
-        stepSad.style.display = 'none';
+        step2.style.display = 'none';
         successState.style.display = 'none';
         selectedRating = 0;
         feedbackText.value = "";
-        copyLinkBtn.innerText = "Copy Link";
+        if(copyLinkBtn) copyLinkBtn.innerText = "Copy Link";
         
         stars.forEach(s => { 
-            s.innerHTML = '☆'; 
+            s.innerHTML = '\u{2606}'; 
             s.style.color = '#555';
             s.classList.remove('selected');
         });
@@ -145,7 +142,7 @@ function initRatingSystem() {
 
         stars.forEach(s => {
           const sVal = parseInt(s.getAttribute('data-value'));
-          s.innerHTML = (sVal <= selectedRating) ? '⭐' : '☆';
+          s.innerHTML = (sVal <= selectedRating) ? '\u{2B50}' : '\u{2606}';
           s.style.color = (sVal <= selectedRating) ? '#ffc107' : '#555';
           if(sVal <= selectedRating) s.classList.add('selected');
           else s.classList.remove('selected');
@@ -162,13 +159,14 @@ function initRatingSystem() {
 
         setTimeout(() => {
             step1.style.display = 'none';
-            if(selectedRating >= 4) {
-                stepHappy.style.display = 'block';
-                // 🔥 UPDATED EXCITING WHATSAPP SHARE MESSAGE 🔥
-                const shareText = "Hey! 👋 I just found this amazing free PDF tool called SArixa. It lets you compress, merge, or convert PDFs instantly. Best part? It's 100% private and offline, so our files are safe. Thought you might need this! Check it out here: https://sarixa-tools.vercel.app/ ✨";
-                document.getElementById('whatsapp-share-btn').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-            } else {
-                stepSad.style.display = 'block';
+            step2.style.display = 'block';
+            
+            // 🔥 ULTIMATE FOOLPROOF WHATSAPP LINK 🔥
+            // Pre-encoded URI with emojis built-in so it NEVER breaks!
+            const directWhatsappLink = "https://api.whatsapp.com/send?text=Hey!%20%F0%9F%91%8B%20I%20just%20found%20this%20amazing%20free%20PDF%20tool%20called%20SArixa.%20It%20lets%20you%20compress%2C%20merge%2C%20or%20convert%20PDFs%20instantly.%20Best%20part%3F%20It's%20100%25%20private%20and%20offline%2C%20so%20our%20files%20are%20safe.%20Thought%20you%20might%20need%20this!%20Check%20it%20out%20here%3A%20https%3A%2F%2Fsarixa-tools.vercel.app%2F%20%E2%9C%A8";
+            
+            if (whatsappBtn) {
+                whatsappBtn.href = directWhatsappLink;
             }
         }, 400); 
       });
@@ -193,7 +191,7 @@ function initRatingSystem() {
                 timestamp: Date.now(),
                 type: trackingType
             }).then(() => {
-                stepSad.style.display = 'none';
+                step2.style.display = 'none';
                 successState.style.display = 'flex';
                 setTimeout(completeClose, 2500);
             }).catch(err => {
@@ -210,6 +208,7 @@ function initRatingSystem() {
         });
     }
 
+    // Global Trigger Logic
     window.triggerGlobalRatingPopup = function() {
         const hasSubmitted = localStorage.getItem('hasSubmittedSarixaRating');
         if (!hasSubmitted) {
