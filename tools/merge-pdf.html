@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#012f28">
+    <title>Merge PDF • SArixa</title>
+    
+    <meta name="description" content="SArixa is a 100% private, free PDF Merger. Combine PDF files instantly and securely in your browser. No file uploads required.">
+    <meta name="robots" content="index, follow">
+    
+    <link rel="icon" type="image/png" href="../assets/Main_logo.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preload" href="/assets/SArixa_logo.png" as="image" fetchpriority="high">
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/tools/merge-pdf.css">
+    <link rel="stylesheet" href="../css/tools/rating.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <main class="tool-container pt-24">
+        
+        <div class="tool-header-wrapper">
+            <h1 class="tool-title">Merge PDF Files</h1>
+            <p class="tool-desc">Combine multiple PDFs into one document easily. <strong>No server uploads.</strong></p>
+            <div class="trust-badge">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>100% Private &bull; Works Offline &bull; Drag to Reorder</span>
+            </div>
+        </div>
+
+        <div class="file-input-group">
+            <label class="file-btn" for="fileInput">
+                <span>Select PDF Files</span>
+                <input type="file" id="fileInput" accept="application/pdf" hidden multiple aria-label="Upload PDF Files">
+            </label>
+        </div>
+
+        <div id="previewBox" class="preview-box">
+            <div id="emptyState">
+                <div class="preview-empty">No files selected</div>
+                <div class="preview-advice">Select PDF files <span class="hide-mobile-text">or Drag & Drop here</span></div>
+            </div>
+            
+            <div id="fileList" class="file-list"></div>
+        </div>
+
+        <div class="action-group-container">
+            <button class="generate-btn" id="mergeBtn" disabled aria-label="Start Merging">Merge PDFs Now</button>
+            
+            <div id="progressContainer" class="progress-container" aria-live="polite">
+                <div class="progress-info">
+                    <span id="progressStatus">Merging files...</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+            </div>
+
+            <div id="outputBox" class="output-box" aria-live="polite"></div>
+        </div>
+
+        <div id="finalActionArea">
+            
+            <div class="preview-btn-wrapper">
+                <button class="preview-btn" id="previewBtn" type="button" aria-label="Preview Merged PDF">Preview PDF</button>
+            </div>
+            
+            <div class="filename-container">
+                <label for="fileNameInput">File Name:</label>
+                <input type="text" id="fileNameInput" class="filename-input" placeholder="sarixa-merged" spellcheck="false" aria-label="Final File Name">
+            </div>
+            
+            <div class="download-btn-wrapper">
+                <button class="action-btn" id="downloadBtn" type="button" aria-label="Download PDF">Download PDF</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="password-prompt-popup" class="popup-overlay">
+        <div class="popup-content">
+            <span id="close-password-popup" class="close-btn">&times;</span>
+            <h3 style="color: #00e676; margin-bottom: 5px;">🔒 Protected PDF</h3>
+            <p style="color: #b2ebf2; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.4;" id="password-file-name">filename.pdf is password protected.</p>
+            
+            <div class="password-input-wrapper" style="position: relative; margin-bottom: 15px;">
+                <input type="password" id="pdfPasswordInput" class="filename-input" placeholder="Enter PDF Password" style="margin-bottom: 0; padding-right: 40px;" spellcheck="false">
+                <button type="button" id="togglePasswordBtn" class="eye-btn" aria-label="Toggle Password Visibility">
+                    <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 12px; width: 100%;">
+                <button id="btn-cancel-password" class="popup-btn popup-btn-outline-red" style="margin: 0; flex: 1;">Cancel</button>
+                <button id="btn-submit-password" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="alert" aria-live="assertive"></div>
+
+    <div id="rating-placeholder"></div>
+
+    <section class="faq-section">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      
+      <details class="faq-item">
+        <summary>Are my PDF files safe? Do you upload them anywhere?</summary>
+        <div class="faq-content">
+          <p>Yes, they are 100% safe! We <strong>never upload</strong> your files to any server. The whole merging process happens right inside your own browser. Your files stay securely on your device the entire time.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I arrange the order of my PDFs before merging?</summary>
+        <div class="faq-content">
+          <p>Absolutely! Once you upload your PDF files, you can easily <strong>drag and drop</strong> the file cards to reorder them exactly how you want them to appear in the final merged document.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is this actually free? Will you add a watermark to my merged PDF?</summary>
+        <div class="faq-content">
+          <p>It's completely free, forever. No hidden fees, no required sign-ups, and absolutely <strong>no watermarks</strong> on your exported PDFs.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is there a limit to how many PDFs I can merge at once?</summary>
+        <div class="faq-content">
+          <p>Since the processing uses your own device's power, there aren't any strict software limits. However, merging a huge number of very large files might take a few extra seconds depending on your device's memory.</p>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this work on my mobile phone?</summary>
+        <div class="faq-content">
+          <p>Yes! SArixa is fully optimized for mobile devices. You can select, drag-to-reorder, and merge PDFs perfectly on Androids, iPhones, and tablets.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="seo-content">
+      <div class="seo-intro">
+        <h2>Best Free PDF Merger Online</h2>
+        <p>SArixa offers the most secure and fastest way to combine multiple PDF files into one. Whether you're organizing study materials, compiling reports, or managing invoices, our tool does it all directly in your browser without any server uploads.</p>
+      </div>
+      
+      <div class="seo-grid">
+        <div class="seo-card">
+          <h3>What is a PDF Merger?</h3>
+          <p>A PDF merger is a utility tool that lets you take two or more separate PDF documents and combine them into a single, continuous file. This makes sharing and organizing documents much easier and more professional.</p>
+        </div>
+        
+        <div class="seo-card">
+          <h3>How to Merge PDF Files?</h3>
+          <ol>
+            <li>Click "Select PDF Files" to choose your documents.</li>
+            <li>Drag and drop the file cards to arrange their order.</li>
+            <li>Click the "Merge PDFs Now" button.</li>
+            <li>Download your combined PDF instantly!</li>
+          </ol>
+        </div>
+
+        <div class="seo-card">
+          <h3>Combine PDFs Securely</h3>
+          <p>Most online PDF mergers upload your sensitive documents to their servers, which is a major privacy risk. SArixa is different—it processes everything locally. Your private files never leave your computer or phone.</p>
+        </div>
+
+        <div class="seo-card">
+          <h3>Why Choose SArixa?</h3>
+          <ul>
+            <li>🔒 <strong>100% Private</strong> – No server uploads, total security.</li>
+            <li>⚡ <strong>Instant Merging</strong> – No waiting in server queues.</li>
+            <li>✋ <strong>Drag & Drop</strong> – Easy visual file arrangement.</li>
+            <li>🆓 <strong>Completely Free</strong> – No watermarks or hidden charges.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../js/global.js" defer></script>
+    <script type="module" src="../js/tools/merge-pdf/merge-pdf.js" defer></script>
+    <script type="module" src="../js/tools/rating.js"></script>
+
+</body>
+</html>
