@@ -165,7 +165,7 @@ function initRatingSystem() {
             if(selectedRating >= 4) {
                 stepHappy.style.display = 'block';
                 // 🔥 UPDATED EXCITING WHATSAPP SHARE MESSAGE 🔥
-                const shareText = "Guys, I just found a lifesaver tool called SArixa! 🚀 You can Compress PDFs, convert Images to PDF, and extract pages instantly. The best part? It works completely offline, so your private documents are 100% safe and it's totally free. Check it out: https://sarixa-tools.vercel.app/";
+                const shareText = "Hey! 👋 I just found this amazing free PDF tool called SArixa. It lets you compress, merge, or convert PDFs instantly. Best part? It's 100% private and offline, so our files are safe. Thought you might need this! Check it out here: https://sarixa-tools.vercel.app/ ✨";
                 document.getElementById('whatsapp-share-btn').href = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
             } else {
                 stepSad.style.display = 'block';
