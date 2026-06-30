@@ -57,16 +57,38 @@ html, body {
 .preview-empty { font-size: 1.2rem; color: #fff; font-weight: bold; margin-bottom: 5px; text-align: center; pointer-events: none;}
 .preview-advice { color: #9be7d8; text-align: center; pointer-events: none;}
 
-/* FILE LIST (SORTABLE) */
+/* FILE LIST & SORTABLE ANIMATIONS */
 .file-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
 
 .file-card {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 15px; background: #012f28; border: 1px solid #00e676; 
     border-radius: 10px; cursor: grab; user-select: none;
-    transition: transform 0.2s, box-shadow 0.2s;
+    /* 🚀 FIX: transform transition removed so Sortable.js can slide items smoothly */
+    transition: box-shadow 0.25s ease, border-color 0.2s ease, background-color 0.2s ease;
+    will-change: transform;
 }
-.file-card:active { cursor: grabbing; transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,230,118,0.3); }
+.file-card:hover { border-color: #00ff84; }
+.file-card:active { cursor: grabbing; }
+
+/* 🚀 Clean & Smooth 3D Reordering CSS */
+.sortable-ghost { 
+    opacity: 0.2 !important; 
+    border: 2px dashed #00e676 !important; 
+    background: rgba(0, 230, 118, 0.05) !important; 
+    box-shadow: none !important;
+}
+
+.sortable-drag, .sortable-fallback { 
+    opacity: 1 !important; 
+    /* 3D floating effect while dragging */
+    transform: scale(1.02) rotate(1deg) !important; 
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 230, 118, 0.3) !important; 
+    cursor: grabbing !important;
+    z-index: 99999 !important;
+    background: #013a32 !important;
+    border-color: #00ff84 !important;
+}
 
 .file-info-wrap { display: flex; align-items: center; gap: 15px; overflow: hidden; }
 
@@ -118,9 +140,7 @@ html, body {
 .download-btn-wrapper { text-align: center; }
 .action-btn { width: 100%; max-width: 350px; }
 
-/* -----------------------------------------
-   POPUPS (PASSWORD & ERROR HANDLING)
------------------------------------------ */
+/* POPUPS (PASSWORD & ERROR HANDLING) */
 .popup-overlay {
     display: none;
     position: fixed;
@@ -186,7 +206,7 @@ html, body {
     background-color: rgba(255, 82, 82, 0.1);
 }
 
-/* 🚀 EYE BUTTON CSS */
+/* EYE BUTTON CSS */
 .password-input-wrapper { position: relative; width: 100%; }
 .eye-btn {
     position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
@@ -222,9 +242,7 @@ input:-webkit-autofill:active {
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
 .toast.error { background: #ff5252; color: #fff; }
 
-/* -----------------------------------------
-   FAQ SECTION
------------------------------------------ */
+/* FAQ SECTION */
 .faq-section { width: 95%; max-width: 1000px; margin: 0 auto 80px auto; background: rgba(0, 255, 200, 0.05); border: 2px solid rgba(0, 255, 200, 0.2); border-radius: 20px; padding: 30px; }
 .faq-title { text-align: center; font-size: 1.8rem; color: #00e676; margin-bottom: 25px; }
 .faq-item { background: #012f28; border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 8px; margin-bottom: 12px; overflow: hidden; transition: all 0.3s ease; }
@@ -236,9 +254,7 @@ input:-webkit-autofill:active {
 .faq-content { padding: 0 20px 20px 20px; color: #b2ebf2; line-height: 1.6; font-size: 0.95rem; }
 .faq-content strong { color: #00e676; }
 
-/* -----------------------------------------
-   SEO CONTENT SECTION
------------------------------------------ */
+/* SEO CONTENT SECTION */
 .seo-content { width: 95%; max-width: 1000px; margin: 0 auto 80px auto; padding: 0; }
 .seo-intro { text-align: center; margin-bottom: 40px; }
 .seo-intro h2 { color: #00e676; font-size: 2rem; margin-bottom: 15px; }

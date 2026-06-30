@@ -42,10 +42,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
-    // Initialize Sortable JS
+    // PREMIUM SORTABLE SETUP WITH SMOOTH ANIMATION
     new Sortable(fileList, {
-        animation: 200,
-        ghostClass: 'sortable-ghost'
+        animation: 250,
+        scroll: true,
+        forceFallback: true, 
+        scrollSensitivity: 80,
+        scrollSpeed: 20,
+        fallbackOnBody: true, 
+        delay: 150,              
+        delayOnTouchOnly: true,  
+        touchStartThreshold: 5,
+        ghostClass: 'sortable-ghost',
+        dragClass: 'sortable-drag',
+        easing: "cubic-bezier(0.25, 1, 0.5, 1)"
     });
 
     // Eye Password Visibility Toggle
@@ -149,6 +159,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Processing Incoming Selection Streams
     async function handleFiles(files) {
+        // 🚀 FIX 1: Sortable drop handle korar jonne empty state check (Prevents wrong validation error)
+        if (!files || files.length === 0) return; 
+        
         const newFiles = Array.from(files).filter(file => file.type === 'application/pdf');
         
         if (newFiles.length === 0) { 
@@ -188,7 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
                             filesState.push({ id, file, rawBuffer: cleanBytes });
                             progressContainer.style.display = 'none';
                             renderFileCard(file, id);
-                            showToast(`AES-256 Unlocked successfully!`);
+                            
+                            // 🚀 FIX 2: Success toast function ta remove kora holo (Bina kono popup-e clean transition hobe)
                             isUnlocked = true;
                         } catch (e) {
                             progressContainer.style.display = 'none';
@@ -272,6 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const mergedPdf = await PDFDocument.create();
             mergedPdf.setTitle('SArixa Merged Document');
             
+            // Respect visual DOM order set by Sortable
             const orderedDomIds = Array.from(fileList.children).map(li => li.dataset.id);
             const orderedFilesState = orderedDomIds.map(id => filesState.find(item => item.id === id));
 
