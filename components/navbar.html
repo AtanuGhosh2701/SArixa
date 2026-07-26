@@ -1,0 +1,50 @@
+<header class="navbar">
+    <div class="logo">
+        <a href="/index.html">
+            <img src="/assets/SArixa_logo.png" alt="SArixa Logo" width="160" height="40" fetchpriority="high">
+        </a>
+    </div>
+    
+    <div class="hamburger" id="hamburger-btn" role="button" aria-label="Toggle navigation menu" tabindex="0">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <nav id="nav-links">
+        <a href="/index.html" class="nav-item">Home</a>
+        
+        <div class="dropdown">
+            <div role="button" tabindex="0" class="dropdown-trigger" id="toolsBtn" aria-label="Toggle Tools Menu" style="cursor: pointer;">
+                Tools <span class="arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" id="toolsMenu">
+                
+                <div class="nav-search-container" id="navSearchContainer">
+                    <span class="nav-search-icon" id="navSearchIcon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="nav-tool-search" placeholder="Search tools..." autocomplete="off">
+                </div>
+
+                <div class="nav-tools-list" id="navToolsList">
+                    <a href="/tools/img-to-pdf.html" class="dropdown-item">Image to PDF</a>
+                    <a href="/tools/compress-pdf.html" class="dropdown-item">Compress PDF</a>
+                    <a href="/tools/pdf-to-img.html" class="dropdown-item">PDF to Image</a>
+                    <a href="/tools/merge-pdf.html" class="dropdown-item">Merge PDF</a>
+                    <a href="/tools/protect-pdf.html" class="dropdown-item">Protect PDF</a>
+                </div>
+
+                <div class="dropdown-footer">More tools coming soon... ✨</div>
+            </div>
+        </div>
+
+        <a href="/about.html" class="nav-item">About Us</a>
+        <a href="/contact.html" class="nav-item">Contact Us</a>
+        <a href="/privacy.html" class="nav-item">Privacy Policy</a>
+        <a href="/terms.html" class="nav-item">Terms & Conditions</a>
+    </nav>
+</header>

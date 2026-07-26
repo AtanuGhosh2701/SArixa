@@ -1,0 +1,28 @@
+# Allow all standard search engines
+User-agent: *
+Allow: /
+
+# EXPLICITLY ALLOW ASSETS & SCRIPTS (Vital for rendering your HTML/JS tool)
+Allow: /css/
+Allow: /js/
+Allow: /assets/
+Allow: /components/
+
+# EXPLICITLY ALLOW TOOL PAGES
+Allow: /tools/
+
+# Block unwanted AI Scrapers from stealing bandwidth
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# Link to your sitemap
+Sitemap: https://sarixa-tools.vercel.app/sitemap.xml

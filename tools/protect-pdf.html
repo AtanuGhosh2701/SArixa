@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#012f28">
+    
+    <title>Protect PDF • SArixa</title>
+    <meta name="description" content="Secure your PDF files with strong AES-256 password encryption instantly. 100% private, set permissions to prevent printing or copying.">
+    <link rel="canonical" href="https://sarixa-tools.vercel.app/tools/protect-pdf.html">
+    
+    <link rel="icon" type="image/png" href="../assets/Main_logo.png">
+    <link rel="apple-touch-icon" href="../assets/Main_logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/tools/protect-pdf.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <main>
+        <div class="tool-container pt-24">
+            <div class="tool-header-wrapper">
+                <h1 class="tool-title">Protect PDF</h1>
+                <p class="tool-desc">Lock your PDF and set permissions with AES-256 encryption.</p>
+                <div class="trust-badge">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    100% Private (Runs strictly offline)
+                </div>
+            </div>
+
+            <div id="fileZone">
+                <div id="uploadArea">
+                    <div class="file-input-group" style="text-align: center; margin-bottom: 20px;">
+                        <label class="file-btn" for="fileInput">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            <span>Select PDF File</span>
+                            <input type="file" id="fileInput" accept="application/pdf" hidden>
+                        </label>
+                    </div>
+                    
+                    <div id="previewBox" class="preview-box">
+                        <div class="preview-empty">No file selected</div>
+                        <div class="preview-advice">Select a PDF or Drag & Drop here</div>
+                    </div>
+                </div>
+
+                <div id="fileInfoBox" class="preview-box has-file" style="display: none;">
+                    <div class="file-info-card">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#00e676" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <div class="file-info-text">
+                            <span id="selectedFileName" class="file-name">filename.pdf</span>
+                            <span id="selectedFileSize" class="file-size">0 MB</span>
+                        </div>
+                        <button id="removeFileBtn" class="remove-btn" title="Remove File">&times;</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advanced-security-panel">
+                <div class="security-card">
+                    <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#00e676" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Document Open Password</h3>
+                    <p class="card-desc">Required to open and view the PDF.</p>
+                    
+                    <div class="password-input-wrapper">
+                        <input type="password" id="userPassword" placeholder="Enter open password...">
+                        <button type="button" class="eye-btn toggle-password" data-target="userPassword" aria-label="Toggle visibility">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path class="eye-path" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle class="eye-circle" cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                    <div class="strength-meter-container">
+                        <div class="strength-meter">
+                            <div class="strength-bar" id="str-1"></div>
+                            <div class="strength-bar" id="str-2"></div>
+                            <div class="strength-bar" id="str-3"></div>
+                            <div class="strength-bar" id="str-4"></div>
+                        </div>
+                        <span id="strengthText" class="strength-text">Enter password</span>
+                    </div>
+                </div>
+
+                <div class="security-card">
+                    <h3><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#ffc107" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Permissions Password <span class="badge">Pro</span></h3>
+                    <p class="card-desc">Required to change restrictions.</p>
+                    
+                    <div class="password-input-wrapper">
+                        <input type="password" id="ownerPassword" placeholder="Enter owner password (Optional)...">
+                        <button type="button" class="eye-btn toggle-password" data-target="ownerPassword" aria-label="Toggle visibility">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path class="eye-path" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle class="eye-circle" cx="12" cy="12" r="3"></circle></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="permissions-info-badge">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Restrictions apply only to viewers opening with the Open Password.
+                    </div>
+
+                    <div class="permissions-toggles">
+                        <label class="toggle-row">
+                            <span>Allow Printing</span>
+                            <input type="checkbox" id="permPrint" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <label class="toggle-row">
+                            <span>Allow Text Copying</span>
+                            <input type="checkbox" id="permCopy" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <label class="toggle-row">
+                            <span>Allow Modification</span>
+                            <input type="checkbox" id="permModify" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="password-warning" style="text-align: center; margin: 20px 0; color: #ffc107; font-size: 0.9rem;">
+                ⚠️ SArixa processes everything offline. If you forget these passwords, the document cannot be recovered!
+            </div>
+
+            <div class="action-group-container" style="text-align: center; margin-top: 30px;">
+                <button id="protectBtn" class="generate-btn" disabled>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Encrypt & Protect PDF
+                </button>
+                
+                <div id="progressContainer" class="progress-container">
+                    <div class="progress-info">
+                        <span id="progressStatus">Encrypting PDF...</span>
+                        <span id="progressText">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="outputBox" class="output-box"></div>
+            
+            <div id="finalActionArea" style="display: none;">
+                <div class="filename-container" style="text-align: center; margin-top: 25px; margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                    <label style="color: #b2ebf2;">Save file as:</label>
+                    <input type="text" id="fileNameInput" class="filename-input" value="SArixa-Protected.pdf" style="max-width: 300px;">
+                </div>
+                
+                <div class="download-btn-container" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+                    
+                    <button class="action-btn" id="downloadBtn" type="button" aria-label="Download PDF">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download PDF
+                    </button>
+                    
+                    <button class="action-btn share-btn" id="shareBtn" type="button" disabled>
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                        Share PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="rating-placeholder"></div>
+
+        <section class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <details class="faq-item">
+                    <summary>What is the difference between Open and Permissions password?</summary>
+                    <div class="faq-content">
+                        <p>The <strong>Open Password</strong> is required just to view the document. The <strong>Permissions (Owner) Password</strong> is a master key used to restrict people from printing or copying the content, even if they can read it.</p>
+                    </div>
+                </details>
+                <details class="faq-item">
+                    <summary>Is my document safe during encryption?</summary>
+                    <div class="faq-content">
+                        <p><strong>Absolutely.</strong> SArixa uses purely client-side JavaScript and WebAssembly (WASM). Your PDF <strong>never leaves your computer</strong>, making it <strong>100% secure</strong> from data leaks.</p>
+                    </div>
+                </details>
+                <details class="faq-item">
+                    <summary>What level of encryption does SArixa use?</summary>
+                    <div class="faq-content">
+                        <p>We use <strong>AES-256 bit encryption</strong>. This is the highest and most robust security standard available for PDF documents, trusted by banks, military, and governments worldwide.</p>
+                    </div>
+                </details>
+                <details class="faq-item">
+                    <summary>Can SArixa recover my password if I forget it?</summary>
+                    <div class="faq-content">
+                        <p><strong>No.</strong> Because we <strong>do not store your files or passwords</strong> on any server, a lost password cannot be recovered. Please memorize or securely save your passwords.</p>
+                    </div>
+                </details>
+                <details class="faq-item">
+                    <summary>Will the password work on all devices and PDF viewers?</summary>
+                    <div class="faq-content">
+                        <p><strong>Yes! </strong>The AES-256 encryption applied by SArixa is universally supported. You can open your protected files seamlessly on <strong>Adobe Acrobat, Google Chrome, Mac Preview, iOS, and Android devices.</strong></p>
+                    </div>
+                </details>
+                <details class="faq-item">
+                    <summary>Can I remove the password later?</summary>
+                    <div class="faq-content">
+                        <p><strong>Yes.</strong> As long as you remember the original password, you can use any standard PDF software (like Adobe Acrobat) or our upcoming <strong>"Unlock PDF" </strong>tool to remove the security permanently.</p>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <section class="seo-content">
+            <div class="seo-intro">
+                <h2>Best Free PDF Password Protector Online</h2>
+                <p>SArixa offers the most robust <strong>AES-256 PDF encryption</strong> right inside your browser. Whether you are sending confidential legal documents, financial records, or private invoices, you can lock your PDF files instantly without any server uploads.</p>
+            </div>
+            
+            <div class="seo-grid">
+                <div class="seo-card">
+                    <h3>What is PDF Encryption?</h3>
+                    <p>PDF encryption is a security measure that locks your document using a strong password. It ensures that only authorized people can open the file and allows you to set specific permissions like disabling text copying or printing.</p>
+                </div>
+                
+                <div class="seo-card">
+                    <h3>How to Protect a PDF?</h3>
+                    <ol>
+                        <li>Select your PDF file</li>
+                        <li>Enter a strong Open or Permissions password</li>
+                        <li>Toggle your desired security restrictions</li>
+                        <li>Click on "Encrypt & Protect PDF" and download</li>
+                    </ol>
+                    <p>SArixa makes securing documents fast, simple, and strictly offline.</p>
+                </div>
+
+                <div class="seo-card">
+                    <h3>Encrypt Without Server Uploads</h3>
+                    <p>Most online PDF protectors require you to upload your sensitive documents to their cloud servers, which is a massive privacy risk. SArixa processes the AES-256 encryption directly inside your device's browser. Your files never leave your computer.</p>
+                </div>
+
+                <div class="seo-card">
+                    <h3>Why Choose SArixa?</h3>
+                    <ul>
+                        <li>🔑 <strong>Dual Passwords</strong> – Set Open and Permissions passwords separately</li>
+                        <li>🛡️ <strong>AES-256 Encryption</strong> – Military-grade security standard</li>
+                        <li>🔒 <strong>100% Private</strong> – Zero cloud server uploads</li>
+                        <li>🆓 <strong>Completely Free</strong> – No hidden limits or subscriptions</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div id="toast" class="toast"></div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="../js/global.js" defer></script>
+    <script type="module" src="../js/tools/rating.js" defer></script>
+    <script type="module" src="../js/tools/protect-pdf/protect-pdf.js" defer></script>
+</body>
+</html>
