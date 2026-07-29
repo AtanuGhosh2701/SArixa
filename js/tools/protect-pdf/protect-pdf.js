@@ -215,13 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const arrayBuffer = await currentFile.arrayBuffer();
                 
-                // Initialize worker
-                const worker = new Worker('../js/tools/protect-pdf/protect-worker.js');
+                const worker = new Worker('/js/tools/protect-pdf/protect-worker.js');
 
                 const workerTimeout = setTimeout(() => {
-                    handleError("Engine initialization timed out. WASM files not found!");
+                    handleError("Engine initialization timed out. Please check your mobile internet speed and try again.");
                     worker.terminate();
-                }, 15000);
+                }, 45000); 
 
                 worker.onmessage = function(e) {
                     const data = e.data;
@@ -240,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             permCopy: permCopy.checked,
                             permModify: permModify.checked
                         }, [arrayBuffer]);
-                    } 
+                    }
                     else if (data.type === 'SUCCESS') {
                         clearTimeout(workerTimeout);
                         progressBar.style.width = '100%';
