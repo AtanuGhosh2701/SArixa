@@ -1,7 +1,31 @@
 // Import the native sharing helper system (using correct relative path)
 import { sharePdfFile } from '../sharing-system.js';
 
+// ==========================================
+// 🔥 PRE-WARM ENGINE (WITH SMART STATE TRACKING)
+// ==========================================
+let activeWorker = null;
+let isEngineReady = false; // Engine ready kina seta track korar flag
+
+function preloadEngine() {
+    if (activeWorker) activeWorker.terminate(); 
+    isEngineReady = false;
+    activeWorker = new Worker('/js/tools/protect-pdf/protect-worker.js');
+    
+    // Background-e engine ready hole flag ta true kore dibe
+    activeWorker.onmessage = function(e) {
+        if (e.data.type === 'READY') {
+            isEngineReady = true;
+            console.log("🔥 Background Engine is fully READY!");
+        }
+    };
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    
+    // Page load houar sathe sathei engine background-e ready hote shuru korbe
+    preloadEngine();
+
     const fileInput = document.getElementById('fileInput');
     const previewBox = document.getElementById('previewBox');
     const uploadArea = document.getElementById('uploadArea');
@@ -34,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const finalActionArea = document.getElementById('finalActionArea');
     const fileNameInput = document.getElementById('fileNameInput');
     const downloadBtn = document.getElementById('downloadBtn');
-    const shareBtn = document.getElementById('shareBtn'); // <-- Added Share Button
+    const shareBtn = document.getElementById('shareBtn');
     const toast = document.getElementById('toast');
 
     let currentFile = null;
@@ -177,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(finalActionArea) finalActionArea.style.display = 'none';
         
         encryptedPdfBlob = null;
-        if (shareBtn) shareBtn.disabled = true; // Disable Share Button
+        if (shareBtn) shareBtn.disabled = true;
         validatePasswords();
     }
 
@@ -192,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if(outputBox) outputBox.style.display = 'none';
             if(finalActionArea) finalActionArea.style.display = 'none';
 
-            if (shareBtn) shareBtn.disabled = true; // Disable Share Button
+            if (shareBtn) shareBtn.disabled = true;
             validatePasswords();
         });
     }
@@ -205,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             protectBtn.disabled = true;
             userPassword.disabled = true;
             ownerPassword.disabled = true;
-            if (shareBtn) shareBtn.disabled = true; // Disable share during generation
+            if (shareBtn) shareBtn.disabled = true;
             
             progressContainer.style.display = 'block';
             progressStatus.textContent = 'Initializing Security Engine...';
@@ -215,31 +239,39 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const arrayBuffer = await currentFile.arrayBuffer();
                 
-                const worker = new Worker('/js/tools/protect-pdf/protect-worker.js');
+                const worker = activeWorker || new Worker('/js/tools/protect-pdf/protect-worker.js');
 
                 const workerTimeout = setTimeout(() => {
-                    handleError("Engine initialization timed out. Please check your mobile internet speed and try again.");
+                    handleError("Engine initialization timed out. Please check your internet speed and try again.");
                     worker.terminate();
-                }, 45000); 
+                    preloadEngine(); 
+                }, 45000);
 
+                // Encryption suru korar function
+                const startEncryption = () => {
+                    progressStatus.textContent = "Applying AES-256 Encryption...";
+                    progressBar.style.width = "60%";
+                    progressText.textContent = "60%";
+                    
+                    worker.postMessage({
+                        type: 'ENCRYPT',
+                        arrayBuffer: arrayBuffer,
+                        userPassword: userPassword.value,
+                        ownerPassword: ownerPassword.value.trim() !== "" ? ownerPassword.value : null,
+                        permPrint: permPrint.checked,
+                        permCopy: permCopy.checked,
+                        permModify: permModify.checked
+                    }, [arrayBuffer]);
+                };
+
+                // Notun onmessage handler set kora hochhe encryption handle korar jonno
                 worker.onmessage = function(e) {
                     const data = e.data;
                     
                     if (data.type === 'READY') {
-                        progressStatus.textContent = "Applying AES-256 Encryption...";
-                        progressBar.style.width = "60%";
-                        progressText.textContent = "60%";
-                        
-                        worker.postMessage({
-                            type: 'ENCRYPT',
-                            arrayBuffer: arrayBuffer,
-                            userPassword: userPassword.value,
-                            ownerPassword: ownerPassword.value.trim() !== "" ? ownerPassword.value : null,
-                            permPrint: permPrint.checked,
-                            permCopy: permCopy.checked,
-                            permModify: permModify.checked
-                        }, [arrayBuffer]);
-                    }
+                        isEngineReady = true;
+                        startEncryption();
+                    } 
                     else if (data.type === 'SUCCESS') {
                         clearTimeout(workerTimeout);
                         progressBar.style.width = '100%';
@@ -247,7 +279,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         progressStatus.textContent = 'Encryption complete!';
 
                         encryptedPdfBlob = new Blob([data.encryptedBuffer], { type: 'application/pdf' });
+                        
                         worker.terminate();
+                        preloadEngine(); // Background-e notun kore engine abar toiri hok
 
                         setTimeout(() => {
                             progressContainer.style.display = 'none';
@@ -269,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             ownerPassword.disabled = false;
                             protectBtn.innerHTML = "Update Security Settings";
 
-                            if (shareBtn) shareBtn.disabled = false; // ENABLE SHARE BUTTON!
+                            if (shareBtn) shareBtn.disabled = false;
                             
                             if (window.confetti) {
                                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#00e676', '#ffffff'] });
@@ -280,6 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         clearTimeout(workerTimeout);
                         handleError(data.message);
                         worker.terminate();
+                        preloadEngine(); 
                     }
                 };
 
@@ -287,7 +322,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearTimeout(workerTimeout);
                     handleError("Failed to load backend engine. Worker Error.");
                     worker.terminate();
+                    preloadEngine(); 
                 };
+
+                // 🔥 ASOL JADU: Jodi engine aage thekei background e ready hoye thake, 
+                // Tahole READY message er wait na kore direct encryption start koro!
+                if (isEngineReady) {
+                    startEncryption();
+                }
 
             } catch (error) {
                 handleError(error.message);
