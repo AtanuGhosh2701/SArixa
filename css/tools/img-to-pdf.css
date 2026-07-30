@@ -186,8 +186,10 @@ input[type="range"]::-webkit-slider-thumb {
     position: relative;
     display: inline-block;
     width: 52px;
+    min-width: 52px;
     height: 28px;
     margin-top: 4px;
+    flex-shrink: 0;
 }
 
 .switch input {
@@ -636,6 +638,7 @@ input:checked + .slider:before {
     border-radius: 16px;
     user-select: none;
     -webkit-user-select: none;
+    box-sizing: border-box;
 }
 
 .img-thumb {
@@ -1169,13 +1172,23 @@ input:checked + .slider:before {
 
 .protection-toggle-container {
     border: 1px solid rgba(0, 230, 118, 0.4) !important;
-    border-radius: 10px;
-    padding: 15px 25px !important;
+    border-radius: 12px;
+    padding: 12px 20px !important;
     background: #012f28;
-    max-width: fit-content;
+    width: fit-content;
+    max-width: 100%;
     margin-left: auto !important;
     margin-right: auto !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.protection-toggle-container .batch-toggle-wrapper {
+    background: transparent;
+    border: none;
+    padding: 0;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .advanced-security-panel {
@@ -1498,4 +1511,28 @@ input:checked + .slider:before {
     color: #9be7d8;
     text-transform: uppercase;
     margin-top: 5px;
+}
+
+/* -----------------------------------------
+   16. ADDITIONAL MOBILE RESPONSIVE FIXES
+----------------------------------------- */
+@media (max-width: 768px) {
+    .protection-toggle-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 15px !important;
+    }
+
+    .protection-toggle-container .batch-toggle-wrapper {
+        gap: 10px;
+    }
+
+    .batch-toggle-wrapper label:not(.switch) {
+        font-size: 0.88rem;
+        word-break: break-word;
+    }
+
+    .advanced-security-panel {
+        grid-template-columns: 1fr;
+    }
 }
