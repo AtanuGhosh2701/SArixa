@@ -11,7 +11,7 @@ const previewBox = document.getElementById("previewBox");
 const outputBox = document.getElementById("outputBox");
 const previewBtn = document.getElementById("previewBtn");
 const downloadBtn = document.getElementById("downloadBtn");
-const shareBtn = document.getElementById("shareBtn"); // <-- Added Share Button
+const shareBtn = document.getElementById("shareBtn"); 
 const qualitySelect = document.getElementById("qualitySelect");
 const targetSizeContainer = document.getElementById("targetSizeContainer");
 const targetSizeInput = document.getElementById("targetSizeInput");
@@ -283,19 +283,49 @@ wmDensity.addEventListener('input', (e) => { wmDensityVal.innerText = e.target.v
 wmOpacity.addEventListener('input', (e) => { document.getElementById("wmOpacityVal").innerText = e.target.value; });
 wmSize.addEventListener('input', (e) => { document.getElementById("wmSizeVal").innerText = e.target.value; });
 
-fontDropdown.addEventListener("click", () => fontDropdown.classList.toggle("open"));
-document.addEventListener("click", (e) => { if (!fontDropdown.contains(e.target)) fontDropdown.classList.remove("open"); });
+// 🔥 ULTIMATE MOBILE DROPDOWN FIX 🔥
+if (fontDropdown) {
+    // Parent div er z-index barate hobe jate eta nicher kono settings er pichone lukhiye na jay
+    if (fontDropdown.parentElement) {
+        fontDropdown.parentElement.style.position = "relative";
+        fontDropdown.parentElement.style.zIndex = "99999";
+    }
 
-wmFontList.addEventListener("click", (e) => {
-  if(e.target.classList.contains("font-item")) {
-    Array.from(wmFontList.children).forEach(i => i.classList.remove("active"));
-    e.target.classList.add("active");
-    selectedFont = e.target.getAttribute("data-font");
-    selectedFontText.innerText = e.target.innerText;
-    selectedFontText.style.fontFamily = e.target.style.fontFamily;
-    fontDropdown.classList.remove("open");
-  }
-});
+    // Direct event listener on the dropdown for instant response
+    fontDropdown.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Stops event bubbling completely
+        
+        const clickedFontItem = e.target.closest(".font-item");
+        
+        if (clickedFontItem) {
+            // Option was clicked inside the dropdown
+            Array.from(wmFontList.children).forEach(i => i.classList.remove("active"));
+            clickedFontItem.classList.add("active");
+            selectedFont = clickedFontItem.getAttribute("data-font");
+            selectedFontText.innerText = clickedFontItem.innerText;
+            selectedFontText.style.fontFamily = clickedFontItem.style.fontFamily;
+            fontDropdown.classList.remove("open");
+        } else {
+            // Dropdown main body was clicked to open/close
+            fontDropdown.classList.toggle("open");
+        }
+    });
+
+    // Close when tapping anywhere else outside (Desktop)
+    document.addEventListener("click", (e) => {
+        if (fontDropdown.classList.contains("open") && !fontDropdown.contains(e.target)) {
+            fontDropdown.classList.remove("open");
+        }
+    });
+    
+    // Close when tapping anywhere else outside (Mobile strict fallback)
+    document.addEventListener("touchstart", (e) => {
+        if (fontDropdown.classList.contains("open") && !fontDropdown.contains(e.target)) {
+            fontDropdown.classList.remove("open");
+        }
+    }, { passive: true });
+}
 
 formatBtns.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -347,11 +377,56 @@ document.addEventListener("click", (e) => {
 });
 
 // ==========================================
-// CORE PREVIEW FUNCTIONS
+// CORE PREVIEW FUNCTIONS & SORTABLE FIX
 // ==========================================
+
+// 🔥 UPDATED SORTABLE.JS FOR LOW-END DEVICES 🔥
 const sortable = new Sortable(previewBox, {
-  animation: 200, scroll: true, forceFallback: true, scrollSensitivity: 60, scrollSpeed: 15, fallbackOnBody: true, delay: 200, delayOnTouchOnly: true, touchStartThreshold: 5, draggable: ".image-card", 
-  onEnd: function(evt) { const moved = images.splice(evt.oldIndex, 1)[0]; images.splice(evt.newIndex, 0, moved); renderPreview(); }
+  animation: 250, // Smoother animation time
+  easing: "cubic-bezier(0.25, 1, 0.5, 1)", 
+  scroll: true, 
+  forceFallback: true, // Forces custom rendering to avoid native mobile drag bugs
+  fallbackClass: "sortable-fallback", // Added optimized CSS class
+  ghostClass: "sortable-ghost", // Added optimized CSS class
+  dragClass: "sortable-drag",
+  scrollSensitivity: 80, 
+  scrollSpeed: 20, 
+  fallbackOnBody: true, 
+  fallbackTolerance: 5, // Prevents accidental drag on scroll
+  delay: 150, // Lower delay for quick tap-and-drag response
+  delayOnTouchOnly: true, 
+  touchStartThreshold: 5, 
+  emptyInsertThreshold: 8,
+  draggable: ".image-card", 
+  
+  onEnd: function(evt) { 
+    if (evt.oldIndex === evt.newIndex) return;
+
+    // 1. Array Update - Backend state sync
+    const moved = images.splice(evt.oldIndex, 1)[0]; 
+    images.splice(evt.newIndex, 0, moved); 
+    
+    // 2. DOM Manipulation FIX - Skip Full re-render (renderPreview) completely!
+    // Instead, dynamically update the visible labels based on their new HTML order.
+    const cards = previewBox.querySelectorAll(".image-card");
+    cards.forEach((card, i) => {
+        // Update visual text numbers
+        const badge = card.querySelector(".page-badge");
+        const pageNum = card.querySelector(".page-number");
+        if (badge) badge.innerText = `Page ${i + 1}`;
+        if (pageNum) pageNum.innerText = `Page ${i + 1}`;
+
+        // Re-assign the correct index to the delete button closure
+        const deleteBtn = card.querySelector(".delete");
+        if (deleteBtn) {
+            deleteBtn.onclick = (e) => { 
+                e.stopPropagation(); 
+                imageIndexToDelete = i; 
+                deleteConfirmPopup.style.display = "flex"; 
+            };
+        }
+    });
+  }
 });
 
 const handleFileInput = (e) => {
@@ -927,6 +1002,7 @@ downloadBtn.onclick = () => {
 
   setTimeout(() => { if (window.triggerGlobalRatingPopup) window.triggerGlobalRatingPopup(); }, 1500); 
 };
+
 // Share Button Logic
 if (shareBtn) {
   shareBtn.onclick = async () => {

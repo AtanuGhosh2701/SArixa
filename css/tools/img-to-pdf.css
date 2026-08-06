@@ -160,6 +160,8 @@ input[type="range"]::-webkit-slider-thumb {
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(0, 255, 200, 0.1);
     border-radius: 12px;
+    position: relative;
+    z-index: 50; 
 }
 
 .settings-group div.setting-item {
@@ -180,7 +182,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* -----------------------------------------
-   5. CUSTOM UI COMPONENTS
+   5. CUSTOM UI COMPONENTS & DROPDOWNS
 ----------------------------------------- */
 .switch {
     position: relative;
@@ -246,6 +248,12 @@ input:checked + .slider:before {
     color: var(--text-bright);
     cursor: pointer;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 999;
+}
+
+.custom-dropdown.open {
+    z-index: 9999; 
 }
 
 .dropdown-selected {
@@ -264,44 +272,56 @@ input:checked + .slider:before {
 .dropdown-arrow {
     font-size: 0.7rem;
     color: var(--text-main);
-    transition: transform 0.2s;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 5px;
-    background: #012f28;
-    border: 1px solid rgba(0, 255, 200, 0.3);
-    border-radius: 6px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    display: none;
-    z-index: 100;
-    overflow: hidden;
-}
-
-.custom-dropdown.open .dropdown-menu {
-    display: block;
+    transition: transform 0.3s;
 }
 
 .custom-dropdown.open .dropdown-arrow {
     transform: rotate(180deg);
 }
 
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: #012f28;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.95);
+    z-index: 100000 !important; 
+    
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    padding: 0;
+    border: 0 solid rgba(0, 255, 200, 0.6);
+    pointer-events: none;
+    
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out, border-width 0.3s;
+}
+
+.custom-dropdown.open .dropdown-menu {
+    max-height: 300px;
+    opacity: 1;
+    padding: 5px 0;
+    border-width: 1px;
+    pointer-events: auto;
+}
+
 .font-list {
-    max-height: 130px;
+    max-height: 250px; 
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; 
 }
 
 .font-item {
-    padding: 8px 12px;
+    display: block;
+    padding: 10px 12px;
     color: var(--text-main);
     font-size: 0.95rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     transition: 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .font-item:hover {
@@ -639,6 +659,10 @@ input:checked + .slider:before {
     user-select: none;
     -webkit-user-select: none;
     box-sizing: border-box;
+    /* GPU ACCELERATION FOR MOBILE SMOOTHNESS */
+    will-change: transform;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
 .img-thumb {
@@ -1535,4 +1559,26 @@ input:checked + .slider:before {
     .advanced-security-panel {
         grid-template-columns: 1fr;
     }
+}
+
+/* -----------------------------------------
+   17. SORTABLE JS OPTIMIZATIONS (LOW-END DEVICES)
+----------------------------------------- */
+.sortable-ghost {
+    opacity: 0.3 !important;
+    background: rgba(1, 47, 40, 0.5) !important;
+    border: 2px dashed var(--accent-primary) !important;
+    box-shadow: none !important;
+}
+
+.sortable-fallback {
+    opacity: 0.9 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8) !important;
+    pointer-events: none !important;
+    z-index: 9999 !important;
+    will-change: transform;
+}
+
+.sortable-drag {
+    cursor: grabbing !important;
 }
