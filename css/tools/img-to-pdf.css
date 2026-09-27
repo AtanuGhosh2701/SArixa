@@ -239,6 +239,7 @@ input:checked + .slider:before {
     background-color: #003c2f;
 }
 
+/* Scoped exclusively to .custom-dropdown */
 .custom-dropdown {
     position: relative;
     width: 100%;
@@ -256,20 +257,20 @@ input:checked + .slider:before {
     z-index: 9999; 
 }
 
-.dropdown-selected {
+.custom-dropdown .dropdown-selected {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 12px;
 }
 
-.dropdown-actions {
+.custom-dropdown .dropdown-actions {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-.dropdown-arrow {
+.custom-dropdown .dropdown-arrow {
     font-size: 0.7rem;
     color: var(--text-main);
     transition: transform 0.3s;
@@ -279,7 +280,8 @@ input:checked + .slider:before {
     transform: rotate(180deg);
 }
 
-.dropdown-menu {
+/* 🔥 NAVBAR FIX: Ei code ta ekhon sudhu .custom-dropdown er bhetor thaka dropdown ke affect korbe 🔥 */
+.custom-dropdown .dropdown-menu {
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -307,13 +309,13 @@ input:checked + .slider:before {
     pointer-events: auto;
 }
 
-.font-list {
+.custom-dropdown .font-list {
     max-height: 250px; 
     overflow-y: auto;
     -webkit-overflow-scrolling: touch; 
 }
 
-.font-item {
+.custom-dropdown .font-item {
     display: block;
     padding: 10px 12px;
     color: var(--text-main);
@@ -324,11 +326,11 @@ input:checked + .slider:before {
     -webkit-tap-highlight-color: transparent;
 }
 
-.font-item:hover {
+.custom-dropdown .font-item:hover {
     background: rgba(0, 230, 118, 0.1);
 }
 
-.font-item.active {
+.custom-dropdown .font-item.active {
     background: var(--accent-primary);
     color: #003c2f;
     font-weight: bold;
@@ -659,7 +661,6 @@ input:checked + .slider:before {
     user-select: none;
     -webkit-user-select: none;
     box-sizing: border-box;
-    /* GPU ACCELERATION FOR MOBILE SMOOTHNESS */
     will-change: transform;
     -webkit-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
