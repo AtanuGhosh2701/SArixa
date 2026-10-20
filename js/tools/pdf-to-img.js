@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const overlay = document.getElementById(overlayId);
         const panel = document.getElementById(panelId);
         
-        if(modeId) {
+        if (modeId) {
             document.getElementById(modeId).addEventListener('change', (e) => {
                 document.getElementById('customColorSection').style.display = e.target.value === 'custom' ? 'block' : 'none';
             });
@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 worker.terminate();
             };
 
-            worker.onerror = (err) => {
+            worker.onerror = () => {
                 reject(new Error("Decryption stream connection error."));
                 worker.terminate();
             };
@@ -286,16 +286,17 @@ document.addEventListener("DOMContentLoaded", () => {
         extractBtn.textContent = "Convert to Images";
     }
 
+    // Updated Target Size Compression for Crisp Output
     async function compressToTargetSize(canvas, targetKB, format) {
         let targetBytes = targetKB * 1024;
-        let minQ = 0.1, maxQ = 0.9, quality = 0.8;
+        let minQ = 0.1, maxQ = 0.98, quality = 0.92;
         let dataURL = canvas.toDataURL(format, quality);
         let size = Math.round((dataURL.length * 3) / 4);
 
         if (size <= targetBytes) return dataURL;
 
         if (format === 'image/jpeg') {
-            for (let i = 0; i < 6; i++) { 
+            for (let i = 0; i < 7; i++) { 
                 quality = (minQ + maxQ) / 2;
                 dataURL = canvas.toDataURL(format, quality);
                 size = Math.round((dataURL.length * 3) / 4);
@@ -307,12 +308,14 @@ document.addEventListener("DOMContentLoaded", () => {
         size = Math.round((dataURL.length * 3) / 4);
         if (size > targetBytes) {
             let ratio = Math.sqrt(targetBytes / size);
-            if (ratio < 0.1) ratio = 0.1; 
+            if (ratio < 0.15) ratio = 0.15; 
             
             let scCanvas = document.createElement('canvas');
-            scCanvas.width = canvas.width * ratio;
-            scCanvas.height = canvas.height * ratio;
+            scCanvas.width = Math.floor(canvas.width * ratio);
+            scCanvas.height = Math.floor(canvas.height * ratio);
             let scCtx = scCanvas.getContext('2d');
+            scCtx.imageSmoothingEnabled = true;
+            scCtx.imageSmoothingQuality = 'high';
             scCtx.drawImage(canvas, 0, 0, scCanvas.width, scCanvas.height);
             
             dataURL = scCanvas.toDataURL(format, quality);
@@ -343,12 +346,12 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const format = formatSelect.value;
             const qualityMode = qualitySelect.value;
-            let initialScale = 2.0;
+            let initialScale = 4.0;
 
-            if (qualityMode === 'high') initialScale = 2.0;
-            else if (qualityMode === 'medium') initialScale = 1.5;
-            else if (qualityMode === 'low') initialScale = 1.0;
-            else initialScale = 2.0; 
+            if (qualityMode === 'high') initialScale = 4.0;
+            else if (qualityMode === 'medium') initialScale = 2.5;
+            else if (qualityMode === 'low') initialScale = 1.5;
+            else initialScale = 3.0; 
 
             for (let i = 1; i <= totalPages; i++) {
                 updateProgress(i, totalPages);
@@ -357,12 +360,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 const viewport = page.getViewport({ scale: initialScale }); 
                 
                 const pdfCanvas = document.createElement('canvas');
-                pdfCanvas.width = viewport.width; pdfCanvas.height = viewport.height;
-                await page.render({ canvasContext: pdfCanvas.getContext('2d'), viewport }).promise;
+                pdfCanvas.width = Math.floor(viewport.width);
+                pdfCanvas.height = Math.floor(viewport.height);
+                const pdfCtx = pdfCanvas.getContext('2d');
+                pdfCtx.imageSmoothingEnabled = true;
+                pdfCtx.imageSmoothingQuality = 'high';
+
+                await page.render({ canvasContext: pdfCtx, viewport }).promise;
 
                 const finalCanvas = document.createElement('canvas');
-                finalCanvas.width = viewport.width; finalCanvas.height = viewport.height;
+                finalCanvas.width = pdfCanvas.width;
+                finalCanvas.height = pdfCanvas.height;
                 const ctx = finalCanvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
 
                 let bgColor = bgMode.value === 'black' ? '#000000' : (bgMode.value === 'custom' ? bgPicker.color.hexString : '#ffffff');
                 ctx.fillStyle = bgColor;
@@ -378,9 +389,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     finalDataURL = await compressToTargetSize(finalCanvas, targetKB, format);
                 } else {
                     let qualityParam = 1.0;
-                    if (qualityMode === 'high') qualityParam = 0.9;
-                    else if (qualityMode === 'medium') qualityParam = 0.7;
-                    else if (qualityMode === 'low') qualityParam = 0.5;
+                    if (qualityMode === 'high') qualityParam = 1.0;
+                    else if (qualityMode === 'medium') qualityParam = 0.82;
+                    else if (qualityMode === 'low') qualityParam = 0.65;
                     finalDataURL = finalCanvas.toDataURL(format, qualityParam);
                 }
 
@@ -395,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 extractBtn.disabled = false;
                 extractBtn.innerText = "Re-Convert Images";
                 
-                if(outputBox) {
+                if (outputBox) {
                     outputBox.style.display = "block";
                     outputBox.innerHTML = `
                         <div class="success-card">
@@ -501,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (activeCroppers.has(pageNum)) activeCroppers.get(pageNum).destroy();
                 card.remove();
 
-                if(pageDataMap.size === 0) workspaceSection.style.display = 'none';
+                if (pageDataMap.size === 0) workspaceSection.style.display = 'none';
                 delPopup.style.display = "none";
             };
 
@@ -623,7 +634,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         modal.querySelector('.cancel-btn').onclick = () => { cropper.destroy(); modal.remove(); };
         modal.querySelector('.save-btn').onclick = () => {
-            const canvas = cropper.getCroppedCanvas();
+            const canvas = cropper.getCroppedCanvas({
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
             const newURL = canvas.toDataURL(formatSelect.value, 1.0);
             pageDataMap.set(pageNum, newURL);
             imgElement.src = newURL;
@@ -650,7 +664,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const ext = formatSelect.value === 'image/jpeg' ? 'jpg' : 'png';
 
         for (let [pageNum, cropper] of activeCroppers.entries()) {
-            const canvas = cropper.getCroppedCanvas();
+            const canvas = cropper.getCroppedCanvas({
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high'
+            });
             pageDataMap.set(pageNum, canvas.toDataURL(formatSelect.value, 1.0));
         }
 
