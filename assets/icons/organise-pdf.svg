@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Transparent Background -->
+  <rect x="10" y="10" width="100" height="100" rx="24" fill="rgba(0, 230, 118, 0.05)" stroke="rgba(0, 230, 118, 0.2)" stroke-width="1.5"/>
+
+  <!-- Document 1: Back (Light Cyan) -->
+  <path d="M 62 24 H 78 L 92 38 V 72 H 62 Z" fill="#9ce5d9" stroke="#9ce5d9" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Folded Corner for Doc 1 -->
+  <path d="M 78 24 V 38 H 92 Z" fill="#82d4c6" stroke="#82d4c6" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Document 2: Middle (Bright Neon Green) -->
+  <path d="M 48 36 H 64 L 78 50 V 84 H 48 Z" fill="#00e573" stroke="#00e573" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Folded Corner for Doc 2 -->
+  <path d="M 64 36 V 50 H 78 Z" fill="#00c261" stroke="#00c261" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Document 3: Front (Dark Slate Green) -->
+  <path d="M 34 48 H 50 L 64 62 V 96 H 34 Z" fill="#103b31" stroke="#103b31" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Folded Corner for Doc 3 (Accent Cyan) -->
+  <path d="M 50 48 V 62 H 64 Z" fill="#9ce5d9" stroke="#9ce5d9" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- Stylized PDF Text/Lines on Front Document -->
+  <rect x="42" y="68" width="16" height="4" rx="2" fill="#9ce5d9"/>
+  <rect x="42" y="78" width="10" height="4" rx="2" fill="#9ce5d9"/>
+
+  <!-- Dynamic Wrapping Reorganize Arrow (Smooth Quadratic Curve) -->
+  <path d="M 24 72 Q 60 114 96 78" fill="none" stroke="#00e573" stroke-width="7" stroke-linecap="round"/>
+  
+  <!-- Premium Arrowhead snapping perfectly to the curve -->
+  <polyline points="84,80 96,78 92,90" fill="none" stroke="#00e573" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

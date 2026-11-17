@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
+  <defs>
+    <linearGradient id="neonGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ff84"/>
+      <stop offset="100%" stop-color="#00e676"/>
+    </linearGradient>
+    
+    <filter id="neonGlow2" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#00e676" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="10" y="10" width="100" height="100" rx="24" fill="rgba(0, 230, 118, 0.05)" stroke="rgba(0, 230, 118, 0.2)" stroke-width="1.5"/>
+
+  <path d="M 32 20 L 70 20 L 86 36 L 86 92 C 86 94.2 84.2 96 82 96 L 36 96 C 33.8 96 32 94.2 32 92 Z" fill="#012f28" stroke="rgba(178, 235, 242, 0.3)" stroke-width="1.5"/>
+  <path d="M 70 20 L 70 36 L 86 36 Z" fill="rgba(178, 235, 242, 0.15)"/>
+
+  <rect x="42" y="36" width="36" height="24" rx="4" fill="none" stroke="#b2ebf2" stroke-width="1.5"/>
+  
+  <circle cx="68" cy="43" r="3.5" fill="#b2ebf2"/>
+  <path d="M 43 59 L 52 48 L 59 56 L 68 46 L 77 59 Z" fill="url(#neonGrad2)" opacity="0.9"/>
+  
+  <path d="M 60 66 L 60 76 M 56 72 L 60 76 L 64 72" fill="none" stroke="#b2ebf2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g filter="url(#neonGlow2)">
+    <rect x="44" y="80" width="32" height="15" rx="4" fill="url(#neonGrad2)"/>
+    <text x="60" y="90" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="9" fill="#021b1a" text-anchor="middle" letter-spacing="1.5">PDF</text>
+  </g>
+</svg>
