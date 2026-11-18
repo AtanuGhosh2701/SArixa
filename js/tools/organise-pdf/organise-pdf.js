@@ -1,4 +1,4 @@
-import { sharePdfFile } from './sharing-system.js';
+import { sharePdfFile } from '../sharing-system.js';
 
 const initOrganisePdfTool = () => {
     let pdfjsLib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
