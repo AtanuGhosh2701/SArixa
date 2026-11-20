@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SArixa - PDF Organizer & Editor Stylesheet
+   SArixa - PDF Organizer & Editor Stylesheet (Performance & GPU Optimized)
    ========================================================================== */
 
 :root {
@@ -103,7 +103,7 @@ body {
     font-size: 1.1rem;
     border-radius: 10px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .file-btn:hover {
@@ -121,7 +121,7 @@ body {
     border: 2px dashed var(--accent-primary);
     border-radius: 15px;
     background: rgba(0, 230, 118, 0.02);
-    transition: all 0.3s ease;
+    transition: border-color 0.25s ease, background-color 0.25s ease;
     box-sizing: border-box;
 }
 
@@ -252,7 +252,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     min-height: 44px;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .btn-secondary:disabled {
@@ -277,7 +277,7 @@ body {
     min-height: 44px;
     box-sizing: border-box;
     justify-content: space-between;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease;
 }
 
 .toggle-group:hover {
@@ -304,7 +304,7 @@ body {
     min-height: 44px;
     box-sizing: border-box;
     justify-content: space-between;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease;
 }
 
 .search-group:focus-within {
@@ -335,7 +335,7 @@ body {
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .search-icon-btn:hover {
@@ -402,7 +402,7 @@ body {
     border: 1px solid rgba(0, 255, 200, 0.3);
     border-radius: 34px;
     cursor: pointer;
-    transition: 0.4s;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .slider:before {
@@ -414,7 +414,7 @@ body {
     bottom: 3px;
     background-color: var(--text-main);
     border-radius: 50%;
-    transition: 0.4s;
+    transition: transform 0.25s ease, background-color 0.25s ease;
 }
 
 input:checked + .slider {
@@ -442,7 +442,7 @@ input:checked + .slider:before {
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
@@ -499,7 +499,7 @@ input:checked + .slider:before {
     width: 0%;
     height: 100%;
     background: var(--accent-primary);
-    transition: width 0.3s;
+    transition: width 0.25s ease;
     box-shadow: 0 0 10px rgba(0, 230, 118, 0.7);
 }
 
@@ -521,7 +521,7 @@ input:checked + .slider:before {
 }
 
 .success-card {
-    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     background: rgba(1, 47, 40, 0.85);
     border: 1px solid var(--accent-primary);
     border-radius: 16px;
@@ -546,7 +546,7 @@ input:checked + .slider:before {
 
 #finalActionArea {
     display: none;
-    animation: slideUpFade 0.5s forwards;
+    animation: slideUpFade 0.45s forwards;
     margin-top: 10px;
     width: 100%;
 }
@@ -576,7 +576,7 @@ input:checked + .slider:before {
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
-    transition: 0.3s;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
     box-sizing: border-box;
 }
 
@@ -591,6 +591,7 @@ input:checked + .slider:before {
 #rating-placeholder {
     margin-top: 60px;
 }
+
 /* -----------------------------------------
    6. GEAR ICON & CUSTOMIZATION MODALS
 ----------------------------------------- */
@@ -607,7 +608,7 @@ input:checked + .slider:before {
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .gear-icon-btn:hover {
@@ -634,6 +635,7 @@ input:checked + .slider:before {
     max-height: 90vh;
     display: flex;
     flex-direction: column;
+    overscroll-behavior: contain;
 }
 
 .custom-settings-modal-box.wm-modal-wide {
@@ -657,7 +659,7 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     padding: 0;
     z-index: 10;
 }
@@ -687,7 +689,7 @@ input:checked + .slider:before {
     cursor: pointer;
     z-index: 100004;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     padding: 0;
 }
 
@@ -719,7 +721,7 @@ input:checked + .slider:before {
 .select-all-box {
     user-select: none;
     -webkit-user-select: none;
-    transition: border-color 0.2s, background-color 0.2s;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .select-all-box:hover {
@@ -738,7 +740,7 @@ input:checked + .slider:before {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     background: rgba(0, 0, 0, 0.25);
     flex-shrink: 0;
     box-sizing: border-box;
@@ -785,7 +787,7 @@ input:checked + .slider:before {
     z-index: 15;
     cursor: pointer;
     pointer-events: auto;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     color: transparent;
     font-size: 14px;
@@ -821,7 +823,7 @@ input:checked + .slider:before {
     z-index: 16;
     cursor: pointer;
     pointer-events: auto;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
     padding: 0;
     user-select: none;
@@ -870,6 +872,8 @@ input:checked + .slider:before {
     z-index: 50;
     width: 100%;
     box-sizing: border-box;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .settings-group div.setting-item {
@@ -988,7 +992,7 @@ input:checked + .slider:before {
 .custom-dropdown .dropdown-arrow {
     font-size: 0.7rem;
     color: var(--text-main);
-    transition: transform 0.3s;
+    transition: transform 0.25s ease;
 }
 
 .custom-dropdown.open .dropdown-arrow {
@@ -1011,7 +1015,7 @@ input:checked + .slider:before {
     border: 0 solid rgba(0, 255, 200, 0.6);
     pointer-events: none;
     display: none;
-    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease-in-out, border-width 0.3s;
+    transition: max-height 0.25s ease-in-out, opacity 0.25s ease-in-out, padding 0.25s ease-in-out, border-width 0.25s;
 }
 
 .custom-dropdown.open .dropdown-menu {
@@ -1037,7 +1041,7 @@ input:checked + .slider:before {
     font-size: 0.95rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .custom-dropdown .font-item:hover {
@@ -1067,7 +1071,7 @@ input:checked + .slider:before {
     border: 2px solid var(--accent-primary);
     border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .wm-format-btn svg {
@@ -1101,7 +1105,7 @@ input:checked + .slider:before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: 0.3s;
+    transition: background-color 0.25s ease;
     box-sizing: border-box;
 }
 
@@ -1110,13 +1114,14 @@ input:checked + .slider:before {
 }
 
 /* -----------------------------------------
-   9. PDF GRID & PAGE CARDS
+   9. PDF GRID & PAGE CARDS (VIRTUAL-READY & GPU-SAFE)
 ----------------------------------------- */
 .pdf-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 3rem;
     padding: 0 3rem;
+    contain: layout style;
 }
 
 .card-wrapper {
@@ -1158,7 +1163,7 @@ input:checked + .slider:before {
     border: 2px dashed rgba(0, 230, 118, 0.4);
     border-radius: 6px;
     background: rgba(0, 230, 118, 0.05);
-    transition: all 0.2s ease-in-out;
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     z-index: 1;
 }
 
@@ -1170,7 +1175,7 @@ input:checked + .slider:before {
     font-weight: bold;
     font-family: monospace;
     z-index: 2;
-    transition: all 0.2s;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .card-gap:hover::after {
@@ -1193,6 +1198,8 @@ input:checked + .slider:before {
     color: var(--bg-main);
 }
 
+/* Removed permanent will-change: transform and added content-visibility: auto
+   on .image-card so off-screen cards skip paint without clipping external .card-gap */
 .image-card {
     background-color: var(--bg-card);
     border-radius: 12px;
@@ -1200,12 +1207,20 @@ input:checked + .slider:before {
     position: relative;
     cursor: pointer;
     border: 2px solid rgba(0, 255, 200, 0.2);
-    will-change: transform;
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 308px;
+    contain: layout paint style;
+}
+
+.sortable-chosen .image-card,
+.sortable-drag .image-card {
+    will-change: transform;
+    content-visibility: visible;
 }
 
 .image-card.selected {
@@ -1243,7 +1258,7 @@ input:checked + .slider:before {
     width: auto;
     height: auto;
     display: block;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
     object-fit: contain;
     border-radius: 3px;
 }
@@ -1303,10 +1318,10 @@ input:checked + .slider:before {
     position: fixed;
     bottom: 30px;
     left: 50%;
-    transform: translateX(-50%);
-    background: rgba(1, 47, 40, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    transform: translate3d(-50%, 0, 0);
+    background: rgba(1, 47, 40, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(0, 230, 118, 0.3);
     border-radius: 20px;
     padding: 12px 20px;
@@ -1315,7 +1330,8 @@ input:checked + .slider:before {
     gap: 15px;
     z-index: 9999;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    transition: opacity 0.3s ease, bottom 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.25s ease, bottom 0.25s ease, transform 0.25s ease;
+    contain: layout style;
 }
 
 .floating-toolbar.hidden {
@@ -1334,7 +1350,7 @@ input:checked + .slider:before {
     border: none;
     color: var(--text-sub);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
     padding: 5px;
     position: relative;
     z-index: 10;
@@ -1383,7 +1399,7 @@ input:checked + .slider:before {
     display: flex;
     gap: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    transition: opacity 0.2s, transform 0.2s;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     z-index: 100002;
     align-items: center;
 }
@@ -1430,7 +1446,6 @@ input:checked + .slider:before {
 #detail-slide-hint {
     display: none !important;
 }
-
 /* -----------------------------------------
    11. POPUPS, PASSWORD MODAL & TOAST
 ----------------------------------------- */
@@ -1473,7 +1488,7 @@ input:checked + .slider:before {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .popup-btn-red {
@@ -1536,7 +1551,7 @@ input:checked + .slider:before {
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: 0.2s ease;
+    transition: color 0.2s ease;
     padding: 4px;
 }
 
@@ -1560,7 +1575,7 @@ input:-webkit-autofill:active {
     position: fixed;
     bottom: 30px;
     left: 50%;
-    transform: translateX(-50%) translateY(100px);
+    transform: translate3d(-50%, 100px, 0);
     background: var(--accent-primary);
     color: #012f28;
     padding: 12px 24px;
@@ -1569,14 +1584,14 @@ input:-webkit-autofill:active {
     font-size: 1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
     z-index: 100100;
-    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+    transition: transform 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.25s ease;
     text-align: center;
     opacity: 0;
     pointer-events: none;
 }
 
 .toast.show {
-    transform: translateX(-50%) translateY(0);
+    transform: translate3d(-50%, 0, 0);
     opacity: 1;
     pointer-events: auto;
 }
@@ -1620,7 +1635,7 @@ input:-webkit-autofill:active {
     border-radius: 50%;
     display: inline-block;
     position: relative;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
 }
 
@@ -1655,6 +1670,7 @@ input:-webkit-autofill:active {
     z-index: 100000;
     display: flex;
     flex-direction: column;
+    contain: layout style;
 }
 
 .editor-modal.hidden {
@@ -1684,7 +1700,7 @@ input:-webkit-autofill:active {
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .header-icon-btn:hover:not(:disabled) {
@@ -1718,6 +1734,7 @@ input:-webkit-autofill:active {
     border-bottom: 1px solid rgba(0, 255, 200, 0.1);
     min-height: 60px;
     z-index: 100001;
+    overscroll-behavior: contain;
 }
 
 .format-tools-center {
@@ -1813,7 +1830,7 @@ input:-webkit-autofill:active {
     border-radius: 6px;
     cursor: pointer;
     background: #000;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease, border-color 0.2s ease;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
     position: relative;
     z-index: 10;
@@ -1849,7 +1866,7 @@ input:-webkit-autofill:active {
     padding: 6px;
     border-radius: 6px;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1925,7 +1942,7 @@ input:-webkit-autofill:active {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     margin-top: 2px;
     position: relative;
     z-index: 1000 !important;
@@ -1965,6 +1982,7 @@ input:-webkit-autofill:active {
     display: flex !important;
     flex-direction: column !important;
     gap: 4px !important;
+    overscroll-behavior: contain;
 }
 
 .custom-dropup-item {
@@ -2084,7 +2102,7 @@ input:-webkit-autofill:active {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color 0.2s ease;
 }
 
 .color-ok-btn:hover {
@@ -2104,6 +2122,8 @@ input:-webkit-autofill:active {
     padding: 5px;
     padding-bottom: 110px;
     box-sizing: border-box;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .editor-canvas-container {
@@ -2330,7 +2350,7 @@ input:-webkit-autofill:active {
     cursor: move;
     border: none !important;
     box-sizing: border-box !important;
-    transition: border-radius 0.2s, background-color 0.2s;
+    transition: border-radius 0.2s ease, background-color 0.2s ease;
 }
 
 .text-wrapper.selected {
@@ -2358,7 +2378,7 @@ input:-webkit-autofill:active {
     letter-spacing: 0px;
     word-spacing: 0px;
     text-align: left;
-    transition: padding 0.2s;
+    transition: padding 0.2s ease;
 }
 
 .text-content.is-list {
@@ -2584,7 +2604,7 @@ input:-webkit-autofill:active {
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     min-width: 50px;
     text-align: center;
 }
@@ -2602,7 +2622,7 @@ input:-webkit-autofill:active {
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s ease;
+    transition: background-color 0.25s ease;
 }
 
 .reset-tilt-btn:hover {
@@ -2647,7 +2667,7 @@ input:-webkit-autofill:active {
 }
 
 /* -----------------------------------------
-   16. FAQ & SEO CONTENT SECTIONS
+   16. FAQ & SEO CONTENT SECTIONS (LAZY PAINT)
 ----------------------------------------- */
 .faq-section {
     width: 95%;
@@ -2658,6 +2678,8 @@ input:-webkit-autofill:active {
     border-radius: 20px;
     padding: 30px;
     box-sizing: border-box;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 520px;
 }
 
 .faq-title {
@@ -2675,7 +2697,7 @@ input:-webkit-autofill:active {
     border-radius: 8px;
     margin-bottom: 12px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .faq-item:hover {
@@ -2705,7 +2727,7 @@ input:-webkit-autofill:active {
     transform: translateY(-50%);
     color: var(--accent-primary);
     font-size: 0.8rem;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 }
 
 .faq-item[open] summary::after {
@@ -2738,6 +2760,8 @@ input:-webkit-autofill:active {
     margin: 0 auto 100px auto;
     padding: 0;
     box-sizing: border-box;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 480px;
 }
 
 .seo-intro {
@@ -2771,7 +2795,7 @@ input:-webkit-autofill:active {
     border: 1px solid rgba(0, 255, 200, 0.2);
     border-radius: 12px;
     padding: 25px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .seo-card:hover {
@@ -2904,6 +2928,8 @@ input:-webkit-autofill:active {
         width: 100%;
         border-radius: 20px 20px 0 0;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
         justify-content: flex-start;
         padding: 15px;
         border-bottom: none;
@@ -2912,7 +2938,7 @@ input:-webkit-autofill:active {
     }
 
     .floating-toolbar.hidden {
-        transform: translate(-50%, 100%);
+        transform: translate3d(-50%, 100%, 0);
     }
 
     .fab-btn {
@@ -2934,9 +2960,9 @@ input:-webkit-autofill:active {
         order: 1;
         flex-direction: row !important;
         padding: 12px 15px;
-        background: rgba(1, 30, 25, 0.85) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(1, 30, 25, 0.92) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         border-bottom: 1px solid rgba(0, 230, 118, 0.2) !important;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         z-index: 100005;
@@ -3011,6 +3037,7 @@ input:-webkit-autofill:active {
         width: 100% !important;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
         padding: 12px 15px;
         background: #011e19;
         border-top: none !important;

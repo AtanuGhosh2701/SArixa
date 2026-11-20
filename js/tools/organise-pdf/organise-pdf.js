@@ -60,7 +60,6 @@ const initOrganisePdfTool = () => {
         }
     }
 
-    // Ensure accessibility labels on interactive controls when browser is idle
     const runWhenIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 200));
     runWhenIdle(() => {
         document.querySelectorAll('input, select, button').forEach((el, idx) => {
@@ -71,7 +70,6 @@ const initOrganisePdfTool = () => {
         });
     });
 
-    // Preload core PDF libraries when the user interacts with the file selection button
     const fileBtnLabelEl = document.querySelector('label[for="fileInput"]');
     if (fileBtnLabelEl) {
         ['pointerenter', 'pointerdown', 'touchstart'].forEach(ev => {
@@ -79,7 +77,6 @@ const initOrganisePdfTool = () => {
         });
     }
 
-    // Remove legacy toolbar items if present
     const fabColorBtn = document.getElementById('fab-color');
     if (fabColorBtn) fabColorBtn.remove();
     const fabResizeOldBtn = document.getElementById('fab-resize');
@@ -87,7 +84,6 @@ const initOrganisePdfTool = () => {
     const submenuResizeOld = document.getElementById('submenu-resize');
     if (submenuResizeOld) submenuResizeOld.remove();
 
-    // Keep rating popup hidden initially until triggered by Rate Now or Download
     const ratingPlaceEl = document.getElementById('rating-placeholder');
     if (ratingPlaceEl) {
         const rObs = new MutationObserver(() => {
@@ -109,7 +105,7 @@ const initOrganisePdfTool = () => {
     const uploadZone = document.getElementById('uploadZone');
     const emptyState = document.getElementById('emptyState');
     const fileCardsContainer = document.getElementById('fileCardsContainer');
-    
+
     const workspaceSection = document.getElementById('workspaceSection');
     const pdfGrid = document.getElementById('pdf-grid');
     const exportBtn = document.getElementById('export-btn');
@@ -123,7 +119,6 @@ const initOrganisePdfTool = () => {
     const applyPageNumBtn = document.getElementById('apply-page-num-btn');
     const clearPageNumBtn = document.getElementById('clear-page-num-btn');
 
-    // Watermark Panel Elements
     const wmSettingsPanel = document.getElementById('wm-settings-panel');
     const wmType = document.getElementById('wmType');
     const wmTextInput = document.getElementById('wmTextInput');
@@ -146,7 +141,6 @@ const initOrganisePdfTool = () => {
     const applyWmSelectedBtn = document.getElementById('apply-wm-selected-btn');
     const clearWmSelectedBtn = document.getElementById('clear-wm-selected-btn');
 
-    // Page Number & Watermark Color Picker Elements
     const fontColorSwatchBtn = document.getElementById('fontColorSwatchBtn');
     const fontColorPickerPanel = document.getElementById('fontColorPickerPanel');
     const fontColorPopoverOverlay = document.getElementById('fontColorPopoverOverlay');
@@ -162,7 +156,7 @@ const initOrganisePdfTool = () => {
     const wmHexColorPreview = document.getElementById('wmHexColorPreview');
     const wmCustomHex = document.getElementById('wmCustomHex');
     const wmColorOkBtn = document.getElementById('wmColorOkBtn');
-    
+
     const pageSearchInput = document.getElementById('page-search-input');
     const pageSearchBtn = document.getElementById('page-search-btn');
 
@@ -184,6 +178,7 @@ const initOrganisePdfTool = () => {
 
     let exportedPdfBlob = null;
     let isExportPreviewOpen = false;
+    let activePreviewPdfDoc = null;
 
     const eyeOpenSvg = `<svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
     const eyeOffSvg = `<svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
@@ -200,11 +195,22 @@ const initOrganisePdfTool = () => {
         return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
     }
 
+    function cleanupPreviewResources() {
+        if (activePreviewPdfDoc) {
+            try { activePreviewPdfDoc.destroy(); } catch (e) {}
+            activePreviewPdfDoc = null;
+        }
+        const existingViewer = document.getElementById('pdfViewerContainer');
+        if (existingViewer) {
+            existingViewer.querySelectorAll('canvas').forEach(c => { c.width = 1; c.height = 1; });
+            existingViewer.remove();
+        }
+    }
+
     function hideExportResultArea() {
         if (outputBox) outputBox.style.display = 'none';
         if (finalActionArea) finalActionArea.style.display = 'none';
-        const existingViewer = document.getElementById('pdfViewerContainer');
-        if (existingViewer) existingViewer.remove();
+        cleanupPreviewResources();
         isExportPreviewOpen = false;
         if (previewBtn) previewBtn.innerHTML = "Preview PDF";
         if (shareBtn) shareBtn.disabled = true;
@@ -221,8 +227,7 @@ const initOrganisePdfTool = () => {
             }
         });
     }
-    
-    // Floating Action Toolbar & Modals
+
     const floatingToolbar = document.getElementById('floating-toolbar');
     const fabUndo = document.getElementById('fab-undo');
     const fabRedo = document.getElementById('fab-redo');
@@ -236,7 +241,7 @@ const initOrganisePdfTool = () => {
     const fabMargins = document.getElementById('fab-margins');
     const fabRemove = document.getElementById('fab-remove');
     const fabReset = document.getElementById('fab-reset');
-    const fabCrop = document.getElementById('fab-crop'); 
+    const fabCrop = document.getElementById('fab-crop');
     const fabDraw = document.getElementById('fab-draw');
     const fabViewChanges = document.getElementById('fab-view-changes');
 
@@ -279,16 +284,16 @@ const initOrganisePdfTool = () => {
     const btnDetailClose = document.getElementById('detail-close-btn');
     const fabAddMoreTextWrapper = document.getElementById('add-text-btn-wrapper');
     const fabAddMoreTextBtn = document.getElementById('fab-add-more-text');
-    
+
     const extractHeaderGroup = document.getElementById('extract-header-group');
-    
+
     const drawHeaderGroup = document.getElementById('draw-header-group');
     const drawFormatToolbar = document.getElementById('draw-format-toolbar');
     const btnDrawCancel = document.getElementById('draw-cancel');
     const btnDrawSave = document.getElementById('draw-save');
     const drawUndoBtn = document.getElementById('draw-undo-btn');
     const drawRedoBtn = document.getElementById('draw-redo-btn');
-    
+
     const drawColorTriggerBtn = document.getElementById('draw-color-trigger-btn');
     const drawJoystick = document.getElementById('draw-cursor-joystick');
     const djMain = document.getElementById('dj-main');
@@ -306,7 +311,7 @@ const initOrganisePdfTool = () => {
     const formatUnderline = document.getElementById('format-underline');
     const formatStrike = document.getElementById('format-strike');
     const alignBtns = document.querySelectorAll('#text-format-toolbar .align-btn');
-    
+
     const pointerToggle = document.getElementById('pointer-toggle');
     const pointerStyleSelect = document.getElementById('pointer-style-select');
 
@@ -325,15 +330,77 @@ const initOrganisePdfTool = () => {
     const ccpOkBtn = document.getElementById('ccp-ok-btn');
 
     // ==========================================
-    // 3. STATE MANAGEMENT & VARIABLES
+    // 3. STATE MANAGEMENT, DEVICE PROFILE & MEMORY MANAGERS
     // ==========================================
+    const DEVICE_PROFILE = (() => {
+        const mem = navigator.deviceMemory || 4;
+        const cores = navigator.hardwareConcurrency || 4;
+        const isMobile = window.innerWidth <= 900 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent || '');
+        const isLowEnd = mem <= 3 || cores <= 4;
+        return {
+            isMobile,
+            isLowEnd,
+            // Ultra-Crisp Thumbnail & Editor Resolution with tight LRU cache
+            thumbScale: isLowEnd ? 0.58 : (isMobile ? 0.78 : 0.85),
+            maxThumbDim: isLowEnd ? 620 : (isMobile ? 880 : 960),
+            thumbQuality: isLowEnd ? 0.88 : 0.92,
+            lruMaxEntries: isLowEnd ? 14 : (isMobile ? 22 : (mem >= 8 ? 75 : 50)),
+            renderConcurrency: isMobile ? 1 : 2,
+            editorDpr: Math.min(window.devicePixelRatio || 1, isLowEnd ? 1.75 : 2.25),
+            previewDpr: Math.min(window.devicePixelRatio || 1, isLowEnd ? 1.6 : 2.25),
+            exportScale: isLowEnd ? 1.5 : (isMobile ? 1.75 : 2.0),
+            maxOverlayDim: isLowEnd ? 1300 : (isMobile ? 1600 : 2200),
+            maxEditorDim: isLowEnd ? 1500 : (isMobile ? 2050 : 2500),
+            maxUndoHistory: isLowEnd ? 12 : (isMobile ? 18 : 30)
+        };
+    })();
+
+    const yieldToMain = () => new Promise(resolve => {
+        if (typeof window.requestAnimationFrame === 'function' && document.visibilityState === 'visible') {
+            requestAnimationFrame(() => setTimeout(resolve, 0));
+        } else {
+            setTimeout(resolve, 0);
+        }
+    });
+
+    function releaseCanvasMemory(canvas) {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 1;
+        canvas.height = 1;
+    }
+
+    function canvasToBlob(canvas, mimeType = 'image/jpeg', quality = 0.8) {
+        return new Promise((resolve) => {
+            if (canvas.toBlob) {
+                canvas.toBlob((blob) => {
+                    if (blob) return resolve(blob);
+                    fetch(canvas.toDataURL(mimeType, quality)).then(r => r.blob()).then(resolve);
+                }, mimeType, quality);
+            } else {
+                fetch(canvas.toDataURL(mimeType, quality)).then(r => r.blob()).then(resolve);
+            }
+        });
+    }
+
+    async function canvasToBlobUrl(canvas, mimeType = 'image/jpeg', quality = 0.8) {
+        const blob = await canvasToBlob(canvas, mimeType, quality);
+        return ThumbnailCacheManager.registerBlobUrl(URL.createObjectURL(blob));
+    }
+
+    async function canvasToArrayBuffer(canvas, mimeType = 'image/png', quality = 0.92) {
+        const blob = await canvasToBlob(canvas, mimeType, quality);
+        return await blob.arrayBuffer();
+    }
+
     let colorPickerInstance = null;
     let fontColorPicker = null;
     let wmColorPicker = null;
-    let activeColorTarget = 'text'; 
-    
+    let activeColorTarget = 'text';
+
     let activeTextContent = null;
-    let editorScale = 1.0; 
+    let editorScale = 1.0;
     let currentImgOffsetX = 0;
     let currentImgOffsetY = 0;
     let currentImgDrawW = 0;
@@ -341,19 +408,19 @@ const initOrganisePdfTool = () => {
 
     let isDetailViewOpen = false;
     let isTextEditingOpen = false;
-    let isDrawMode = false; 
+    let isDrawMode = false;
     let isMarginsMode = false;
     let currentPdfRenderTask = null;
 
-    let pdfSources = []; 
+    let pdfSources = [];
     let pdfJsDocs = [];
     let originalFileName = "organized.pdf";
-    let pagesState = []; 
+    let pagesState = [];
     let historyUndoStack = [];
     let historyRedoStack = [];
     let sortableInstance = null;
     let addedItemCounter = 0;
-    let activeInsertPoint = null; 
+    let activeInsertPoint = null;
 
     let selectedPageIds = [];
     let selectedPageId = null;
@@ -372,6 +439,8 @@ const initOrganisePdfTool = () => {
     let textInitialLeft = 0;
     let textInitialTop = 0;
     let textInitialFontSize = 24;
+    let textHasDragged = false;
+    let textDragRafId = null;
 
     let drawCanvas = null;
     let drawCtx = null;
@@ -407,7 +476,336 @@ const initOrganisePdfTool = () => {
         Legal: [612, 1008]
     };
 
-    // Mobile Drop-Up Menu for Bottom Toolbar Selects
+    // LRU Thumbnail Cache & ObjectURL Lifecycle Manager
+    const ThumbnailCacheManager = (() => {
+        const lruMap = new Map();
+        const allCreatedBlobUrls = new Set();
+        const visiblePageIds = new Set();
+
+        function registerBlobUrl(url) {
+            if (url && url.startsWith('blob:')) allCreatedBlobUrls.add(url);
+            return url;
+        }
+
+        function revokeBlobUrl(url) {
+            if (url && url.startsWith('blob:') && allCreatedBlobUrls.has(url)) {
+                try { URL.revokeObjectURL(url); } catch (e) {}
+                allCreatedBlobUrls.delete(url);
+            }
+        }
+
+        function touch(pageId, url) {
+            if (!pageId || !url) return;
+            if (lruMap.has(pageId)) lruMap.delete(pageId);
+            lruMap.set(pageId, url);
+            evictIfNeeded();
+        }
+
+        function get(pageId) {
+            if (!lruMap.has(pageId)) return null;
+            const url = lruMap.get(pageId);
+            lruMap.delete(pageId);
+            lruMap.set(pageId, url);
+            return url;
+        }
+
+        function isUrlReferencedInHistory(url) {
+            if (!url) return false;
+            const checkArr = (arr) => arr.some(p => p.cacheUrl === url || p.dataUrl === url || p.cleanDataUrl === url || p.rawCacheUrl === url);
+            if (checkArr(pagesState)) return true;
+            for (let i = 0; i < historyUndoStack.length; i++) {
+                if (checkArr(historyUndoStack[i])) return true;
+            }
+            for (let i = 0; i < historyRedoStack.length; i++) {
+                if (checkArr(historyRedoStack[i])) return true;
+            }
+            return false;
+        }
+
+        function evictIfNeeded(customMaxLimit = DEVICE_PROFILE.lruMaxEntries) {
+            if (lruMap.size <= customMaxLimit) return;
+            for (const [pageId, url] of lruMap.entries()) {
+                if (lruMap.size <= customMaxLimit) break;
+                if (visiblePageIds.has(pageId) && customMaxLimit > 0) continue;
+                const st = pagesState.find(p => p.id === pageId);
+                if (st && st.type === 'original') {
+                    lruMap.delete(pageId);
+                    st.cacheUrl = null;
+                    st.rawCacheUrl = null;
+                    if (!isUrlReferencedInHistory(url)) {
+                        revokeBlobUrl(url);
+                    }
+                    const wrapper = pdfGrid ? pdfGrid.querySelector(`.card-wrapper[data-id="${pageId}"]`) : null;
+                    if (wrapper && !visiblePageIds.has(pageId)) {
+                        const c = wrapper.querySelector('canvas');
+                        if (c && c.width > 1) {
+                            releaseCanvasMemory(c);
+                            wrapper.dataset.thumbRendered = 'false';
+                        }
+                    }
+                }
+            }
+        }
+
+        function markVisible(pageId, isVis) {
+            if (isVis) visiblePageIds.add(pageId);
+            else visiblePageIds.delete(pageId);
+        }
+
+        function clearAll() {
+            lruMap.clear();
+            visiblePageIds.clear();
+            allCreatedBlobUrls.forEach(url => {
+                try { URL.revokeObjectURL(url); } catch (e) {}
+            });
+            allCreatedBlobUrls.clear();
+        }
+
+        return {
+            registerBlobUrl,
+            revokeBlobUrl,
+            touch,
+            get,
+            markVisible,
+            isVisible: (id) => visiblePageIds.has(id),
+            evictIfNeeded,
+            clearAll
+        };
+    })();
+
+    // Centralized PDF Document & Source Lifecycle Manager
+    const ResourceManager = (() => {
+        function isSourceReferenced(sourceIdx) {
+            const inCurrent = pagesState.some(p => p.type === 'original' && p.sourceIndex === sourceIdx);
+            if (inCurrent) return true;
+            for (let i = 0; i < historyUndoStack.length; i++) {
+                if (historyUndoStack[i].some(p => p.type === 'original' && p.sourceIndex === sourceIdx)) return true;
+            }
+            for (let i = 0; i < historyRedoStack.length; i++) {
+                if (historyRedoStack[i].some(p => p.type === 'original' && p.sourceIndex === sourceIdx)) return true;
+            }
+            return false;
+        }
+
+        function cleanupUnreferencedSources() {
+            for (let s = 0; s < pdfSources.length; s++) {
+                if (pdfSources[s] && !isSourceReferenced(s)) {
+                    if (pdfJsDocs[s]) {
+                        try { pdfJsDocs[s].destroy(); } catch (e) {}
+                        pdfJsDocs[s] = null;
+                    }
+                    pdfSources[s] = null;
+                }
+            }
+        }
+
+        // Frees 200-400MB of PDF.js Worker memory before heavy PDF-Lib export runs.
+        // If user edits again after export, getCachedPdfDoc() transparently reloads on demand.
+        async function suspendPdfJsDocsForExport() {
+            ThumbnailRenderQueue.clearPendingOnly();
+            for (let s = 0; s < pdfJsDocs.length; s++) {
+                if (pdfJsDocs[s]) {
+                    try { await pdfJsDocs[s].cleanup(); } catch (e) {}
+                    try { await pdfJsDocs[s].destroy(); } catch (e) {}
+                    pdfJsDocs[s] = null;
+                }
+            }
+            if (DEVICE_PROFILE.isMobile) {
+                ThumbnailCacheManager.evictIfNeeded(12);
+            }
+        }
+
+        function destroyAllPdfDocs() {
+            for (let s = 0; s < pdfJsDocs.length; s++) {
+                if (pdfJsDocs[s]) {
+                    try { pdfJsDocs[s].destroy(); } catch (e) {}
+                    pdfJsDocs[s] = null;
+                }
+            }
+            pdfJsDocs = [];
+            pdfSources = [];
+        }
+
+        return {
+            cleanupUnreferencedSources,
+            suspendPdfJsDocsForExport,
+            destroyAllPdfDocs
+        };
+    })();
+
+    // Bounded Lazy Thumbnail Render Queue & IntersectionObserver
+    const ThumbnailRenderQueue = (() => {
+        const queue = [];
+        const queuedIds = new Set();
+        let activeCount = 0;
+        let observer = null;
+
+        function ensureObserver() {
+            if (observer || typeof IntersectionObserver === 'undefined') return observer;
+            observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const wrapper = entry.target;
+                    const pageId = wrapper.dataset.id;
+                    if (!pageId) return;
+                    if (entry.isIntersecting) {
+                        ThumbnailCacheManager.markVisible(pageId, true);
+                        if (wrapper.dataset.thumbRendered !== 'true') {
+                            enqueue(pageId, true);
+                        }
+                    } else {
+                        ThumbnailCacheManager.markVisible(pageId, false);
+                    }
+                });
+                ThumbnailCacheManager.evictIfNeeded();
+            }, {
+                root: null,
+                rootMargin: '320px 0px',
+                threshold: 0.01
+            });
+            return observer;
+        }
+
+        function observeWrapper(wrapper) {
+            const obs = ensureObserver();
+            if (obs && wrapper) obs.observe(wrapper);
+            else if (wrapper && wrapper.dataset.id) enqueue(wrapper.dataset.id, false);
+        }
+
+        function unobserveWrapper(wrapper) {
+            if (observer && wrapper) observer.unobserve(wrapper);
+        }
+
+        function enqueue(pageId, highPriority = false) {
+            if (!pageId) return;
+            if (queuedIds.has(pageId)) {
+                if (highPriority) {
+                    const idx = queue.indexOf(pageId);
+                    if (idx > 0) {
+                        queue.splice(idx, 1);
+                        queue.unshift(pageId);
+                    }
+                }
+                return;
+            }
+            queuedIds.add(pageId);
+            if (highPriority) queue.unshift(pageId);
+            else queue.push(pageId);
+            processQueue();
+        }
+
+        async function renderCardThumbnail(pageId) {
+            const stateObj = pagesState.find(p => p.id === pageId);
+            if (!stateObj) return;
+            const wrapper = pdfGrid ? pdfGrid.querySelector(`.card-wrapper[data-id="${pageId}"]`) : null;
+            if (!wrapper) return;
+            const canvas = wrapper.querySelector('canvas');
+            if (!canvas) return;
+
+            let imgUrl = stateObj.cacheUrl || stateObj.dataUrl || ThumbnailCacheManager.get(pageId);
+
+            if (imgUrl) {
+                await new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        canvas.width = img.width || 240;
+                        canvas.height = img.height || 340;
+                        const ctx = canvas.getContext('2d');
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(img, 0, 0);
+                        wrapper.dataset.thumbRendered = 'true';
+                        ThumbnailCacheManager.touch(pageId, imgUrl);
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        stateObj.cacheUrl = null;
+                        resolve();
+                    };
+                    img.src = imgUrl;
+                });
+                if (wrapper.dataset.thumbRendered === 'true') return;
+            }
+
+            if (stateObj.type === 'original' && stateObj.sourceIndex !== null && pdfSources[stateObj.sourceIndex]) {
+                let page = null;
+                try {
+                    const pdf = await getCachedPdfDoc(stateObj.sourceIndex);
+                    page = await pdf.getPage(stateObj.originalIndex);
+                    const unscaled = page.getViewport({ scale: 1 });
+                    stateObj.pageWidth = unscaled.width;
+                    stateObj.pageHeight = unscaled.height;
+
+                    const maxSide = Math.max(unscaled.width, unscaled.height, 1);
+                    const targetScale = Math.min(DEVICE_PROFILE.thumbScale, DEVICE_PROFILE.maxThumbDim / maxSide);
+                    const viewport = page.getViewport({ scale: Math.max(0.14, targetScale) });
+
+                    canvas.width = Math.max(1, Math.round(viewport.width));
+                    canvas.height = Math.max(1, Math.round(viewport.height));
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    await page.render({ canvasContext: ctx, viewport }).promise;
+
+                    const blobUrl = await canvasToBlobUrl(canvas, 'image/jpeg', DEVICE_PROFILE.thumbQuality);
+                    stateObj.cacheUrl = blobUrl;
+                    stateObj.rawCacheUrl = blobUrl;
+                    wrapper.dataset.thumbRendered = 'true';
+                    ThumbnailCacheManager.touch(pageId, blobUrl);
+                } catch (e) {
+                    console.warn('Thumbnail render skipped for', pageId, e);
+                } finally {
+                    // Release internal PDF.js page caches immediately so 68MB PDFs do not accumulate in RAM
+                    if (page && page.cleanup) {
+                        try { page.cleanup(); } catch (err) {}
+                    }
+                }
+            } else if (stateObj.type === 'blank') {
+                const w = Math.round((stateObj.pageWidth || 400) * 0.4);
+                const h = Math.round((stateObj.pageHeight || 565) * 0.4);
+                canvas.width = Math.max(80, w);
+                canvas.height = Math.max(110, h);
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                wrapper.dataset.thumbRendered = 'true';
+            }
+        }
+
+        function processQueue() {
+            while (activeCount < DEVICE_PROFILE.renderConcurrency && queue.length > 0) {
+                const nextId = queue.shift();
+                queuedIds.delete(nextId);
+                activeCount++;
+                renderCardThumbnail(nextId).finally(() => {
+                    activeCount--;
+                    if (queue.length > 0) {
+                        setTimeout(processQueue, 0);
+                    }
+                });
+            }
+        }
+
+        function clearPendingOnly() {
+            queue.length = 0;
+            queuedIds.clear();
+        }
+
+        function reset() {
+            clearPendingOnly();
+            if (observer) {
+                observer.disconnect();
+            }
+        }
+
+        return {
+            observeWrapper,
+            unobserveWrapper,
+            enqueue,
+            renderCardThumbnail,
+            clearPendingOnly,
+            reset
+        };
+    })();
+
     let activeDropupMenu = null;
     function closeCustomDropupMenu() {
         if (activeDropupMenu) { activeDropupMenu.remove(); activeDropupMenu = null; }
@@ -457,18 +855,21 @@ const initOrganisePdfTool = () => {
             return p ? [p] : [];
         }
         if (selectedPageIds.length > 0) {
-            return pagesState.filter(p => selectedPageIds.includes(p.id));
+            const selectedSet = new Set(selectedPageIds);
+            return pagesState.filter(p => selectedSet.has(p.id));
         }
         return pagesState.slice();
     }
 
     function updateSelectionUI() {
-        selectedPageIds = selectedPageIds.filter(id => pagesState.some(p => p.id === id));
+        const validIds = new Set(pagesState.map(p => p.id));
+        selectedPageIds = selectedPageIds.filter(id => validIds.has(id));
+        const selectedSet = new Set(selectedPageIds);
+
         if (!isDetailViewOpen) {
             selectedPageId = selectedPageIds.length > 0 ? selectedPageIds[selectedPageIds.length - 1] : null;
         }
 
-        // Display top-right Eye Icon on cards when 2 or more pages are selected
         if (pdfGrid) {
             pdfGrid.classList.toggle('multi-select-active', selectedPageIds.length >= 2);
         }
@@ -477,7 +878,7 @@ const initOrganisePdfTool = () => {
             const id = wrapper.dataset.id;
             const card = wrapper.querySelector('.image-card');
             if (card) {
-                card.classList.toggle('selected', selectedPageIds.includes(id));
+                card.classList.toggle('selected', selectedSet.has(id));
             }
         });
 
@@ -581,7 +982,7 @@ const initOrganisePdfTool = () => {
             if (e.target.closest('.slider-popup')) return;
             e.stopPropagation();
             closeCustomDropupMenu();
-            document.querySelectorAll('.slider-popup').forEach(p => p.classList.add('hidden')); 
+            document.querySelectorAll('.slider-popup').forEach(p => p.classList.add('hidden'));
             popup.classList.remove('hidden');
             input.focus();
             if (e.target !== input) input.select();
@@ -589,18 +990,18 @@ const initOrganisePdfTool = () => {
 
         const defaultVal = slider.value;
         input.addEventListener('blur', (e) => {
-            if(e.target.value === '' || isNaN(e.target.value)) {
+            if (e.target.value === '' || isNaN(e.target.value)) {
                 e.target.value = defaultVal; slider.value = defaultVal;
-                if(isTextEditingOpen && cssProp) updateCSS(defaultVal);
+                if (isTextEditingOpen && cssProp) updateCSS(defaultVal);
             }
         });
 
         const updateCSS = (val) => {
             const targetContent = getActiveTextElement();
-            if(targetContent && isTextEditingOpen && cssProp) {
-                if(cssProp === 'bgRadius' || cssProp === 'bgOpacity' || cssProp === 'borderWeight') {
+            if (targetContent && isTextEditingOpen && cssProp) {
+                if (cssProp === 'bgRadius' || cssProp === 'bgOpacity' || cssProp === 'borderWeight') {
                     targetContent.parentElement.dataset[cssProp] = val;
-                    if(cssProp === 'borderWeight') updateBorderStyles(targetContent);
+                    if (cssProp === 'borderWeight') updateBorderStyles(targetContent);
                     else updateBgStyles(targetContent);
                 } else {
                     const mult = (cssProp === 'fontSize') ? editorScale : scaleMult;
@@ -611,60 +1012,82 @@ const initOrganisePdfTool = () => {
 
         input.addEventListener('input', (e) => {
             let v = e.target.value;
-            if(v !== '') { slider.value = v; if(isTextEditingOpen && cssProp) updateCSS(v); }
+            if (v !== '') { slider.value = v; if (isTextEditingOpen && cssProp) updateCSS(v); }
         });
         slider.addEventListener('input', (e) => {
             let v = e.target.value;
             input.value = v;
-            if(isTextEditingOpen && cssProp) updateCSS(v);
+            if (isTextEditingOpen && cssProp) updateCSS(v);
         });
     }
 
     // ==========================================
-    // 5. UNDO / REDO HISTORY STACK
+    // 5. STRUCTURAL-SHARING UNDO / REDO HISTORY STACK
     // ==========================================
-    function clonePagesState(arr) {
-        return arr.map(p => ({
-            ...p,
-            texts: p.texts ? JSON.parse(JSON.stringify(p.texts)) : [],
-            drawings: p.drawings ? JSON.parse(JSON.stringify(p.drawings)) : [],
-            margins: p.margins ? { ...p.margins } : null,
-            watermark: p.watermark ? { ...p.watermark } : null,
-            pageNumber: p.pageNumber ? { ...p.pageNumber } : null
-        }));
+    function cloneSinglePageAnnotations(p) {
+        p.texts = p.texts ? p.texts.map(t => ({ ...t })) : [];
+        p.drawings = p.drawings ? p.drawings.map(d => ({
+            ...d,
+            points: d.points ? d.points.map(pt => ({ x: pt.x, y: pt.y })) : undefined
+        })) : [];
+        p.margins = p.margins ? { ...p.margins } : null;
+        p.watermark = p.watermark ? { ...p.watermark } : null;
+        p.pageNumber = p.pageNumber ? { ...p.pageNumber } : null;
+        return p;
+    }
+
+    function clonePagesState(arr, deepCopyAnnotations = false) {
+        return arr.map(p => {
+            if (deepCopyAnnotations) {
+                return cloneSinglePageAnnotations({ ...p });
+            }
+            return {
+                ...p,
+                texts: p.texts ? p.texts.slice() : [],
+                drawings: p.drawings ? p.drawings.slice() : [],
+                margins: p.margins ? { ...p.margins } : null,
+                watermark: p.watermark ? { ...p.watermark } : null,
+                pageNumber: p.pageNumber ? { ...p.pageNumber } : null
+            };
+        });
     }
 
     function saveState() {
-        historyUndoStack.push(clonePagesState(pagesState));
-        if(historyUndoStack.length > 35) historyUndoStack.shift();
-        historyRedoStack = []; 
+        historyUndoStack.push(clonePagesState(pagesState, false));
+        if (historyUndoStack.length > DEVICE_PROFILE.maxUndoHistory) {
+            historyUndoStack.shift();
+            ResourceManager.cleanupUnreferencedSources();
+        }
+        historyRedoStack = [];
         updateHistoryButtons();
     }
 
     function updateHistoryButtons() {
-        if(fabUndo) fabUndo.disabled = historyUndoStack.length === 0;
-        if(fabRedo) fabRedo.disabled = historyRedoStack.length === 0;
+        if (fabUndo) fabUndo.disabled = historyUndoStack.length === 0;
+        if (fabRedo) fabRedo.disabled = historyRedoStack.length === 0;
     }
 
-    if(fabUndo) {
+    if (fabUndo) {
         fabUndo.addEventListener('click', () => {
-            if(historyUndoStack.length === 0) return;
-            historyRedoStack.push(clonePagesState(pagesState));
+            if (historyUndoStack.length === 0) return;
+            historyRedoStack.push(clonePagesState(pagesState, false));
             pagesState = historyUndoStack.pop();
-            syncDOMWithState(); updateHistoryButtons();
+            syncDOMWithState();
+            updateHistoryButtons();
         });
     }
 
-    if(fabRedo) {
+    if (fabRedo) {
         fabRedo.addEventListener('click', () => {
-            if(historyRedoStack.length === 0) return;
-            historyUndoStack.push(clonePagesState(pagesState));
+            if (historyRedoStack.length === 0) return;
+            historyUndoStack.push(clonePagesState(pagesState, false));
             pagesState = historyRedoStack.pop();
-            syncDOMWithState(); updateHistoryButtons();
+            syncDOMWithState();
+            updateHistoryButtons();
         });
     }
 
-    document.getElementById('btn-submit-confirm').onclick = () => { confirmPopup.classList.add('hidden'); if(confirmCallback) confirmCallback(); };
+    document.getElementById('btn-submit-confirm').onclick = () => { confirmPopup.classList.add('hidden'); if (confirmCallback) confirmCallback(); };
     document.getElementById('btn-cancel-confirm').onclick = () => { confirmPopup.classList.add('hidden'); };
     function requestConfirm(title, desc, callback) {
         confirmTitle.innerText = title; confirmDesc.innerText = desc;
@@ -672,14 +1095,38 @@ const initOrganisePdfTool = () => {
     }
 
     // ==========================================
-    // 6. PDF LOADING, DECRYPTION & THUMBNAILS
+    // 6. PDF LOADING, DECRYPTION & LAZY THUMBNAILS
     // ==========================================
     async function getCachedPdfDoc(sourceIndex) {
         if (!pdfJsDocs[sourceIndex]) {
-            const loadingTask = pdfjsLib.getDocument({ data: pdfSources[sourceIndex].slice(0), verbosity: 0 });
+            const srcBuf = pdfSources[sourceIndex];
+            if (!srcBuf) throw new Error(`PDF source ${sourceIndex} is no longer available.`);
+            const loadingTask = pdfjsLib.getDocument({
+                data: srcBuf.slice(0),
+                verbosity: 0,
+                disableAutoFetch: true,
+                disableStream: false
+            });
             pdfJsDocs[sourceIndex] = await loadingTask.promise;
         }
         return pdfJsDocs[sourceIndex];
+    }
+
+    // Fast <1ms byte scan to detect if a PDF contains an /Encrypt dictionary without loading PDFLib
+    function hasPdfEncryptDictionary(arrayBuffer) {
+        try {
+            const bytes = new Uint8Array(arrayBuffer);
+            const len = bytes.length;
+            const decoder = new TextDecoder('latin1');
+            const tailSize = Math.min(len, 65536);
+            const tailText = decoder.decode(bytes.subarray(len - tailSize, len));
+            if (tailText.includes('/Encrypt')) return true;
+            const headSize = Math.min(len, 16384);
+            const headText = decoder.decode(bytes.subarray(0, headSize));
+            return headText.includes('/Encrypt');
+        } catch (e) {
+            return false;
+        }
     }
 
     function requestPasswordUI(filename) {
@@ -734,7 +1181,7 @@ const initOrganisePdfTool = () => {
 
             btnSubmit.addEventListener('click', onSubmit);
             btnCancel.addEventListener('click', onCancel);
-            if (closeBtn) closeBtn.addEventListener('click', onCancel);
+            if (closeBtn) closeBtn.removeEventListener('click', onCancel);
             pdfPasswordInput.addEventListener('keypress', onEnter);
         });
     }
@@ -777,11 +1224,28 @@ const initOrganisePdfTool = () => {
 
         const rawArrayBuffer = await file.arrayBuffer();
         let finalArrayBuffer = rawArrayBuffer;
+        let initialPdfJsDoc = null;
+
+        // Avoid parsing 68MB with PDFLib on upload; use PDF.js worker + fast /Encrypt byte check
+        const looksEncrypted = hasPdfEncryptDictionary(rawArrayBuffer);
 
         try {
-            await window.PDFLib.PDFDocument.load(new Uint8Array(rawArrayBuffer.slice(0)));
+            if (looksEncrypted) {
+                // Verify if PDFLib requires decryption (owner or user password)
+                await window.PDFLib.PDFDocument.load(new Uint8Array(rawArrayBuffer));
+            }
+            const loadingTask = pdfjsLib.getDocument({
+                data: finalArrayBuffer.slice(0),
+                verbosity: 0,
+                disableAutoFetch: true,
+                disableStream: false
+            });
+            initialPdfJsDoc = await loadingTask.promise;
         } catch (error) {
-            if (error.message && (error.message.toLowerCase().includes('encrypted') || error.message.toLowerCase().includes('password'))) {
+            const errMsg = (error && error.message ? error.message : '').toLowerCase();
+            const isPasswordErr = (error && error.name === 'PasswordException') || errMsg.includes('encrypted') || errMsg.includes('password');
+
+            if (isPasswordErr) {
                 let isUnlocked = false;
 
                 while (!isUnlocked) {
@@ -799,7 +1263,13 @@ const initOrganisePdfTool = () => {
 
                     try {
                         const unlockedBuffer = await unlockPdfWithWasm(rawArrayBuffer.slice(0), pwd, file.name);
-                        await window.PDFLib.PDFDocument.load(new Uint8Array(unlockedBuffer.slice(0)));
+                        const loadingTask = pdfjsLib.getDocument({
+                            data: unlockedBuffer.slice(0),
+                            verbosity: 0,
+                            disableAutoFetch: true,
+                            disableStream: false
+                        });
+                        initialPdfJsDoc = await loadingTask.promise;
                         finalArrayBuffer = unlockedBuffer;
                         progressContainer.style.display = "none";
                         isUnlocked = true;
@@ -842,7 +1312,10 @@ const initOrganisePdfTool = () => {
         updateProgress(10, "Loading document...");
 
         pdfSources.push(finalArrayBuffer);
-        await renderPdfThumbnails(finalArrayBuffer.slice(0), sourceIndex);
+        if (initialPdfJsDoc) {
+            pdfJsDocs[sourceIndex] = initialPdfJsDoc;
+        }
+        await renderPdfThumbnails(sourceIndex);
         fileInput.value = "";
     }
 
@@ -856,37 +1329,54 @@ const initOrganisePdfTool = () => {
             if (e.dataTransfer.files && e.dataTransfer.files[0]) processSelectedFile(e.dataTransfer.files[0]);
         });
     }
-    
+
     function triggerClearWorkspace() {
-        fileInput.value = ""; fileCardsContainer.innerHTML = ''; emptyState.style.display = "block";
-        workspaceSection.style.display = "none"; pdfGrid.innerHTML = '';
-        if(fileInputLabel) fileInputLabel.textContent = "Select PDF File";
-        pagesState = []; historyUndoStack = []; historyRedoStack = []; updateHistoryButtons();
-        pdfJsDocs.forEach(doc => { if (doc && doc.destroy) try { doc.destroy(); } catch(e){} });
-        pdfJsDocs = []; pdfSources = []; exportedPdfBlob = null;
+        ThumbnailRenderQueue.reset();
+        if (pdfGrid) {
+            pdfGrid.querySelectorAll('canvas').forEach(releaseCanvasMemory);
+            pdfGrid.innerHTML = '';
+        }
+        ThumbnailCacheManager.clearAll();
+        ResourceManager.destroyAllPdfDocs();
+
+        fileInput.value = "";
+        fileCardsContainer.innerHTML = '';
+        emptyState.style.display = "block";
+        workspaceSection.style.display = "none";
+        if (fileInputLabel) fileInputLabel.textContent = "Select PDF File";
+
+        pagesState = [];
+        historyUndoStack = [];
+        historyRedoStack = [];
+        updateHistoryButtons();
+        exportedPdfBlob = null;
         hideExportResultArea();
-        clearSelection(); 
+        clearSelection();
     }
 
-    if(pageSearchBtn && pageSearchInput) {
+    if (pageSearchBtn && pageSearchInput) {
         const handleSearch = () => {
             const pageNum = parseInt(pageSearchInput.value, 10);
-            if(pageNum > 0 && pageNum <= pdfGrid.children.length) {
+            if (pageNum > 0 && pageNum <= pdfGrid.children.length) {
                 const targetWrapper = pdfGrid.children[pageNum - 1];
-                if(targetWrapper) {
+                if (targetWrapper) {
+                    const pid = targetWrapper.dataset.id;
+                    if (pid && targetWrapper.dataset.thumbRendered !== 'true') {
+                        ThumbnailRenderQueue.enqueue(pid, true);
+                    }
                     targetWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     const card = targetWrapper.querySelector('.image-card');
                     card.classList.add('highlight-flash');
                     setTimeout(() => card.classList.remove('highlight-flash'), 1500);
-                    togglePageSelection(targetWrapper.dataset.id, true);
+                    togglePageSelection(pid, true);
                 }
             } else alert("Page not found!");
         };
         pageSearchBtn.addEventListener('click', handleSearch);
-        pageSearchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); handleSearch(); } });
+        pageSearchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearch(); } });
     }
 
-    async function renderPdfThumbnails(arrayBuffer, sourceIndex) {
+    async function renderPdfThumbnails(sourceIndex) {
         const wasAllSelected = pagesState.length > 0 && selectedPageIds.length === pagesState.length;
         const hadBatchResize = Boolean(batchResizeToggle && batchResizeToggle.checked);
         const hadPageNum = Boolean(pageNumToggle && pageNumToggle.checked);
@@ -895,51 +1385,91 @@ const initOrganisePdfTool = () => {
 
         saveState();
         try {
-            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer, verbosity: 0 });
-            const pdf = await loadingTask.promise;
-            pdfJsDocs[sourceIndex] = pdf;
-
+            const pdf = await getCachedPdfDoc(sourceIndex);
             const newlyAddedIds = [];
+            const fragment = document.createDocumentFragment();
+            const eagerRenderCount = DEVICE_PROFILE.isMobile ? 6 : 12;
+
+            // Sample Page 1 dimensions first; remaining pages update their exact dimensions when rendered
+            let defaultPageW = 595.28;
+            let defaultPageH = 841.89;
+            try {
+                const firstPage = await pdf.getPage(1);
+                const vp1 = firstPage.getViewport({ scale: 1 });
+                defaultPageW = vp1.width;
+                defaultPageH = vp1.height;
+                if (firstPage.cleanup) firstPage.cleanup();
+            } catch (e) {}
 
             for (let i = 1; i <= pdf.numPages; i++) {
-                updateProgress(10 + ((i / pdf.numPages) * 80), `Rendering Page ${i}...`);
-                const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 0.4 }); 
-                const unscaledViewport = page.getViewport({ scale: 1 }); 
-                const canvas = document.createElement('canvas');
-                canvas.width = viewport.width; canvas.height = viewport.height;
-                await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+                if (i % 15 === 0 || i === pdf.numPages) {
+                    updateProgress(10 + ((i / pdf.numPages) * 80), `Preparing Page ${i} of ${pdf.numPages}...`);
+                    await yieldToMain();
+                }
 
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                let pW = defaultPageW;
+                let pH = defaultPageH;
+                if (pdf.numPages <= 60) {
+                    try {
+                        const page = await pdf.getPage(i);
+                        const unscaledViewport = page.getViewport({ scale: 1 });
+                        pW = unscaledViewport.width;
+                        pH = unscaledViewport.height;
+                        if (page.cleanup) page.cleanup();
+                    } catch (e) {}
+                }
+
                 const uniqueId = `page-src${sourceIndex}-${i}-${Date.now()}-${i}`;
-                
-                const stateObj = { 
-                    id: uniqueId, type: 'original', sourceIndex: sourceIndex, originalIndex: i, 
-                    visualRotation: 0, resize: null, rawCacheUrl: dataUrl, cacheUrl: dataUrl,
-                    texts: [], drawings: [], margins: null, watermark: null, pageNumber: null, isEdited: false,
-                    pageWidth: unscaledViewport.width, pageHeight: unscaledViewport.height
+                const canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+
+                const stateObj = {
+                    id: uniqueId,
+                    type: 'original',
+                    sourceIndex: sourceIndex,
+                    originalIndex: i,
+                    visualRotation: 0,
+                    resize: null,
+                    rawCacheUrl: null,
+                    cacheUrl: null,
+                    texts: [],
+                    drawings: [],
+                    margins: null,
+                    watermark: null,
+                    pageNumber: null,
+                    isEdited: false,
+                    pageWidth: pW,
+                    pageHeight: pH
                 };
-                
+
                 const wrapper = createCardWrapper(uniqueId, `Page`, canvas);
+                wrapper.dataset.thumbRendered = 'false';
                 attachCardEvents(wrapper, stateObj);
                 pagesState.push(stateObj);
-                pdfGrid.appendChild(wrapper);
-                newlyAddedIds.push(uniqueId);
+                fragment.appendChild(wrapper);
+                newlyAddedIds.push({ id: uniqueId, wrapper, eager: i <= eagerRenderCount });
             }
 
+            pdfGrid.appendChild(fragment);
+
+            newlyAddedIds.forEach(({ id, wrapper, eager }) => {
+                ThumbnailRenderQueue.observeWrapper(wrapper);
+                if (eager) ThumbnailRenderQueue.enqueue(id, true);
+            });
+
             if (wasAllSelected) {
-                newlyAddedIds.forEach(id => {
+                newlyAddedIds.forEach(({ id }) => {
                     if (!selectedPageIds.includes(id)) selectedPageIds.push(id);
                 });
             }
 
-            // Preserve active batch settings (Resize, Page Numbers, Watermark) on newly added PDF pages
             if (hadBatchResize) {
                 const preset = batchResizePresetSelect ? batchResizePresetSelect.value : 'A4';
                 const hasBg = batchResizeBgToggle ? batchResizeBgToggle.checked : true;
                 const bgColor = batchResizeColorInput ? batchResizeColorInput.value.toUpperCase() : '#FFFFFF';
                 if (preset && preset !== 'original') {
-                    newlyAddedIds.forEach(id => {
+                    newlyAddedIds.forEach(({ id }) => {
                         const st = pagesState.find(p => p.id === id);
                         if (st) {
                             applyResizePresetToSinglePage(st, preset, hasBg, bgColor);
@@ -949,13 +1479,13 @@ const initOrganisePdfTool = () => {
                 }
             }
             if (hadPageNum) {
-                newlyAddedIds.forEach(id => {
+                newlyAddedIds.forEach(({ id }) => {
                     if (!selectedPageIds.includes(id)) selectedPageIds.push(id);
                 });
                 applyPageNumbersToTargetPages(false);
             }
             if (hadGlobalWm && existingWm) {
-                newlyAddedIds.forEach(id => {
+                newlyAddedIds.forEach(({ id }) => {
                     const st = pagesState.find(p => p.id === id);
                     if (st) {
                         st.watermark = JSON.parse(JSON.stringify(existingWm));
@@ -965,15 +1495,22 @@ const initOrganisePdfTool = () => {
             }
 
             updateGridAspectRatio();
-            updateDynamicLabels(); initSortable(); updateSelectionUI();
+            updateDynamicLabels();
+            initSortable();
+            updateSelectionUI();
             updateProgress(100, "Ready!");
-            setTimeout(() => progressContainer.style.display = "none", 800);
-        } catch (error) { console.error(error); alert("Error reading PDF."); progressContainer.style.display = "none"; }
+            setTimeout(() => progressContainer.style.display = "none", 600);
+        } catch (error) {
+            console.error(error);
+            alert("Error reading PDF.");
+            progressContainer.style.display = "none";
+        }
     }
 
     function createCardWrapper(id, labelText, canvasElement) {
         const wrapper = document.createElement('div');
-        wrapper.className = 'card-wrapper'; wrapper.dataset.id = id;
+        wrapper.className = 'card-wrapper';
+        wrapper.dataset.id = id;
         wrapper.innerHTML = `
             <div class="card-gap left" title="Insert Here"></div>
             <div class="image-card">
@@ -993,6 +1530,7 @@ const initOrganisePdfTool = () => {
     }
 
     function attachCardEvents(wrapper, stateObj) {
+        const pageId = stateObj.id;
         const imageCard = wrapper.querySelector('.image-card');
         const checkBtn = wrapper.querySelector('.card-select-check');
         const eyeBtn = wrapper.querySelector('.card-eye-expand-btn');
@@ -1006,101 +1544,106 @@ const initOrganisePdfTool = () => {
         let snapshotBeforeFirstClick = [];
 
         if (checkBtn) {
-            checkBtn.addEventListener('click', (e) => {
+            checkBtn.onclick = (e) => {
                 e.stopPropagation();
-                togglePageSelection(stateObj.id);
-            });
+                togglePageSelection(pageId);
+            };
         }
 
-        // Open Expand View directly without clearing multi-selection when Eye Icon is clicked
         if (eyeBtn) {
-            eyeBtn.addEventListener('click', (e) => {
+            eyeBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                openDetailView(stateObj.id);
+                openDetailView(pageId);
+            };
+        }
+
+        if (!wrapper.dataset.eventsAttached) {
+            wrapper.dataset.eventsAttached = 'true';
+
+            imageCard.addEventListener('touchstart', (e) => {
+                if (e.target.closest('.card-select-check') || e.target.closest('.card-eye-expand-btn')) return;
+                if (e.touches.length !== 1) return;
+                holdTriggered = false;
+                startTouchX = e.touches[0].clientX;
+                startTouchY = e.touches[0].clientY;
+
+                clearTimeout(holdTimer);
+                holdTimer = setTimeout(() => {
+                    holdTriggered = true;
+                    if (navigator.vibrate) { try { navigator.vibrate(35); } catch (err) {} }
+                    togglePageSelection(pageId);
+                }, 420);
+            }, { passive: true });
+
+            imageCard.addEventListener('touchmove', (e) => {
+                if (!holdTimer || e.touches.length !== 1) return;
+                const dx = Math.abs(e.touches[0].clientX - startTouchX);
+                const dy = Math.abs(e.touches[0].clientY - startTouchY);
+                if (dx > 10 || dy > 10) {
+                    clearTimeout(holdTimer);
+                    holdTimer = null;
+                }
+            }, { passive: true });
+
+            imageCard.addEventListener('touchend', () => {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            });
+
+            imageCard.addEventListener('touchcancel', () => {
+                clearTimeout(holdTimer);
+                holdTimer = null;
+            });
+
+            imageCard.addEventListener('click', (e) => {
+                if (e.target.closest('.card-select-check') || e.target.closest('.card-eye-expand-btn')) return;
+                e.stopPropagation();
+
+                if (holdTriggered) {
+                    holdTriggered = false;
+                    return;
+                }
+
+                const now = Date.now();
+                const isDoubleClick = (now - lastClickTime) < 360;
+
+                if (isDoubleClick) {
+                    lastClickTime = 0;
+                    selectedPageIds = [...snapshotBeforeFirstClick];
+                    togglePageSelection(pageId);
+                    return;
+                }
+
+                lastClickTime = now;
+                snapshotBeforeFirstClick = [...selectedPageIds];
+
+                if (selectedPageIds.length >= 2) {
+                    togglePageSelection(pageId);
+                } else {
+                    selectedPageIds = [pageId];
+                    selectedPageId = pageId;
+                    updateSelectionUI();
+                }
             });
         }
 
-        imageCard.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.card-select-check') || e.target.closest('.card-eye-expand-btn')) return;
-            if (e.touches.length !== 1) return;
-            holdTriggered = false;
-            startTouchX = e.touches[0].clientX;
-            startTouchY = e.touches[0].clientY;
-
-            clearTimeout(holdTimer);
-            holdTimer = setTimeout(() => {
-                holdTriggered = true;
-                if (navigator.vibrate) { try { navigator.vibrate(35); } catch (err) {} }
-                togglePageSelection(stateObj.id);
-            }, 420);
-        }, { passive: true });
-
-        imageCard.addEventListener('touchmove', (e) => {
-            if (!holdTimer || e.touches.length !== 1) return;
-            const dx = Math.abs(e.touches[0].clientX - startTouchX);
-            const dy = Math.abs(e.touches[0].clientY - startTouchY);
-            if (dx > 10 || dy > 10) {
-                clearTimeout(holdTimer);
-                holdTimer = null;
-            }
-        }, { passive: true });
-
-        imageCard.addEventListener('touchend', () => {
-            clearTimeout(holdTimer);
-            holdTimer = null;
-        });
-
-        imageCard.addEventListener('touchcancel', () => {
-            clearTimeout(holdTimer);
-            holdTimer = null;
-        });
-
-        imageCard.addEventListener('click', (e) => {
-            if (e.target.closest('.card-select-check') || e.target.closest('.card-eye-expand-btn')) return;
-            e.stopPropagation();
-
-            if (holdTriggered) {
-                holdTriggered = false;
-                return;
-            }
-
-            const now = Date.now();
-            const isDoubleClick = (now - lastClickTime) < 360;
-
-            if (isDoubleClick) {
-                lastClickTime = 0;
-                selectedPageIds = [...snapshotBeforeFirstClick];
-                togglePageSelection(stateObj.id);
-                return;
-            }
-
-            lastClickTime = now;
-            snapshotBeforeFirstClick = [...selectedPageIds];
-
-            if (selectedPageIds.length >= 2) {
-                togglePageSelection(stateObj.id);
-            } else {
-                selectedPageIds = [stateObj.id];
-                selectedPageId = stateObj.id;
-                updateSelectionUI();
-            }
-        });
-        
         const gapLeft = wrapper.querySelector('.card-gap.left');
         const gapRight = wrapper.querySelector('.card-gap.right');
-        
-        gapLeft.onclick = (e) => { 
+
+        gapLeft.onclick = (e) => {
             e.stopPropagation();
-            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active')); 
-            gapLeft.classList.add('active'); activeInsertPoint = { targetId: stateObj.id, position: 'before' }; 
-            if(insertPopup) insertPopup.classList.remove('hidden');
+            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active'));
+            gapLeft.classList.add('active');
+            activeInsertPoint = { targetId: pageId, position: 'before' };
+            if (insertPopup) insertPopup.classList.remove('hidden');
         };
-        gapRight.onclick = (e) => { 
+        gapRight.onclick = (e) => {
             e.stopPropagation();
-            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active')); 
-            gapRight.classList.add('active'); activeInsertPoint = { targetId: stateObj.id, position: 'after' }; 
-            if(insertPopup) insertPopup.classList.remove('hidden');
+            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active'));
+            gapRight.classList.add('active');
+            activeInsertPoint = { targetId: pageId, position: 'after' };
+            if (insertPopup) insertPopup.classList.remove('hidden');
         };
     }
 
@@ -1118,8 +1661,8 @@ const initOrganisePdfTool = () => {
         if (isDetailViewOpen) return;
         if (!e.target.closest('.card-wrapper') && !e.target.closest('.file-input-group') && !e.target.closest('#uploadZone') && !e.target.closest('.floating-toolbar') && !e.target.closest('.workspace-controls') && !e.target.closest('.fab-submenu') && !e.target.closest('.popup-overlay') && !e.target.closest('.editor-modal') && !e.target.closest('.canva-picker-panel') && !e.target.closest('.picker-overlay') && !e.target.closest('.crop-modal')) {
             clearSelection();
-            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active')); 
-            if(insertPopup && !insertPopup.classList.contains('hidden') && !e.target.closest('#insert-popup .popup-content')) {
+            document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active'));
+            if (insertPopup && !insertPopup.classList.contains('hidden') && !e.target.closest('#insert-popup .popup-content')) {
                 insertPopup.classList.add('hidden');
             }
             activeInsertPoint = null;
@@ -1127,7 +1670,8 @@ const initOrganisePdfTool = () => {
     });
 
     function initSortable() {
-        if (sortableInstance) sortableInstance.destroy();
+        if (sortableInstance) return;
+        if (!window.Sortable || !pdfGrid) return;
         sortableInstance = new Sortable(pdfGrid, {
             animation: 150,
             ghostClass: 'sortable-ghost',
@@ -1144,34 +1688,39 @@ const initOrganisePdfTool = () => {
             fallbackOnBody: true,
             fallbackTolerance: 5,
             onEnd: () => {
-                saveState(); 
+                saveState();
+                const stateMap = new Map(pagesState.map(p => [p.id, p]));
                 const newArray = [];
-                Array.from(pdfGrid.children).forEach(wrapper => newArray.push(pagesState.find(p => p.id === wrapper.dataset.id)));
+                Array.from(pdfGrid.children).forEach(wrapper => {
+                    const st = stateMap.get(wrapper.dataset.id);
+                    if (st) newArray.push(st);
+                });
                 pagesState = newArray;
                 if (pageNumToggle && pageNumToggle.checked) {
                     applyPageNumbersToTargetPages(false);
                 }
-                updateDynamicLabels(); 
+                updateDynamicLabels();
             }
         });
     }
 
     function updateDynamicLabels() {
+        const stateMap = new Map(pagesState.map(p => [p.id, p]));
         Array.from(pdfGrid.children).forEach((wrapper, index) => {
             const label = wrapper.querySelector('.page-label');
             if (label) {
-                const stateObj = pagesState.find(p => p.id === wrapper.dataset.id);
+                const stateObj = stateMap.get(wrapper.dataset.id);
                 if (!stateObj) return;
                 let text = `Page ${index + 1}`;
-                if(stateObj.type === 'blank') text = `[Blank] ${text}`;
-                label.innerText = text;
+                if (stateObj.type === 'blank') text = `[Blank] ${text}`;
+                if (label.innerText !== text) label.innerText = text;
             }
         });
     }
 
     function updateGridAspectRatio() {
         if (pagesState.length === 0) return;
-        let ratioCounts = {}, maxCount = 0, dominantRatio = 1 / 1.414; 
+        let ratioCounts = {}, maxCount = 0, dominantRatio = 1 / 1.414;
         pagesState.forEach(p => {
             let w = p.pageWidth || 400, h = p.pageHeight || 565, rot = p.visualRotation || 0;
             if (Math.abs(rot % 180) === 90) { let temp = w; w = h; h = temp; }
@@ -1179,20 +1728,20 @@ const initOrganisePdfTool = () => {
             ratioCounts[r] = (ratioCounts[r] || 0) + 1;
             if (ratioCounts[r] > maxCount) { maxCount = ratioCounts[r]; dominantRatio = parseFloat(r); }
         });
-        
+
         const clampedRatio = Math.max(0.707, Math.min(1.414, dominantRatio));
         document.documentElement.style.setProperty('--dynamic-card-ratio', clampedRatio);
     }
 
     function checkIsPageEdited(stateObj) {
         return Boolean(
-            (stateObj.texts && stateObj.texts.length > 0) || 
+            (stateObj.texts && stateObj.texts.length > 0) ||
             (stateObj.drawings && stateObj.drawings.length > 0) ||
             hasActiveMargins(stateObj.margins) ||
             stateObj.watermark ||
             stateObj.pageNumber ||
-            (stateObj.visualRotation !== 0) || 
-            (stateObj.resize !== null) || 
+            (stateObj.visualRotation !== 0) ||
+            (stateObj.resize !== null) ||
             (stateObj.type !== 'original')
         );
     }
@@ -1211,40 +1760,84 @@ const initOrganisePdfTool = () => {
     }
 
     function syncDOMWithState() {
-        pdfGrid.innerHTML = '';
         updateGridAspectRatio();
-        
-        pagesState.forEach(stateObj => {
-            let canvas = document.createElement('canvas');
-            const isLandscape = Math.abs(stateObj.visualRotation % 180) === 90;
-            canvas.style.transform = `rotate(${stateObj.visualRotation}deg) scale(${isLandscape ? 0.707 : 1})`;
 
-            const img = new Image();
-            img.src = stateObj.cacheUrl || stateObj.dataUrl; 
-            img.onload = () => {
-                canvas.width = img.width; canvas.height = img.height;
-                canvas.getContext('2d').drawImage(img, 0, 0);
-            };
-            
-            const wrapper = createCardWrapper(stateObj.id, `Page`, canvas);
-            if(stateObj.type === 'blank') wrapper.querySelector('.image-card').classList.add('blank-card');
-            if(selectedPageIds.includes(stateObj.id)) wrapper.querySelector('.image-card').classList.add('selected');
-            
+        const existingWrappers = new Map();
+        Array.from(pdfGrid.children).forEach(w => {
+            if (w.dataset && w.dataset.id) {
+                existingWrappers.set(w.dataset.id, w);
+            }
+        });
+
+        const selectedSet = new Set(selectedPageIds);
+        const nextIdsSet = new Set(pagesState.map(p => p.id));
+
+        existingWrappers.forEach((wrapper, id) => {
+            if (!nextIdsSet.has(id)) {
+                ThumbnailRenderQueue.unobserveWrapper(wrapper);
+                ThumbnailCacheManager.markVisible(id, false);
+                const c = wrapper.querySelector('canvas');
+                if (c) releaseCanvasMemory(c);
+                wrapper.remove();
+                existingWrappers.delete(id);
+            }
+        });
+
+        const fragment = document.createDocumentFragment();
+
+        pagesState.forEach(stateObj => {
+            let wrapper = existingWrappers.get(stateObj.id);
+            let canvas = wrapper ? wrapper.querySelector('canvas') : null;
+            const currentThumbKey = `${stateObj.type}:${stateObj.cacheUrl || stateObj.dataUrl || ''}`;
+
+            if (!wrapper) {
+                canvas = document.createElement('canvas');
+                canvas.width = 1;
+                canvas.height = 1;
+                wrapper = createCardWrapper(stateObj.id, `Page`, canvas);
+                wrapper.dataset.thumbRendered = 'false';
+                wrapper.dataset.thumbKey = currentThumbKey;
+                ThumbnailRenderQueue.observeWrapper(wrapper);
+            } else if (wrapper.dataset.thumbKey !== currentThumbKey) {
+                wrapper.dataset.thumbKey = currentThumbKey;
+                wrapper.dataset.thumbRendered = 'false';
+            }
+
+            const isLandscape = Math.abs((stateObj.visualRotation || 0) % 180) === 90;
+            if (canvas) {
+                canvas.style.transform = `rotate(${stateObj.visualRotation || 0}deg) scale(${isLandscape ? 0.707 : 1})`;
+            }
+
+            const imageCard = wrapper.querySelector('.image-card');
+            if (imageCard) {
+                imageCard.classList.toggle('blank-card', stateObj.type === 'blank');
+                imageCard.classList.toggle('selected', selectedSet.has(stateObj.id));
+            }
+
             const badge = wrapper.querySelector('.edited-badge');
             const isActuallyEdited = checkIsPageEdited(stateObj);
-            badge.style.display = isActuallyEdited ? "block" : "none";
+            if (badge) badge.style.display = isActuallyEdited ? "block" : "none";
             stateObj.isEdited = isActuallyEdited;
 
             attachCardEvents(wrapper, stateObj);
-            pdfGrid.appendChild(wrapper);
+            fragment.appendChild(wrapper);
+
+            if (wrapper.dataset.thumbRendered !== 'true') {
+                const isVis = ThumbnailCacheManager.isVisible(stateObj.id);
+                ThumbnailRenderQueue.enqueue(stateObj.id, isVis);
+            }
         });
-        updateDynamicLabels(); initSortable(); updateSelectionUI();
+
+        pdfGrid.appendChild(fragment);
+        updateDynamicLabels();
+        initSortable();
+        updateSelectionUI();
     }
 
     if (!CanvasRenderingContext2D.prototype.roundRect) {
         CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
             if (w < 2 * r) r = w / 2; if (h < 2 * r) r = h / 2;
-            this.beginPath(); this.moveTo(x+r, y); this.arcTo(x+w, y, x+w, y+h, r); this.arcTo(x+w, y+h, x, y+h, r); this.arcTo(x, y+h, x, y, r); this.arcTo(x, y, x+w, y, r); this.closePath(); return this;
+            this.beginPath(); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this;
         };
     }
 
@@ -1256,7 +1849,7 @@ const initOrganisePdfTool = () => {
     function setupWorkspaceColorPickers() {
         if (typeof iro === 'undefined') return;
 
-        if ( document.getElementById('fontIroPickerContainer') && !fontColorPicker ) {
+        if (document.getElementById('fontIroPickerContainer') && !fontColorPicker) {
             fontColorPicker = new iro.ColorPicker("#fontIroPickerContainer", {
                 width: 210, color: "#000000", borderWidth: 1, borderColor: "#00e676",
                 layout: [{ component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } }]
@@ -1270,7 +1863,7 @@ const initOrganisePdfTool = () => {
             });
         }
 
-        if ( document.getElementById('wmIroPickerContainer') && !wmColorPicker ) {
+        if (document.getElementById('wmIroPickerContainer') && !wmColorPicker) {
             wmColorPicker = new iro.ColorPicker("#wmIroPickerContainer", {
                 width: 210, color: "#808080", borderWidth: 1, borderColor: "#00e676",
                 layout: [{ component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } }]
@@ -1347,7 +1940,6 @@ const initOrganisePdfTool = () => {
         if (pagesState.length === 0) return;
         if (saveUndo) saveState();
 
-        // Automatically select all pages if none are selected so users can deselect individual pages later
         if (selectedPageIds.length === 0) {
             selectedPageIds = pagesState.map(p => p.id);
             updateSelectionUI();
@@ -1355,10 +1947,11 @@ const initOrganisePdfTool = () => {
 
         const pos = pageNumPos ? pageNumPos.value : 'bottom-right';
         const color = currentPageNumColorHex || '#000000';
-        const targets = pagesState.filter(p => selectedPageIds.includes(p.id));
+        const selectedSet = new Set(selectedPageIds);
+        const targets = pagesState.filter(p => selectedSet.has(p.id));
 
         pagesState.forEach(p => {
-            if (!selectedPageIds.includes(p.id)) p.pageNumber = null;
+            if (!selectedSet.has(p.id)) p.pageNumber = null;
         });
 
         targets.forEach((p, idx) => {
@@ -1616,7 +2209,7 @@ const initOrganisePdfTool = () => {
                 const reader = new FileReader();
                 reader.onload = (ev) => {
                     const img = new Image();
-                    img.onload = () => {
+                    img.onload = async () => {
                         const canvas = document.createElement('canvas');
                         let tw = img.width, th = img.height;
                         const MAX_WM = 800;
@@ -1626,8 +2219,9 @@ const initOrganisePdfTool = () => {
                         }
                         canvas.width = tw; canvas.height = th;
                         canvas.getContext('2d').drawImage(img, 0, 0, tw, th);
-                        wmOriginalImageDataUrl = canvas.toDataURL('image/png');
+                        wmOriginalImageDataUrl = await canvasToBlobUrl(canvas, 'image/png');
                         wmOriginalImageAspect = tw / (th || 1);
+                        releaseCanvasMemory(canvas);
                     };
                     img.src = ev.target.result;
                 };
@@ -1669,7 +2263,7 @@ const initOrganisePdfTool = () => {
             saveState();
             const targets = getTargetPagesForBatchAction();
             targets.forEach(p => {
-                p.watermark = JSON.parse(JSON.stringify(wmCfg));
+                p.watermark = { ...wmCfg };
                 updateSingleCardBadge(p.id);
             });
             if (globalWmToggle) globalWmToggle.checked = true;
@@ -1978,7 +2572,7 @@ const initOrganisePdfTool = () => {
         if (targetIdx === -1) return;
         if (activeInsertPoint.position === 'before') pagesState.splice(targetIdx, 0, newState);
         else pagesState.splice(targetIdx + 1, 0, newState);
-        if(insertPopup) insertPopup.classList.add('hidden');
+        if (insertPopup) insertPopup.classList.add('hidden');
         activeInsertPoint = null;
         document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active'));
         syncDOMWithState();
@@ -1986,16 +2580,18 @@ const initOrganisePdfTool = () => {
 
     if (btnInsertCancel) {
         btnInsertCancel.addEventListener('click', () => {
-            if(insertPopup) insertPopup.classList.add('hidden');
+            if (insertPopup) insertPopup.classList.add('hidden');
             activeInsertPoint = null;
             document.querySelectorAll('.card-gap').forEach(el => el.classList.remove('active'));
         });
     }
 
     if (btnInsertBlank) {
-        btnInsertBlank.addEventListener('click', () => {
-            saveState(); addedItemCounter++;
-            const w = 400, h = 565, blankUrl = createBlankDataUrl(w, h);
+        btnInsertBlank.addEventListener('click', async () => {
+            saveState();
+            addedItemCounter++;
+            const w = 400, h = 565;
+            const blankUrl = await createBlankBlobUrl(w, h);
             insertNewState({
                 id: `inserted-${addedItemCounter}`, type: 'blank', pageWidth: w, pageHeight: h, visualRotation: 0,
                 resize: null, dataUrl: blankUrl, cacheUrl: blankUrl, texts: [], drawings: [], margins: null,
@@ -2011,29 +2607,33 @@ const initOrganisePdfTool = () => {
             const file = e.target.files[0];
             if (!file || !activeInsertPoint) return;
             saveState();
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const dataUrl = event.target.result;
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    addedItemCounter++;
-                    insertNewState({
-                        id: `inserted-${addedItemCounter}`, type: 'image', mime: file.type,
-                        pageWidth: tempImg.width, pageHeight: tempImg.height, dataUrl: dataUrl, cacheUrl: dataUrl,
-                        visualRotation: 0, resize: null, texts: [], drawings: [], margins: null,
-                        watermark: null, pageNumber: null, isEdited: false, originalIndex: null, sourceIndex: null
-                    });
-                };
-                tempImg.src = dataUrl;
+            const blobUrl = ThumbnailCacheManager.registerBlobUrl(URL.createObjectURL(file));
+            const tempImg = new Image();
+            tempImg.onload = async () => {
+                addedItemCounter++;
+                const thumbCanvas = document.createElement('canvas');
+                const sc = Math.min(1, DEVICE_PROFILE.maxThumbDim / Math.max(tempImg.width, tempImg.height, 1));
+                thumbCanvas.width = Math.max(1, Math.round(tempImg.width * sc));
+                thumbCanvas.height = Math.max(1, Math.round(tempImg.height * sc));
+                thumbCanvas.getContext('2d').drawImage(tempImg, 0, 0, thumbCanvas.width, thumbCanvas.height);
+                const thumbUrl = await canvasToBlobUrl(thumbCanvas, file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.8);
+                releaseCanvasMemory(thumbCanvas);
+
+                insertNewState({
+                    id: `inserted-${addedItemCounter}`, type: 'image', mime: file.type,
+                    pageWidth: tempImg.width, pageHeight: tempImg.height, dataUrl: blobUrl, cacheUrl: thumbUrl,
+                    visualRotation: 0, resize: null, texts: [], drawings: [], margins: null,
+                    watermark: null, pageNumber: null, isEdited: false, originalIndex: null, sourceIndex: null
+                });
             };
-            reader.readAsDataURL(file);
+            tempImg.src = blobUrl;
             insertImageInput.value = "";
         });
     }
 
-    if(fabDuplicate) {
+    if (fabDuplicate) {
         fabDuplicate.addEventListener('click', () => {
-            if(selectedPageIds.length === 0) return;
+            if (selectedPageIds.length === 0) return;
             const anyEdited = selectedPageIds.some(id => {
                 const st = pagesState.find(p => p.id === id);
                 return st && st.isEdited;
@@ -2042,9 +2642,9 @@ const initOrganisePdfTool = () => {
             else performBatchDuplicate(true);
         });
     }
-    if (btnDupChanges) btnDupChanges.addEventListener('click', () => { if(duplicatePopup) duplicatePopup.classList.add('hidden'); performBatchDuplicate(true); });
-    if (btnDupOriginal) btnDupOriginal.addEventListener('click', () => { if(duplicatePopup) duplicatePopup.classList.add('hidden'); performBatchDuplicate(false); });
-    if (btnDupCancel) btnDupCancel.addEventListener('click', () => { if(duplicatePopup) duplicatePopup.classList.add('hidden'); });
+    if (btnDupChanges) btnDupChanges.addEventListener('click', () => { if (duplicatePopup) duplicatePopup.classList.add('hidden'); performBatchDuplicate(true); });
+    if (btnDupOriginal) btnDupOriginal.addEventListener('click', () => { if (duplicatePopup) duplicatePopup.classList.add('hidden'); performBatchDuplicate(false); });
+    if (btnDupCancel) btnDupCancel.addEventListener('click', () => { if (duplicatePopup) duplicatePopup.classList.add('hidden'); });
 
     function performBatchDuplicate(withChanges) {
         if (selectedPageIds.length === 0) return;
@@ -2055,7 +2655,7 @@ const initOrganisePdfTool = () => {
             if (idx === -1) return;
             const sourceState = pagesState[idx];
             addedItemCounter++;
-            const newState = clonePagesState([sourceState])[0];
+            const newState = clonePagesState([sourceState], true)[0];
             newState.id = `dup-${addedItemCounter}`;
             if (!withChanges) {
                 newState.visualRotation = 0; newState.resize = null; newState.texts = [];
@@ -2071,13 +2671,14 @@ const initOrganisePdfTool = () => {
         const steps = (((amount / 90) % 4) + 4) % 4;
         if (steps === 0) return;
 
-        // 1. Rotate Drawings (Strokes & Flood Fills)
+        cloneSinglePageAnnotations(stateObj);
+
         if (stateObj.drawings && stateObj.drawings.length > 0) {
             stateObj.drawings.forEach(action => {
                 const transformPt = (px, py) => {
-                    if (steps === 1) return { x: 1 - py, y: px };       // +90 deg CW
-                    if (steps === 2) return { x: 1 - px, y: 1 - py };   // 180 deg
-                    if (steps === 3) return { x: py, y: 1 - px };       // -90 deg CCW
+                    if (steps === 1) return { x: 1 - py, y: px };
+                    if (steps === 2) return { x: 1 - px, y: 1 - py };
+                    if (steps === 3) return { x: py, y: 1 - px };
                     return { x: px, y: py };
                 };
                 if (action.type === 'fill' || action.tool === 'fill') {
@@ -2099,7 +2700,6 @@ const initOrganisePdfTool = () => {
             });
         }
 
-        // 2. Rotate Texts (Center position, Font ratio & Angle)
         if (stateObj.texts && stateObj.texts.length > 0) {
             stateObj.texts.forEach(txt => {
                 const oldW = oldVisW || 595.28;
@@ -2132,7 +2732,6 @@ const initOrganisePdfTool = () => {
             });
         }
 
-        // 3. Rotate Margins so padding stays on the same side of the image
         if (stateObj.margins && hasActiveMargins(stateObj.margins)) {
             const m = stateObj.margins;
             const t = m.top || 0, r = m.right || 0, b = m.bottom || 0, l = m.left || 0;
@@ -2158,7 +2757,7 @@ const initOrganisePdfTool = () => {
             const oldVisH = oldSideways ? (stateObj.pageWidth || 841.89) : (stateObj.pageHeight || 841.89);
 
             let newRot = (oldRot + amount) % 360;
-            if (newRot === -0) newRot = 0; 
+            if (newRot === -0) newRot = 0;
             stateObj.visualRotation = newRot;
 
             const newSideways = Math.abs(newRot % 180) === 90;
@@ -2181,7 +2780,7 @@ const initOrganisePdfTool = () => {
             renderBigCanvas(selectedPageId, true, false);
         }
     }
-    
+
     if (fabRotateLeft) fabRotateLeft.addEventListener('click', () => applyRotation(-90));
     if (fabRotateRight) fabRotateRight.addEventListener('click', () => applyRotation(90));
 
@@ -2214,7 +2813,12 @@ const initOrganisePdfTool = () => {
                 const curGlobalIdx = pagesState.findIndex(p => p.id === selectedPageId);
 
                 const wrapper = document.querySelector(`.card-wrapper[data-id="${selectedPageId}"]`);
-                if (wrapper) wrapper.remove();
+                if (wrapper) {
+                    ThumbnailRenderQueue.unobserveWrapper(wrapper);
+                    const c = wrapper.querySelector('canvas');
+                    if (c) releaseCanvasMemory(c);
+                    wrapper.remove();
+                }
 
                 pagesState = pagesState.filter(p => p.id !== selectedPageId);
                 selectedPageIds = selectedPageIds.filter(id => id !== selectedPageId);
@@ -2240,11 +2844,17 @@ const initOrganisePdfTool = () => {
 
             if (selectedPageIds.length === 0) return;
             saveState();
+            const removeSet = new Set(selectedPageIds);
             selectedPageIds.forEach(id => {
                 const wrapper = document.querySelector(`.card-wrapper[data-id="${id}"]`);
-                if (wrapper) wrapper.remove();
+                if (wrapper) {
+                    ThumbnailRenderQueue.unobserveWrapper(wrapper);
+                    const c = wrapper.querySelector('canvas');
+                    if (c) releaseCanvasMemory(c);
+                    wrapper.remove();
+                }
             });
-            pagesState = pagesState.filter(p => !selectedPageIds.includes(p.id));
+            pagesState = pagesState.filter(p => !removeSet.has(p.id));
             clearSelection();
             updateDynamicLabels();
         });
@@ -2266,7 +2876,7 @@ const initOrganisePdfTool = () => {
             if (pageResetPopup) pageResetPopup.classList.add('hidden');
             const idsToReset = (isDetailViewOpen && selectedPageId) ? [selectedPageId] : selectedPageIds;
             if (idsToReset.length === 0) return;
-            saveState(); 
+            saveState();
             idsToReset.forEach(id => {
                 const stateObj = pagesState.find(p => p.id === id);
                 if (!stateObj) return;
@@ -2284,72 +2894,104 @@ const initOrganisePdfTool = () => {
 
     if (globalResetBtn) {
         globalResetBtn.addEventListener('click', () => {
-            if(pdfSources.length === 0) return;
+            if (pdfSources.length === 0) return;
             requestConfirm("Reset Entire Workspace", "Are you sure you want to revert all pages to their original state? This undoes everything.", () => {
                 saveState();
                 progressContainer.style.display = "block"; updateProgress(10, "Resetting document...");
-                if(isDetailViewOpen) closeDetailView();
-                pdfGrid.innerHTML = ''; pagesState = []; clearSelection();
+                if (isDetailViewOpen) closeDetailView();
+
+                ThumbnailRenderQueue.reset();
+                pdfGrid.querySelectorAll('canvas').forEach(releaseCanvasMemory);
+                pdfGrid.innerHTML = '';
+                pagesState = [];
+                clearSelection();
+
                 if (pageNumToggle) { pageNumToggle.checked = false; if (pageNumSettingsPanel) pageNumSettingsPanel.style.display = 'none'; }
                 if (globalWmToggle) { globalWmToggle.checked = false; if (wmSettingsPanel) wmSettingsPanel.style.display = 'none'; }
+                if (batchResizeToggle) { batchResizeToggle.checked = false; }
+                syncAllGearIconsVisibility();
 
                 (async () => {
-                    for(let s=0; s < pdfSources.length; s++) {
+                    const fragment = document.createDocumentFragment();
+                    const eagerIds = [];
+                    const eagerLimit = DEVICE_PROFILE.isMobile ? 6 : 12;
+
+                    for (let s = 0; s < pdfSources.length; s++) {
+                        if (!pdfSources[s]) continue;
                         const pdf = await getCachedPdfDoc(s);
+                        let defW = 595.28, defH = 841.89;
+                        try {
+                            const fp = await pdf.getPage(1);
+                            const vp1 = fp.getViewport({ scale: 1 });
+                            defW = vp1.width; defH = vp1.height;
+                            if (fp.cleanup) fp.cleanup();
+                        } catch (e) {}
+
                         for (let i = 1; i <= pdf.numPages; i++) {
-                            const page = await pdf.getPage(i);
-                            const viewport = page.getViewport({ scale: 0.4 }); 
-                            const unscaledViewport = page.getViewport({ scale: 1 });
                             const canvas = document.createElement('canvas');
-                            canvas.width = viewport.width; canvas.height = viewport.height;
-                            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-            
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            canvas.width = 1;
+                            canvas.height = 1;
+
                             const uniqueId = `page-src${s}-${i}`;
                             const wrapper = createCardWrapper(uniqueId, `Page`, canvas);
-                            const stateObj = { 
-                                id: uniqueId, type: 'original', sourceIndex: s, originalIndex: i, 
-                                visualRotation: 0, resize: null, cacheUrl: dataUrl,
+                            wrapper.dataset.thumbRendered = 'false';
+
+                            const stateObj = {
+                                id: uniqueId, type: 'original', sourceIndex: s, originalIndex: i,
+                                visualRotation: 0, resize: null, rawCacheUrl: null, cacheUrl: null,
                                 texts: [], drawings: [], margins: null, watermark: null, pageNumber: null, isEdited: false,
-                                pageWidth: unscaledViewport.width, pageHeight: unscaledViewport.height
+                                pageWidth: defW, pageHeight: defH
                             };
                             attachCardEvents(wrapper, stateObj);
                             pagesState.push(stateObj);
-                            pdfGrid.appendChild(wrapper);
+                            fragment.appendChild(wrapper);
+                            eagerIds.push({ id: uniqueId, wrapper });
                         }
                     }
-                    updateDynamicLabels(); initSortable(); updateSelectionUI();
+
+                    pdfGrid.appendChild(fragment);
+                    eagerIds.forEach(({ id, wrapper }, idx) => {
+                        ThumbnailRenderQueue.observeWrapper(wrapper);
+                        if (idx < eagerLimit) ThumbnailRenderQueue.enqueue(id, true);
+                    });
+
+                    updateGridAspectRatio();
+                    updateDynamicLabels();
+                    initSortable();
+                    updateSelectionUI();
                     updateProgress(100, "Ready!");
-                    setTimeout(() => progressContainer.style.display = "none", 800);
+                    setTimeout(() => progressContainer.style.display = "none", 600);
                 })();
             });
         });
     }
 
-    if(fabReplace) {
+    if (fabReplace) {
         fabReplace.addEventListener('click', (e) => {
             e.preventDefault(); e.stopPropagation();
-            if(!selectedPageId) return;
+            if (!selectedPageId) return;
             closeAllSubmenus();
-            if(replacePopup) replacePopup.classList.remove('hidden');
+            if (replacePopup) replacePopup.classList.remove('hidden');
         });
     }
-    if(btnReplaceCancel) btnReplaceCancel.addEventListener('click', () => { if(replacePopup) replacePopup.classList.add('hidden'); });
-    if(btnReplaceBlank) {
-        btnReplaceBlank.addEventListener('click', () => {
-            if(replacePopup) replacePopup.classList.add('hidden');
-            if(!selectedPageId) return;
+    if (btnReplaceCancel) btnReplaceCancel.addEventListener('click', () => { if (replacePopup) replacePopup.classList.add('hidden'); });
+    if (btnReplaceBlank) {
+        btnReplaceBlank.addEventListener('click', async () => {
+            if (replacePopup) replacePopup.classList.add('hidden');
+            if (!selectedPageId) return;
             saveState();
             const stateObj = pagesState.find(p => p.id === selectedPageId);
             const w = stateObj.pageWidth || 400, h = stateObj.pageHeight || 565;
             stateObj.type = 'blank'; stateObj.originalIndex = null; stateObj.sourceIndex = null;
-            stateObj.cacheUrl = createBlankDataUrl(w, h); 
+            const blankUrl = await createBlankBlobUrl(w, h);
+            stateObj.dataUrl = blankUrl;
+            stateObj.cacheUrl = blankUrl;
             syncDOMWithState();
         });
     }
-    if(btnReplaceImage) {
+    if (btnReplaceImage) {
         btnReplaceImage.addEventListener('click', () => {
-            if(replacePopup) replacePopup.classList.add('hidden');
+            if (replacePopup) replacePopup.classList.add('hidden');
             replaceImageInput.click();
         });
     }
@@ -2358,27 +3000,34 @@ const initOrganisePdfTool = () => {
         const file = e.target.files[0];
         if (!file || !selectedPageId) return;
         saveState();
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const dataUrl = event.target.result;
-            const stateObj = pagesState.find(p => p.id === selectedPageId);
-            const tempImg = new Image();
-            tempImg.onload = () => {
-                stateObj.type = 'image'; stateObj.mime = file.type;
-                stateObj.dataUrl = dataUrl; stateObj.cacheUrl = dataUrl;
-                stateObj.pageWidth = tempImg.width; stateObj.pageHeight = tempImg.height;
-                syncDOMWithState();
-            };
-            tempImg.src = dataUrl;
+        const blobUrl = ThumbnailCacheManager.registerBlobUrl(URL.createObjectURL(file));
+        const stateObj = pagesState.find(p => p.id === selectedPageId);
+        const tempImg = new Image();
+        tempImg.onload = async () => {
+            const thumbCanvas = document.createElement('canvas');
+            const sc = Math.min(1, DEVICE_PROFILE.maxThumbDim / Math.max(tempImg.width, tempImg.height, 1));
+            thumbCanvas.width = Math.max(1, Math.round(tempImg.width * sc));
+            thumbCanvas.height = Math.max(1, Math.round(tempImg.height * sc));
+            thumbCanvas.getContext('2d').drawImage(tempImg, 0, 0, thumbCanvas.width, thumbCanvas.height);
+            const thumbUrl = await canvasToBlobUrl(thumbCanvas, file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.8);
+            releaseCanvasMemory(thumbCanvas);
+
+            stateObj.type = 'image'; stateObj.mime = file.type;
+            stateObj.dataUrl = blobUrl; stateObj.cacheUrl = thumbUrl;
+            stateObj.pageWidth = tempImg.width; stateObj.pageHeight = tempImg.height;
+            stateObj.originalIndex = null; stateObj.sourceIndex = null;
+            syncDOMWithState();
         };
-        reader.readAsDataURL(file);
-        replaceImageInput.value = ""; 
+        tempImg.src = blobUrl;
+        replaceImageInput.value = "";
     });
 
-    function createBlankDataUrl(w = 400, h = 565) {
+    async function createBlankBlobUrl(w = 400, h = 565) {
         const c = document.createElement('canvas'); c.width = w; c.height = h;
-        const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,w,h);
-        return c.toDataURL();
+        const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h);
+        const url = await canvasToBlobUrl(c, 'image/jpeg', 0.8);
+        releaseCanvasMemory(c);
+        return url;
     }
 
     // ==========================================
@@ -2416,7 +3065,7 @@ const initOrganisePdfTool = () => {
         const totalUnscaledW = rawWidth + (m.left || 0) + (m.right || 0);
         const totalUnscaledH = rawHeight + (m.top || 0) + (m.bottom || 0);
 
-        const maxDimension = 2200;
+        const maxDimension = DEVICE_PROFILE.maxOverlayDim;
         const safeScale = Math.min(targetScale, maxDimension / Math.max(totalUnscaledW, totalUnscaledH, 1));
 
         const imgW = Math.round(rawWidth * safeScale);
@@ -2463,6 +3112,7 @@ const initOrganisePdfTool = () => {
             const totalRot = (pageObj.rotate || 0) + (stateObj.visualRotation || 0);
             const vp = pageObj.getViewport({ scale: safeScale, rotation: totalRot });
             await pageObj.render({ canvasContext: bCtx, viewport: vp }).promise;
+            if (pageObj.cleanup) { try { pageObj.cleanup(); } catch (e) {} }
             cleanCtx.drawImage(basePageCanvas, mLeftPx, mTopPx, imgW, imgH);
             outCtx.drawImage(basePageCanvas, mLeftPx, mTopPx, imgW, imgH);
         } else {
@@ -2486,7 +3136,7 @@ const initOrganisePdfTool = () => {
                 outCtx.restore();
             }
         }
-        basePageCanvas.width = 1; basePageCanvas.height = 1;
+        releaseCanvasMemory(basePageCanvas);
 
         if (stateObj.drawings && stateObj.drawings.length > 0) {
             const tempDrawCanvas = document.createElement('canvas');
@@ -2494,7 +3144,7 @@ const initOrganisePdfTool = () => {
             const tempDrawCtx = tempDrawCanvas.getContext('2d', { willReadFrequently: true });
             replayDrawingsOnCanvas(tempDrawCanvas, tempDrawCtx, stateObj.drawings, safeScale, mLeftPx, mTopPx, imgW, imgH);
             outCtx.drawImage(tempDrawCanvas, 0, 0);
-            tempDrawCanvas.width = 1; tempDrawCanvas.height = 1;
+            releaseCanvasMemory(tempDrawCanvas);
         }
 
         if (stateObj.texts && stateObj.texts.length > 0) {
@@ -2520,24 +3170,24 @@ const initOrganisePdfTool = () => {
     }
 
     async function openCropper(stateObj) {
-        progressContainer.style.display = "block"; 
+        progressContainer.style.display = "block";
         updateProgress(50, "Preparing Image...");
         await ensureCropperLoaded();
-        let compositeDataUrl = null;
+        let compositeBlobUrl = null;
         let cleanSourceCanvas = null;
         let useTransparentPng = false;
 
         try {
-            const rendered = await renderCompositePageCanvas(stateObj, 2.0);
+            const rendered = await renderCompositePageCanvas(stateObj, DEVICE_PROFILE.exportScale);
             useTransparentPng = Boolean(rendered.isTransparentMargin || stateObj.mime === 'image/png');
-            compositeDataUrl = useTransparentPng
-                ? rendered.compositeCanvas.toDataURL("image/png")
-                : rendered.compositeCanvas.toDataURL("image/jpeg", 0.95);
+            compositeBlobUrl = useTransparentPng
+                ? await canvasToBlobUrl(rendered.compositeCanvas, "image/png")
+                : await canvasToBlobUrl(rendered.compositeCanvas, "image/jpeg", 0.94);
             cleanSourceCanvas = rendered.cleanCanvas;
-            rendered.compositeCanvas.width = 1; rendered.compositeCanvas.height = 1;
-        } catch(e) {
+            releaseCanvasMemory(rendered.compositeCanvas);
+        } catch (e) {
             console.error("Failed to render composite page for crop", e);
-            compositeDataUrl = stateObj.dataUrl || stateObj.cacheUrl;
+            compositeBlobUrl = stateObj.dataUrl || stateObj.cacheUrl;
         }
         progressContainer.style.display = "none";
 
@@ -2558,22 +3208,22 @@ const initOrganisePdfTool = () => {
             const cropper = new Cropper(imageElement, { viewMode: 1, autoCropArea: 1, background: true, responsive: true, checkOrientation: false });
             const tiltSlider = modal.querySelector("#tiltSlider"), tiltVal = modal.querySelector("#tiltVal"), tiltStepInput = modal.querySelector("#tiltStepInput"), btnTiltMinus = modal.querySelector("#btnTiltMinus"), btnTiltPlus = modal.querySelector("#btnTiltPlus"), resetTiltBtn = modal.querySelector("#resetTiltBtn");
             let currentTilt = 0;
-            
-            function updateTiltUI() { 
-                if (currentTilt > 180) currentTilt = 180; 
-                if (currentTilt < -180) currentTilt = -180; 
-                tiltSlider.value = currentTilt; 
-                tiltVal.innerText = (Math.round(currentTilt * 10) / 10); 
-                cropper.rotateTo(currentTilt); 
+
+            function updateTiltUI() {
+                if (currentTilt > 180) currentTilt = 180;
+                if (currentTilt < -180) currentTilt = -180;
+                tiltSlider.value = currentTilt;
+                tiltVal.innerText = (Math.round(currentTilt * 10) / 10);
+                cropper.rotateTo(currentTilt);
             }
-            
+
             tiltStepInput.addEventListener("input", (e) => { let step = parseFloat(e.target.value) || 1; btnTiltMinus.innerText = "-" + step + "°"; btnTiltPlus.innerText = "+" + step + "°"; });
             btnTiltMinus.addEventListener("click", () => { let step = parseFloat(tiltStepInput.value) || 1; currentTilt -= step; updateTiltUI(); });
             btnTiltPlus.addEventListener("click", () => { let step = parseFloat(tiltStepInput.value) || 1; currentTilt += step; updateTiltUI(); });
             tiltSlider.addEventListener("input", (e) => { currentTilt = parseFloat(e.target.value); updateTiltUI(); });
             resetTiltBtn.addEventListener("click", () => { currentTilt = 0; updateTiltUI(); });
-            
-            modal.querySelector(".save-btn").onclick = () => {
+
+            modal.querySelector(".save-btn").onclick = async () => {
                 const cropOptions = useTransparentPng
                     ? { imageSmoothingEnabled: true, imageSmoothingQuality: 'high' }
                     : { fillColor: '#ffffff', imageSmoothingEnabled: true, imageSmoothingQuality: 'high' };
@@ -2584,8 +3234,8 @@ const initOrganisePdfTool = () => {
                 stateObj.type = 'image';
                 stateObj.mime = useTransparentPng ? 'image/png' : 'image/jpeg';
                 stateObj.dataUrl = useTransparentPng
-                    ? croppedCanvas.toDataURL("image/png")
-                    : croppedCanvas.toDataURL("image/jpeg", 0.92);
+                    ? await canvasToBlobUrl(croppedCanvas, "image/png")
+                    : await canvasToBlobUrl(croppedCanvas, "image/jpeg", 0.92);
 
                 let cleanCroppedCanvas = croppedCanvas;
                 if (cleanSourceCanvas && cleanSourceCanvas.width > 1) {
@@ -2624,20 +3274,26 @@ const initOrganisePdfTool = () => {
                     );
 
                     stateObj.cleanDataUrl = useTransparentPng
-                        ? cleanCroppedCanvas.toDataURL("image/png")
-                        : cleanCroppedCanvas.toDataURL("image/jpeg", 0.90);
-                    rotCleanCanvas.width = 1; rotCleanCanvas.height = 1;
-                    cleanSourceCanvas.width = 1; cleanSourceCanvas.height = 1;
+                        ? await canvasToBlobUrl(cleanCroppedCanvas, "image/png")
+                        : await canvasToBlobUrl(cleanCroppedCanvas, "image/jpeg", 0.90);
+                    releaseCanvasMemory(rotCleanCanvas);
+                    releaseCanvasMemory(cleanSourceCanvas);
                 }
 
                 const thumbCanvas = document.createElement('canvas');
-                const thumbScale = Math.min(1, 400 / Math.max(cleanCroppedCanvas.width, cleanCroppedCanvas.height));
+                const thumbScale = Math.min(1, DEVICE_PROFILE.maxThumbDim / Math.max(cleanCroppedCanvas.width, cleanCroppedCanvas.height, 1));
                 thumbCanvas.width = Math.max(1, Math.round(cleanCroppedCanvas.width * thumbScale));
                 thumbCanvas.height = Math.max(1, Math.round(cleanCroppedCanvas.height * thumbScale));
                 thumbCanvas.getContext('2d').drawImage(cleanCroppedCanvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
                 stateObj.cacheUrl = useTransparentPng
-                    ? thumbCanvas.toDataURL("image/png")
-                    : thumbCanvas.toDataURL("image/jpeg", 0.75);
+                    ? await canvasToBlobUrl(thumbCanvas, "image/png")
+                    : await canvasToBlobUrl(thumbCanvas, "image/jpeg", DEVICE_PROFILE.thumbQuality);
+                releaseCanvasMemory(thumbCanvas);
+
+                const finalW = croppedCanvas.width * 0.5;
+                const finalH = croppedCanvas.height * 0.5;
+                if (cleanCroppedCanvas !== croppedCanvas) releaseCanvasMemory(cleanCroppedCanvas);
+                releaseCanvasMemory(croppedCanvas);
 
                 stateObj.visualRotation = 0;
                 stateObj.texts = [];
@@ -2646,24 +3302,32 @@ const initOrganisePdfTool = () => {
                 stateObj.resize = null;
                 stateObj.watermark = null;
                 stateObj.pageNumber = null;
-                stateObj.pageWidth = croppedCanvas.width * 0.5;
-                stateObj.pageHeight = croppedCanvas.height * 0.5;
+                stateObj.pageWidth = finalW;
+                stateObj.pageHeight = finalH;
                 stateObj.originalIndex = null;
                 stateObj.sourceIndex = null;
 
-                cropper.destroy(); modal.remove(); syncDOMWithState(); 
+                cropper.destroy();
+                if (compositeBlobUrl && compositeBlobUrl !== stateObj.dataUrl) {
+                    ThumbnailCacheManager.revokeBlobUrl(compositeBlobUrl);
+                }
+                modal.remove();
+                syncDOMWithState();
                 if (isDetailViewOpen) renderBigCanvas(selectedPageId, true, false);
             };
         };
-        imageElement.src = compositeDataUrl;
+        imageElement.src = compositeBlobUrl;
         modal.querySelector(".cancel-btn").onclick = () => {
-            if (cleanSourceCanvas) { cleanSourceCanvas.width = 1; cleanSourceCanvas.height = 1; }
+            if (cleanSourceCanvas) releaseCanvasMemory(cleanSourceCanvas);
+            if (compositeBlobUrl && compositeBlobUrl !== stateObj.dataUrl && compositeBlobUrl !== stateObj.cacheUrl) {
+                ThumbnailCacheManager.revokeBlobUrl(compositeBlobUrl);
+            }
             modal.remove();
         };
     }
 
     // ==========================================
-    // 10. COLOR PICKER & COLOR UTILITIES
+    // 10. COLOR PICKER & GPU-SAFE COLOR UTILITIES
     // ==========================================
     let openColorModalGlobal = null;
 
@@ -2673,22 +3337,22 @@ const initOrganisePdfTool = () => {
             activeColorTarget = targetType;
             customColorModal.style.display = "flex";
             colorPopoverOverlay.style.display = "block";
-            
+
             const headerTitle = customColorModal.querySelector('.panel-header span');
-            if(headerTitle) {
-                if(targetType === 'text') headerTitle.innerText = "Text Color";
-                else if(targetType === 'bg') headerTitle.innerText = "Background Color";
-                else if(targetType === 'border') headerTitle.innerText = "Stroke Color";
-                else if(targetType === 'draw') headerTitle.innerText = "Draw Color"; 
-                else if(targetType === 'margin-bg') headerTitle.innerText = "Margin Color";
+            if (headerTitle) {
+                if (targetType === 'text') headerTitle.innerText = "Text Color";
+                else if (targetType === 'bg') headerTitle.innerText = "Background Color";
+                else if (targetType === 'border') headerTitle.innerText = "Stroke Color";
+                else if (targetType === 'draw') headerTitle.innerText = "Draw Color";
+                else if (targetType === 'margin-bg') headerTitle.innerText = "Margin Color";
             }
 
             const rect = triggerEl.getBoundingClientRect();
             let modalTop = rect.bottom + 8;
-            let modalLeft = rect.left + (rect.width / 2) - 130; 
+            let modalLeft = rect.left + (rect.width / 2) - 130;
             if (modalLeft < 10) modalLeft = 10;
             if (modalLeft + 260 > window.innerWidth) modalLeft = window.innerWidth - 270;
-            if (modalTop + 330 > window.innerHeight) modalTop = rect.top - 330; 
+            if (modalTop + 330 > window.innerHeight) modalTop = rect.top - 330;
 
             customColorModal.style.position = 'fixed';
             customColorModal.style.top = modalTop + 'px';
@@ -2697,15 +3361,15 @@ const initOrganisePdfTool = () => {
             customColorModal.style.width = '260px';
             customColorModal.style.margin = '0';
 
-            if(!colorPickerInstance && typeof iro !== 'undefined') {
-                colorPickerInstance = new iro.ColorPicker("#iroPickerContainer", { 
-                    width: 200, color: "#000000", borderWidth: 1, borderColor: "#00e676", 
-                    layout: [ { component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } } ] 
+            if (!colorPickerInstance && typeof iro !== 'undefined') {
+                colorPickerInstance = new iro.ColorPicker("#iroPickerContainer", {
+                    width: 200, color: "#000000", borderWidth: 1, borderColor: "#00e676",
+                    layout: [{ component: iro.ui.Box }, { component: iro.ui.Slider, options: { sliderType: 'hue' } }]
                 });
-                colorPickerInstance.on('color:change', function(color) { 
-                    const hex = color.hexString.toUpperCase(); 
-                    ccpHexInput.value = hex; 
-                    ccpPreviewCircle.style.backgroundColor = hex; 
+                colorPickerInstance.on('color:change', function (color) {
+                    const hex = color.hexString.toUpperCase();
+                    ccpHexInput.value = hex;
+                    ccpPreviewCircle.style.backgroundColor = hex;
                     applyPickedColor(hex);
                 });
             }
@@ -2713,36 +3377,36 @@ const initOrganisePdfTool = () => {
             const currentHex = triggerEl.style.backgroundColor ? rgbToHex(triggerEl.style.backgroundColor) : '#000000';
             ccpHexInput.value = currentHex.toUpperCase();
             ccpPreviewCircle.style.backgroundColor = currentHex;
-            if(colorPickerInstance) colorPickerInstance.color.hexString = currentHex;
+            if (colorPickerInstance) colorPickerInstance.color.hexString = currentHex;
         };
 
         openColorModalGlobal = openColorModal;
 
         function applyPickedColor(hex) {
             const targetContent = getActiveTextElement();
-            if(activeColorTarget === 'text') {
-                colorTriggerBtn.style.backgroundColor = hex; 
-                if(targetContent) targetContent.style.color = hex; 
-            } else if(activeColorTarget === 'bg') {
+            if (activeColorTarget === 'text') {
+                colorTriggerBtn.style.backgroundColor = hex;
+                if (targetContent) targetContent.style.color = hex;
+            } else if (activeColorTarget === 'bg') {
                 bgColorTriggerBtn.style.backgroundColor = hex;
-                if(targetContent) { targetContent.parentElement.dataset.bgColor = hex; updateBgStyles(targetContent); }
-            } else if(activeColorTarget === 'border') {
-                if(borderColorTriggerBtn) borderColorTriggerBtn.style.backgroundColor = hex;
-                if(targetContent) { targetContent.parentElement.dataset.borderColor = hex; updateBorderStyles(targetContent); }
-            } else if(activeColorTarget === 'draw') { 
-                if(drawColorTriggerBtn) drawColorTriggerBtn.style.backgroundColor = hex;
+                if (targetContent) { targetContent.parentElement.dataset.bgColor = hex; updateBgStyles(targetContent); }
+            } else if (activeColorTarget === 'border') {
+                if (borderColorTriggerBtn) borderColorTriggerBtn.style.backgroundColor = hex;
+                if (targetContent) { targetContent.parentElement.dataset.borderColor = hex; updateBorderStyles(targetContent); }
+            } else if (activeColorTarget === 'draw') {
+                if (drawColorTriggerBtn) drawColorTriggerBtn.style.backgroundColor = hex;
                 updateMainPointStyle();
-            } else if(activeColorTarget === 'margin-bg') {
+            } else if (activeColorTarget === 'margin-bg') {
                 const mColorBtn = document.getElementById('margin-color-trigger-btn');
-                if(mColorBtn) mColorBtn.style.backgroundColor = hex;
-                if(workingMargins) { workingMargins.color = hex; renderMarginPreviewSync(); }
+                if (mColorBtn) mColorBtn.style.backgroundColor = hex;
+                if (workingMargins) { workingMargins.color = hex; renderMarginPreviewSync(); }
             }
         }
 
         colorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(colorTriggerBtn, 'text'); });
         bgColorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(bgColorTriggerBtn, 'bg'); });
-        if(borderColorTriggerBtn) borderColorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(borderColorTriggerBtn, 'border'); });
-        if(drawColorTriggerBtn) drawColorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(drawColorTriggerBtn, 'draw'); });
+        if (borderColorTriggerBtn) borderColorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(borderColorTriggerBtn, 'border'); });
+        if (drawColorTriggerBtn) drawColorTriggerBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); openColorModal(drawColorTriggerBtn, 'draw'); });
 
         function closeColorPopup(e) {
             if (e) e.stopPropagation();
@@ -2755,17 +3419,17 @@ const initOrganisePdfTool = () => {
 
         ccpHexInput.addEventListener('input', (e) => {
             let hex = e.target.value;
-            if(!hex.startsWith("#")) hex = "#" + hex;
-            if(/^#[0-9A-F]{6}$/i.test(hex)) {
+            if (!hex.startsWith("#")) hex = "#" + hex;
+            if (/^#[0-9A-F]{6}$/i.test(hex)) {
                 ccpPreviewCircle.style.backgroundColor = hex;
-                if(colorPickerInstance) colorPickerInstance.color.hexString = hex;
+                if (colorPickerInstance) colorPickerInstance.color.hexString = hex;
                 applyPickedColor(hex.toUpperCase());
             }
         });
-        ccpHexInput.addEventListener('blur', (e) => { 
-            let hex = e.target.value; 
-            if(!hex.startsWith("#")) hex = "#" + hex; 
-            e.target.value = hex.toUpperCase(); 
+        ccpHexInput.addEventListener('blur', (e) => {
+            let hex = e.target.value;
+            if (!hex.startsWith("#")) hex = "#" + hex;
+            e.target.value = hex.toUpperCase();
         });
     }
     setupColorPicker();
@@ -2814,15 +3478,45 @@ const initOrganisePdfTool = () => {
         return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 128) ? '#000000' : '#FFFFFF';
     }
 
+    // Dedicated tiny 16x16 readback canvas so getImageData is NEVER called on #editor-canvas.
+    // This prevents Chrome from demoting #editor-canvas from GPU to CPU software rendering on the 2nd page!
+    let avgColorSampleCanvas = null;
+    let avgColorSampleCtx = null;
+
     function getAverageRGB(ctx, x, y, width, height) {
         try {
-            const data = ctx.getImageData(x, y, width, height).data;
-            let r = 0, g = 0, b = 0, count = 0;
-            for(let i = 0; i < data.length; i += 16) { r += data[i]; g += data[i+1]; b += data[i+2]; count++; }
-            return "#" + ((1 << 24) + (Math.floor(r/count) << 16) + (Math.floor(g/count) << 8) + Math.floor(b/count)).toString(16).slice(1);
-        } catch(e) { return "#FFFFFF"; }
-    }
+            const srcCanvas = ctx && ctx.canvas ? ctx.canvas : editorCanvas;
+            if (!srcCanvas || srcCanvas.width <= 1 || srcCanvas.height <= 1) return "#FFFFFF";
+            if (!avgColorSampleCanvas) {
+                avgColorSampleCanvas = document.createElement('canvas');
+                avgColorSampleCanvas.width = 16;
+                avgColorSampleCanvas.height = 16;
+                avgColorSampleCtx = avgColorSampleCanvas.getContext('2d', { willReadFrequently: true });
+            }
+            const cssW = parseFloat(srcCanvas.style.width) || srcCanvas.width;
+            const cssH = parseFloat(srcCanvas.style.height) || srcCanvas.height;
+            const ratioX = srcCanvas.width / Math.max(1, cssW);
+            const ratioY = srcCanvas.height / Math.max(1, cssH);
 
+            const sx = Math.max(0, Math.min(srcCanvas.width - 1, Math.round(x * ratioX)));
+            const sy = Math.max(0, Math.min(srcCanvas.height - 1, Math.round(y * ratioY)));
+            const sw = Math.max(1, Math.min(srcCanvas.width - sx, Math.round(width * ratioX)));
+            const sh = Math.max(1, Math.min(srcCanvas.height - sy, Math.round(height * ratioY)));
+
+            avgColorSampleCtx.fillStyle = '#FFFFFF';
+            avgColorSampleCtx.fillRect(0, 0, 16, 16);
+            avgColorSampleCtx.drawImage(srcCanvas, sx, sy, sw, sh, 0, 0, 16, 16);
+
+            const data = avgColorSampleCtx.getImageData(0, 0, 16, 16).data;
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < data.length; i += 16) {
+                r += data[i]; g += data[i + 1]; b += data[i + 2]; count++;
+            }
+            return "#" + ((1 << 24) + (Math.floor(r / count) << 16) + (Math.floor(g / count) << 8) + Math.floor(b / count)).toString(16).slice(1);
+        } catch (e) {
+            return "#FFFFFF";
+        }
+    }
     // ==========================================
     // 11. EXPAND VIEW NAVIGATION & SUBTOOL ROUTING
     // ==========================================
@@ -2849,7 +3543,8 @@ const initOrganisePdfTool = () => {
 
     function getExpandNavigationList() {
         if (selectedPageIds.length > 1) {
-            return pagesState.filter(p => selectedPageIds.includes(p.id)).map(p => p.id);
+            const selectedSet = new Set(selectedPageIds);
+            return pagesState.filter(p => selectedSet.has(p.id)).map(p => p.id);
         }
         return pagesState.map(p => p.id);
     }
@@ -2943,7 +3638,8 @@ const initOrganisePdfTool = () => {
         if (keepPageId && pagesState.some(p => p.id === keepPageId)) {
             selectedPageId = keepPageId;
         } else if (selectedPageIds.length > 0) {
-            const orderedSelected = pagesState.filter(p => selectedPageIds.includes(p.id));
+            const selectedSet = new Set(selectedPageIds);
+            const orderedSelected = pagesState.filter(p => selectedSet.has(p.id));
             if (orderedSelected.length > 0) selectedPageId = orderedSelected[0].id;
         }
 
@@ -2954,14 +3650,14 @@ const initOrganisePdfTool = () => {
         hideAllEditorHeadersAndToolbars();
         document.getElementById('detail-header-group').style.display = 'flex';
         floatingToolbar.classList.remove('hidden');
-        floatingToolbar.style.zIndex = '100001'; 
-        if(fabAddMoreTextWrapper) fabAddMoreTextWrapper.style.display = 'none'; 
+        floatingToolbar.style.zIndex = '100001';
+        if (fabAddMoreTextWrapper) fabAddMoreTextWrapper.style.display = 'none';
         editorOverlay.querySelectorAll('.text-wrapper').forEach(w => w.remove());
         editorOverlay.style.pointerEvents = 'none';
         editorOverlay.style.overflow = 'hidden';
 
-        if(fabDuplicate) fabDuplicate.style.display = 'none';
-        if(fabReplace) fabReplace.style.display = 'none';
+        if (fabDuplicate) fabDuplicate.style.display = 'none';
+        if (fabReplace) fabReplace.style.display = 'none';
 
         updateSelectionUI();
         updateExpandNavigationUI();
@@ -2969,13 +3665,24 @@ const initOrganisePdfTool = () => {
     }
 
     function returnFromSubTool() {
+        if (textDragRafId) {
+            cancelAnimationFrame(textDragRafId);
+            textDragRafId = null;
+        }
+        activeDragTextWrapper = null;
+        textInteractionMode = null;
+
         if (drawCanvas) {
-            drawCanvas.width = 1; drawCanvas.height = 1;
+            releaseCanvasMemory(drawCanvas);
             drawCanvas.remove(); drawCanvas = null; drawCtx = null;
         }
         if (strokeBufferCanvas) {
-            strokeBufferCanvas.width = 1; strokeBufferCanvas.height = 1;
+            releaseCanvasMemory(strokeBufferCanvas);
             strokeBufferCanvas = null; strokeBufferCtx = null;
+        }
+        if (marginRawBaseCanvas) {
+            releaseCanvasMemory(marginRawBaseCanvas);
+            marginRawBaseCanvas = null;
         }
         if (drawJoystick) drawJoystick.classList.add('hidden');
         if (marginGuidesContainer) marginGuidesContainer.classList.add('hidden');
@@ -3011,6 +3718,15 @@ const initOrganisePdfTool = () => {
         if (m.left > 0 && m.top === 0 && m.bottom === 0 && m.right === 0) return 'left';
         if (m.right > 0 && m.top === 0 && m.bottom === 0 && m.left === 0) return 'right';
         return 'custom';
+    }
+
+    let marginPreviewRafId = null;
+    function scheduleMarginPreviewRender() {
+        if (marginPreviewRafId) return;
+        marginPreviewRafId = requestAnimationFrame(() => {
+            marginPreviewRafId = null;
+            renderMarginPreviewSync();
+        });
     }
 
     function applyPageSizePresetToMargins(preset) {
@@ -3218,7 +3934,7 @@ const initOrganisePdfTool = () => {
             }
             workingMargins.pageSize = (workingMargins.top === 0 && workingMargins.bottom === 0 && workingMargins.left === 0 && workingMargins.right === 0) ? 'original' : 'custom';
             syncMarginInputsWithState();
-            renderMarginPreviewSync();
+            scheduleMarginPreviewRender();
         };
         singleInput.addEventListener('input', e => onSingleValueChange(e.target.value));
         singleSlider.addEventListener('input', e => onSingleValueChange(e.target.value));
@@ -3233,7 +3949,7 @@ const initOrganisePdfTool = () => {
                 workingMargins[side] = v;
                 workingMargins.pageSize = (workingMargins.top === 0 && workingMargins.bottom === 0 && workingMargins.left === 0 && workingMargins.right === 0) ? 'original' : 'custom';
                 syncMarginInputsWithState();
-                renderMarginPreviewSync();
+                scheduleMarginPreviewRender();
             };
             inp.addEventListener('input', e => onCustomSideChange(e.target.value));
             sld.addEventListener('input', e => onCustomSideChange(e.target.value));
@@ -3252,7 +3968,8 @@ const initOrganisePdfTool = () => {
         });
 
         cancelBtn.addEventListener('click', () => {
-            workingMargins = null; marginRawBaseCanvas = null;
+            workingMargins = null;
+            if (marginRawBaseCanvas) { releaseCanvasMemory(marginRawBaseCanvas); marginRawBaseCanvas = null; }
             returnFromSubTool();
         });
 
@@ -3262,12 +3979,13 @@ const initOrganisePdfTool = () => {
             const stateObj = pagesState.find(p => p.id === selectedPageId);
             if (stateObj) {
                 const active = hasActiveMargins(workingMargins);
-                stateObj.margins = active ? JSON.parse(JSON.stringify(workingMargins)) : null;
+                stateObj.margins = active ? { ...workingMargins } : null;
                 stateObj.resize = (workingMargins.pageSize && workingMargins.pageSize !== 'original' && workingMargins.pageSize !== 'custom')
                     ? workingMargins.pageSize
                     : null;
             }
-            workingMargins = null; marginRawBaseCanvas = null;
+            workingMargins = null;
+            if (marginRawBaseCanvas) { releaseCanvasMemory(marginRawBaseCanvas); marginRawBaseCanvas = null; }
             updateSingleCardBadge(selectedPageId);
             returnFromSubTool();
         });
@@ -3324,7 +4042,7 @@ const initOrganisePdfTool = () => {
         workingMargins[activeMarginGuideSide] = Math.max(0, Math.min(2000, Math.round(marginDragStartVal + delta)));
         workingMargins.pageSize = (workingMargins.top === 0 && workingMargins.bottom === 0 && workingMargins.left === 0 && workingMargins.right === 0) ? 'original' : 'custom';
         syncMarginInputsWithState();
-        renderMarginPreviewSync();
+        scheduleMarginPreviewRender();
         e.preventDefault();
     }, { passive: false });
 
@@ -3413,9 +4131,10 @@ const initOrganisePdfTool = () => {
         const isMobile = window.innerWidth <= 768;
         const availW = window.innerWidth - (isMobile ? 12 : 60);
         const availH = window.innerHeight - (isMobile ? 145 : 180);
+        const maxCap = Math.min(DEVICE_PROFILE.isLowEnd ? 1.8 : 2.5, DEVICE_PROFILE.maxEditorDim / Math.max(totalUnscaledW, totalUnscaledH, 1));
 
-        const maxFitScale = Math.min(availW / totalUnscaledW, availH / totalUnscaledH, 2.5) * (isMobile ? 0.95 : 0.90);
-        const baseSteadyScale = Math.min(availW / marginBaseRawW, availH / marginBaseRawH, 2.5) * (isMobile ? 0.88 : 0.82);
+        const maxFitScale = Math.min(availW / totalUnscaledW, availH / totalUnscaledH, maxCap) * (isMobile ? 0.95 : 0.90);
+        const baseSteadyScale = Math.min(availW / marginBaseRawW, availH / marginBaseRawH, maxCap) * (isMobile ? 0.88 : 0.82);
         editorScale = Math.max(0.1, Math.min(baseSteadyScale, maxFitScale));
 
         const imgW = Math.round(marginBaseRawW * editorScale);
@@ -3428,7 +4147,8 @@ const initOrganisePdfTool = () => {
         const cw = imgW + mLeftPx + mRightPx;
         const ch = imgH + mTopPx + mBottomPx;
 
-        editorCanvas.width = cw; editorCanvas.height = ch;
+        if (editorCanvas.width !== cw) editorCanvas.width = cw;
+        if (editorCanvas.height !== ch) editorCanvas.height = ch;
         editorCanvas.style.width = cw + 'px'; editorCanvas.style.height = ch + 'px';
 
         currentImgOffsetX = mLeftPx; currentImgOffsetY = mTopPx;
@@ -3459,7 +4179,7 @@ const initOrganisePdfTool = () => {
             const tempDrawCtx = tempDrawCanvas.getContext('2d', { willReadFrequently: true });
             replayDrawingsOnCanvas(tempDrawCanvas, tempDrawCtx, stateObj.drawings, editorScale, mLeftPx, mTopPx, imgW, imgH);
             ctx.drawImage(tempDrawCanvas, 0, 0);
-            tempDrawCanvas.width = 1; tempDrawCanvas.height = 1;
+            releaseCanvasMemory(tempDrawCanvas);
         }
 
         if (stateObj.texts && stateObj.texts.length > 0) {
@@ -3480,7 +4200,7 @@ const initOrganisePdfTool = () => {
 
         const stateObj = pagesState.find(p => p.id === selectedPageId);
         workingMargins = (stateObj && stateObj.margins)
-            ? JSON.parse(JSON.stringify(stateObj.margins))
+            ? { ...stateObj.margins }
             : getDefaultMargins();
 
         if (!workingMargins.pageSize) {
@@ -3771,13 +4491,13 @@ const initOrganisePdfTool = () => {
         openedSubToolFromExpand = isDetailViewOpen && !isTextEditingOpen && !isDrawMode && !isMarginsMode;
         editorModal.classList.add('subtool-open');
         isDetailViewOpen = true; isTextEditingOpen = false; isDrawMode = true; isMarginsMode = false;
-        
+
         editorModal.classList.remove('hidden');
         hideAllEditorHeadersAndToolbars();
         drawHeaderGroup.style.display = 'flex';
         drawFormatToolbar.style.display = 'flex';
-        floatingToolbar.classList.add('hidden'); 
-        
+        floatingToolbar.classList.add('hidden');
+
         editorOverlay.querySelectorAll('.text-wrapper').forEach(w => w.remove());
         editorOverlay.style.pointerEvents = 'auto';
         editorOverlay.style.touchAction = 'none';
@@ -3808,7 +4528,9 @@ const initOrganisePdfTool = () => {
         drawCanvas.height = editorCanvas.height;
 
         const stateObj = pagesState.find(p => p.id === selectedPageId);
-        workingDrawings = (stateObj && stateObj.drawings) ? JSON.parse(JSON.stringify(stateObj.drawings)) : [];
+        workingDrawings = (stateObj && stateObj.drawings)
+            ? stateObj.drawings.map(d => ({ ...d, points: d.points ? d.points.slice() : undefined }))
+            : [];
         replayDrawingsOnCanvas(drawCanvas, drawCtx, workingDrawings, editorScale, currentImgOffsetX, currentImgOffsetY, currentImgDrawW, currentImgDrawH);
         syncStrokeBufferCanvas();
 
@@ -3846,7 +4568,7 @@ const initOrganisePdfTool = () => {
                 currentStrokePoints = [];
             }
             if (!selectedPageId) return;
-            saveState(); 
+            saveState();
             const stateObj = pagesState.find(p => p.id === selectedPageId);
             if (stateObj) {
                 stateObj.drawings = workingDrawings.map(d => ({
@@ -3857,7 +4579,7 @@ const initOrganisePdfTool = () => {
             workingDrawings = []; drawHistory = []; redoDrawHistory = [];
             returnFromSubTool();
             updateSingleCardBadge(selectedPageId);
-            if(selectedPageIds.length > 0) floatingToolbar.classList.remove('hidden');
+            if (selectedPageIds.length > 0) floatingToolbar.classList.remove('hidden');
         });
     }
 
@@ -3866,25 +4588,22 @@ const initOrganisePdfTool = () => {
     }
 
     function updateDrawHistoryButtons() {
-        if(drawUndoBtn) drawUndoBtn.disabled = drawHistory.length === 0;
-        if(drawRedoBtn) drawRedoBtn.disabled = redoDrawHistory.length === 0;
+        if (drawUndoBtn) drawUndoBtn.disabled = drawHistory.length === 0;
+        if (drawRedoBtn) drawRedoBtn.disabled = redoDrawHistory.length === 0;
     }
 
     function saveDrawState() {
-        const snapshot = workingDrawings.map(d => ({
-            ...d,
-            points: d.points ? d.points.slice() : undefined
-        }));
+        const snapshot = workingDrawings.slice();
         drawHistory.push(snapshot);
-        if(drawHistory.length > 30) drawHistory.shift();
+        if (drawHistory.length > DEVICE_PROFILE.maxUndoHistory) drawHistory.shift();
         redoDrawHistory = [];
         updateDrawHistoryButtons();
     }
 
     if (drawUndoBtn) {
         drawUndoBtn.addEventListener('click', () => {
-            if(drawHistory.length === 0 || !drawCanvas || !drawCtx) return;
-            redoDrawHistory.push(workingDrawings.map(d => ({ ...d, points: d.points ? d.points.slice() : undefined })));
+            if (drawHistory.length === 0 || !drawCanvas || !drawCtx) return;
+            redoDrawHistory.push(workingDrawings.slice());
             workingDrawings = drawHistory.pop();
             replayDrawingsOnCanvas(drawCanvas, drawCtx, workingDrawings, editorScale, currentImgOffsetX, currentImgOffsetY, currentImgDrawW, currentImgDrawH);
             syncStrokeBufferCanvas();
@@ -3894,8 +4613,8 @@ const initOrganisePdfTool = () => {
 
     if (drawRedoBtn) {
         drawRedoBtn.addEventListener('click', () => {
-            if(redoDrawHistory.length === 0 || !drawCanvas || !drawCtx) return;
-            drawHistory.push(workingDrawings.map(d => ({ ...d, points: d.points ? d.points.slice() : undefined })));
+            if (redoDrawHistory.length === 0 || !drawCanvas || !drawCtx) return;
+            drawHistory.push(workingDrawings.slice());
             workingDrawings = redoDrawHistory.pop();
             replayDrawingsOnCanvas(drawCanvas, drawCtx, workingDrawings, editorScale, currentImgOffsetX, currentImgOffsetY, currentImgDrawW, currentImgDrawH);
             syncStrokeBufferCanvas();
@@ -4030,14 +4749,14 @@ const initOrganisePdfTool = () => {
 
     const dTools = [toolPen, toolMarker, toolEraser, toolFill];
     dTools.forEach(tool => {
-        if(tool) {
+        if (tool) {
             tool.addEventListener('click', (e) => {
                 e.preventDefault();
                 const prevTool = activeDrawTool;
-                dTools.forEach(t => { if(t) t.classList.remove('active'); });
+                dTools.forEach(t => { if (t) t.classList.remove('active'); });
                 tool.classList.add('active');
                 activeDrawTool = tool.id.replace('tool-', '');
-                
+
                 const sizeInput = document.getElementById('draw-size'), sizeSlider = document.getElementById('draw-slider-size');
                 const opInput = document.getElementById('draw-opacity'), opSlider = document.getElementById('draw-slider-opacity');
 
@@ -4172,24 +4891,100 @@ const initOrganisePdfTool = () => {
     window.addEventListener('pointerup', endDrawInteraction);
     window.addEventListener('pointercancel', endDrawInteraction);
 
-    linkInputAndSlider('draw-size', 'draw-slider-size', null); 
-    linkInputAndSlider('draw-opacity', 'draw-slider-opacity', null); 
-    linkInputAndSlider('draw-offset', 'draw-slider-offset', null); 
+    linkInputAndSlider('draw-size', 'draw-slider-size', null);
+    linkInputAndSlider('draw-opacity', 'draw-slider-opacity', null);
+    linkInputAndSlider('draw-offset', 'draw-slider-offset', null);
 
     ['draw-size', 'draw-slider-size', 'draw-opacity', 'draw-slider-opacity', 'draw-offset', 'draw-slider-offset'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', () => updateMainPointStyle());
     });
 
+// ==========================================
+    // 14. ZERO-COPY IN-PLACE PDF OVERLAY & EXTRACTION ENGINE
     // ==========================================
-    // 14. PDF OVERLAY & PAGE EXTRACTION ENGINE
-    // ==========================================
-    async function generateOverlayPngBytesForPdf(stateObj, pdfPageWidth, pdfPageHeight) {
+    function drawNativePageNumberOnPdfPage(finalPage, stateObj, helveticaFont) {
+        const pn = stateObj.pageNumber;
+        if (!pn || !pn.num || !helveticaFont) return;
+
+        const { rgb, degrees } = window.PDFLib;
+        const mediaBox = finalPage.getCropBox() || finalPage.getMediaBox();
+        const boxOriginX = mediaBox.x || 0;
+        const boxOriginY = mediaBox.y || 0;
+        const width = mediaBox.width;
+        const height = mediaBox.height;
+
+        const totalRot = ((finalPage.getRotation().angle % 360) + 360) % 360;
+        const isSideways = (totalRot === 90 || totalRot === 270);
+        const visW = isSideways ? height : width;
+        const visH = isSideways ? width : height;
+
+        // Scale font size & padding proportionally to page dimensions so high-res photo PDFs don't get tiny page numbers
+        const pageUnitScale = Math.min(visW, visH) / 595.28;
+        const fontSize = (pn.size || 18) * pageUnitScale;
+        const textStr = `Page - ${pn.num}`;
+        const textW = helveticaFont.widthOfTextAtSize(textStr, fontSize);
+        const textH = fontSize;
+        const pad = 18 * pageUnitScale;
+
+        let vx = visW - pad - textW;
+        let vy = pad;
+
+        switch (pn.pos) {
+            case 'bottom-center': vx = (visW - textW) / 2; vy = pad; break;
+            case 'bottom-right': vx = visW - pad - textW; vy = pad; break;
+            case 'bottom-left': vx = pad; vy = pad; break;
+            case 'top-center': vx = (visW - textW) / 2; vy = visH - pad - textH; break;
+            case 'top-right': vx = visW - pad - textW; vy = visH - pad - textH; break;
+            case 'top-left': vx = pad; vy = visH - pad - textH; break;
+        }
+
+        const cRgb = hexToRgbPdf(pn.color || '#000000');
+        const drawOpts = {
+            size: fontSize,
+            font: helveticaFont,
+            color: rgb(cRgb.r, cRgb.g, cRgb.b)
+        };
+
+        if (totalRot === 0) {
+            finalPage.drawText(textStr, { ...drawOpts, x: boxOriginX + vx, y: boxOriginY + vy });
+        } else if (totalRot === 90) {
+            finalPage.drawText(textStr, { ...drawOpts, x: boxOriginX + vy, y: boxOriginY + height - vx, rotate: degrees(-90) });
+        } else if (totalRot === 180) {
+            finalPage.drawText(textStr, { ...drawOpts, x: boxOriginX + width - vx, y: boxOriginY + height - vy, rotate: degrees(-180) });
+        } else if (totalRot === 270) {
+            finalPage.drawText(textStr, { ...drawOpts, x: boxOriginX + width - vy, y: boxOriginY + vx, rotate: degrees(-270) });
+        }
+    }
+
+    function drawCroppedOverlayOnPdfPage(finalPage, pdfOverlayImg, overlayInfo) {
+        const { degrees } = window.PDFLib;
+        const mediaBox = finalPage.getCropBox() || finalPage.getMediaBox();
+        const boxOriginX = mediaBox.x || 0;
+        const boxOriginY = mediaBox.y || 0;
+        const width = mediaBox.width;
+        const height = mediaBox.height;
+
+        const totalRot = ((finalPage.getRotation().angle % 360) + 360) % 360;
+        const { vx, vy, vw, vh } = overlayInfo;
+
+        if (totalRot === 0) {
+            finalPage.drawImage(pdfOverlayImg, { x: boxOriginX + vx, y: boxOriginY + vy, width: vw, height: vh });
+        } else if (totalRot === 90) {
+            finalPage.drawImage(pdfOverlayImg, { x: boxOriginX + vy, y: boxOriginY + height - vx, width: vw, height: vh, rotate: degrees(-90) });
+        } else if (totalRot === 180) {
+            finalPage.drawImage(pdfOverlayImg, { x: boxOriginX + width - vx, y: boxOriginY + height - vy, width: vw, height: vh, rotate: degrees(-180) });
+        } else if (totalRot === 270) {
+            finalPage.drawImage(pdfOverlayImg, { x: boxOriginX + width - vy, y: boxOriginY + vx, width: vw, height: vh, rotate: degrees(-270) });
+        }
+    }
+
+    // Crops the overlay canvas to the tightest non-transparent bounding box so PDF-Lib embeds a tiny PNG instead of a 15MP full-page PNG
+    async function generateCroppedOverlayForPdf(stateObj, pdfPageWidth, pdfPageHeight) {
         const hasDrawings = stateObj.drawings && stateObj.drawings.length > 0;
         const hasTexts = stateObj.texts && stateObj.texts.length > 0;
         const hasWm = Boolean(stateObj.watermark);
-        const hasPn = Boolean(stateObj.pageNumber && stateObj.pageNumber.num);
-        if (!hasDrawings && !hasTexts && !hasWm && !hasPn) return null;
+        if (!hasDrawings && !hasTexts && !hasWm) return null;
 
         const isSideways = Math.abs((stateObj.visualRotation || 0) % 180) === 90;
         const visW = isSideways ? pdfPageHeight : pdfPageWidth;
@@ -4204,10 +4999,15 @@ const initOrganisePdfTool = () => {
         const normScaleX = visW / (totalRawW || 1);
         const normScaleY = visH / (totalRawH || 1);
 
-        const exportMultiplier = 2.0;
+        const maxSide = Math.max(visW, visH, 1);
+        const exportMultiplier = Math.min(DEVICE_PROFILE.exportScale, DEVICE_PROFILE.maxOverlayDim / maxSide);
+
+        const cw = Math.max(1, Math.round(visW * exportMultiplier));
+        const ch = Math.max(1, Math.round(visH * exportMultiplier));
+
         const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = Math.max(1, Math.round(visW * exportMultiplier));
-        tempCanvas.height = Math.max(1, Math.round(visH * exportMultiplier));
+        tempCanvas.width = cw;
+        tempCanvas.height = ch;
         const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
 
         const offX = Math.round((m.left || 0) * normScaleX * exportMultiplier);
@@ -4221,40 +5021,275 @@ const initOrganisePdfTool = () => {
         if (hasTexts) {
             drawSavedTextsOnContext(tempCtx, stateObj.texts, offX, offY, imgW, imgH, exportMultiplier * normScaleX);
         }
-        if (hasWm || hasPn) {
-            await drawWatermarkAndPageNumOnContext(tempCtx, stateObj, tempCanvas.width, tempCanvas.height, exportMultiplier);
+        if (hasWm) {
+            // Temporarily omit pageNumber from canvas because page numbers are drawn natively via vector font
+            const savedPn = stateObj.pageNumber;
+            stateObj.pageNumber = null;
+            await drawWatermarkAndPageNumOnContext(tempCtx, stateObj, cw, ch, exportMultiplier);
+            stateObj.pageNumber = savedPn;
         }
 
-        const dataUrl = tempCanvas.toDataURL('image/png');
-        tempCanvas.width = 1; tempCanvas.height = 1;
-        return await fetch(dataUrl).then(r => r.arrayBuffer());
+        // Fast 32-bit pixel scan to find tight non-empty bounding box
+        let minX = 0, minY = 0, maxX = cw - 1, maxY = ch - 1;
+        const isFullMosaic = hasWm && stateObj.watermark && stateObj.watermark.mosaic;
+
+        if (!isFullMosaic) {
+            const imgData = tempCtx.getImageData(0, 0, cw, ch);
+            const buf32 = new Uint32Array(imgData.data.buffer);
+            minX = cw; minY = ch; maxX = -1; maxY = -1;
+
+            for (let y = 0; y < ch; y++) {
+                const rowOffset = y * cw;
+                for (let x = 0; x < cw; x++) {
+                    if ((buf32[rowOffset + x] & 0xff000000) !== 0) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+
+            if (maxX < minX || maxY < minY) {
+                releaseCanvasMemory(tempCanvas);
+                return null;
+            }
+
+            const pad = 4;
+            minX = Math.max(0, minX - pad);
+            minY = Math.max(0, minY - pad);
+            maxX = Math.min(cw - 1, maxX + pad);
+            maxY = Math.min(ch - 1, maxY + pad);
+        }
+
+        const cropW = maxX - minX + 1;
+        const cropH = maxY - minY + 1;
+
+        let pngBytes;
+        if (cropW === cw && cropH === ch) {
+            pngBytes = await canvasToArrayBuffer(tempCanvas, 'image/png');
+            releaseCanvasMemory(tempCanvas);
+        } else {
+            const cropCanvas = document.createElement('canvas');
+            cropCanvas.width = cropW;
+            cropCanvas.height = cropH;
+            cropCanvas.getContext('2d').drawImage(tempCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+            releaseCanvasMemory(tempCanvas);
+            pngBytes = await canvasToArrayBuffer(cropCanvas, 'image/png');
+            releaseCanvasMemory(cropCanvas);
+        }
+
+        const u0 = minX / cw;
+        const v0 = minY / ch;
+        const uw = cropW / cw;
+        const vhNorm = cropH / ch;
+
+        return {
+            pngBytes,
+            vx: u0 * visW,
+            vy: (1 - v0 - vhNorm) * visH,
+            vw: uw * visW,
+            vh: vhNorm * visH
+        };
     }
 
-    async function buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, applyChanges) {
-        const { rgb } = window.PDFLib;
+
+// Expands the PDF page's MediaBox/CropBox directly around the existing page content (100% original image quality, zero CTM distortion)
+    function applyMarginsToPdfPageInPlace(finalPage, stateObj, applyChanges) {
         const m = (applyChanges && hasActiveMargins(stateObj.margins)) ? stateObj.margins : null;
+        if (!m) return;
 
-        let baseW = stateObj.pageWidth || 595.28;
-        let baseH = stateObj.pageHeight || 841.89;
+        const { rgb, PDFName } = window.PDFLib;
+        const cropBox = finalPage.getCropBox() || finalPage.getMediaBox();
+        const boxX = cropBox.x || 0;
+        const boxY = cropBox.y || 0;
+        const rawW = cropBox.width || stateObj.pageWidth || 595.28;
+        const rawH = cropBox.height || stateObj.pageHeight || 841.89;
 
-        if (!m) {
+        const srcRot = ((finalPage.getRotation().angle % 360) + 360) % 360;
+        const visRot = applyChanges ? (((stateObj.visualRotation || 0) % 360) + 360) % 360 : 0;
+        const totalRot = (srcRot + visRot) % 360;
+        const isTotalSideways = (totalRot === 90 || totalRot === 270);
+
+        const visBaseW = isTotalSideways ? rawH : rawW;
+        const visBaseH = isTotalSideways ? rawW : rawH;
+
+        let mTop = m.top || 0;
+        let mBottom = m.bottom || 0;
+        let mLeft = m.left || 0;
+        let mRight = m.right || 0;
+
+        // Recalculate exact preset padding from the page's actual raw dimensions so every page is centered accurately
+        const preset = m.pageSize || stateObj.resize;
+        if (preset && preset !== 'original' && preset !== 'custom') {
+            let targetW = visBaseW, targetH = visBaseH;
+            if (preset === 'Square') {
+                const maxSide = Math.max(visBaseW, visBaseH);
+                targetW = maxSide;
+                targetH = maxSide;
+            } else if (PAGE_SIZE_PRESETS[preset]) {
+                const [pW, pH] = PAGE_SIZE_PRESETS[preset];
+                const scale = Math.max(visBaseW / pW, visBaseH / pH);
+                targetW = pW * scale;
+                targetH = pH * scale;
+            }
+            const padX = Math.max(0, (targetW - visBaseW) / 2);
+            const padY = Math.max(0, (targetH - visBaseH) / 2);
+            mLeft = padX; mRight = padX;
+            mTop = padY; mBottom = padY;
+        } else {
+            // Scale custom margin values if actual page dimensions differ from stateObj.pageWidth
+            const stateVisW = isTotalSideways ? (stateObj.pageHeight || visBaseW) : (stateObj.pageWidth || visBaseW);
+            const stateVisH = isTotalSideways ? (stateObj.pageWidth || visBaseH) : (stateObj.pageHeight || visBaseH);
+            const ratioX = visBaseW / Math.max(1, stateVisW);
+            const ratioY = visBaseH / Math.max(1, stateVisH);
+            mLeft *= ratioX; mRight *= ratioX;
+            mTop *= ratioY; mBottom *= ratioY;
+        }
+
+        let uTop = mTop, uBottom = mBottom, uLeft = mLeft, uRight = mRight;
+        if (totalRot === 90) {
+            uLeft = mTop; uRight = mBottom; uBottom = mLeft; uTop = mRight;
+        } else if (totalRot === 180) {
+            uBottom = mTop; uTop = mBottom; uRight = mLeft; uLeft = mRight;
+        } else if (totalRot === 270) {
+            uRight = mTop; uLeft = mBottom; uTop = mLeft; uBottom = mRight;
+        }
+
+        const newBoxX = boxX - uLeft;
+        const newBoxY = boxY - uBottom;
+        const newBoxW = rawW + uLeft + uRight;
+        const newBoxH = rawH + uBottom + uTop;
+
+        finalPage.setMediaBox(newBoxX, newBoxY, newBoxW, newBoxH);
+        finalPage.setCropBox(newBoxX, newBoxY, newBoxW, newBoxH);
+        if (finalPage.node.get(PDFName.of('BleedBox'))) finalPage.setBleedBox(newBoxX, newBoxY, newBoxW, newBoxH);
+        if (finalPage.node.get(PDFName.of('TrimBox'))) finalPage.setTrimBox(newBoxX, newBoxY, newBoxW, newBoxH);
+        if (finalPage.node.get(PDFName.of('ArtBox'))) finalPage.setArtBox(newBoxX, newBoxY, newBoxW, newBoxH);
+
+        if (m.hasBg) {
+            const bgRgb = hexToRgbPdf(m.color || '#FFFFFF');
+            const fillCol = rgb(bgRgb.r, bgRgb.g, bgRgb.b);
+            if (uBottom > 0.05) {
+                finalPage.drawRectangle({ x: newBoxX, y: newBoxY, width: newBoxW, height: uBottom, color: fillCol });
+            }
+            if (uTop > 0.05) {
+                finalPage.drawRectangle({ x: newBoxX, y: boxY + rawH, width: newBoxW, height: uTop, color: fillCol });
+            }
+            if (uLeft > 0.05) {
+                finalPage.drawRectangle({ x: newBoxX, y: boxY, width: uLeft, height: rawH, color: fillCol });
+            }
+            if (uRight > 0.05) {
+                finalPage.drawRectangle({ x: boxX + rawW, y: boxY, width: uRight, height: rawH, color: fillCol });
+            }
+        }
+    }
+
+    // Allows in-place export even when Page Size or Margins are enabled!
+    function canExportSingleDocInPlace(targetStates) {
+        const neededSources = new Set();
+        let lastOrigIdx = -1;
+        for (let i = 0; i < targetStates.length; i++) {
+            const st = targetStates[i];
+            if (!st) continue;
+            if (st.type === 'original') {
+                neededSources.add(st.sourceIndex);
+                if (neededSources.size > 1) return false;
+                if (st.originalIndex <= lastOrigIdx) return false;
+                lastOrigIdx = st.originalIndex;
+            }
+        }
+        return neededSources.size === 1;
+    }
+
+    async function exportPagesInPlaceSingleDoc(targetStates, applyChanges, onProgress) {
+        const { PDFDocument, StandardFonts, degrees } = window.PDFLib;
+        const firstOrig = targetStates.find(st => st && st.type === 'original');
+        const sourceIdx = firstOrig.sourceIndex;
+
+        const mainPdf = await PDFDocument.load(pdfSources[sourceIdx], { updateMetadata: false });
+        mainPdf.setTitle('SArixa Organized Document');
+
+        const keptOrigNumbers = new Set(
+            targetStates.filter(st => st && st.type === 'original').map(st => st.originalIndex)
+        );
+
+        for (let pIdx = mainPdf.getPageCount() - 1; pIdx >= 0; pIdx--) {
+            if (!keptOrigNumbers.has(pIdx + 1)) {
+                mainPdf.removePage(pIdx);
+            }
+        }
+
+        let helveticaFont = null;
+        if (applyChanges && targetStates.some(st => st && st.pageNumber && st.pageNumber.num)) {
+            helveticaFont = await mainPdf.embedFont(StandardFonts.Helvetica);
+        }
+
+        for (let i = 0; i < targetStates.length; i++) {
+            const stateObj = targetStates[i];
+            if (i % 2 === 0) await yieldToMain();
+            if (onProgress) onProgress(i, targetStates.length);
+
             let finalPage;
             if (stateObj.type === 'original') {
-                const srcDoc = loadedDocs[stateObj.sourceIndex];
-                const [copiedPage] = await newPdf.copyPages(srcDoc, [stateObj.originalIndex - 1]);
-                finalPage = newPdf.addPage(copiedPage);
-            } else if (stateObj.type === 'image') {
+                finalPage = mainPdf.getPage(i);
+                if (applyChanges && hasActiveMargins(stateObj.margins)) {
+                    applyMarginsToPdfPageInPlace(finalPage, stateObj, true);
+                }
+            } else {
+                finalPage = await buildNonOriginalPdfPageWithMargins(mainPdf, stateObj, applyChanges, i);
+            }
+
+            if (applyChanges) {
+                let exportRot = (stateObj.visualRotation || 0) % 360;
+                if (exportRot < 0) exportRot += 360;
+                if (exportRot !== 0) {
+                    const currentRot = finalPage.getRotation().angle;
+                    finalPage.setRotation(degrees(currentRot + exportRot));
+                }
+
+                const totalRot = ((finalPage.getRotation().angle % 360) + 360) % 360;
+                const { width, height } = finalPage.getSize();
+                const overlayInfo = await generateCroppedOverlayForPdf(stateObj, width, height);
+                if (overlayInfo) {
+                    const pdfOverlayImg = await mainPdf.embedPng(overlayInfo.pngBytes);
+                    overlayInfo.pngBytes = null;
+                    drawCroppedOverlayOnPdfPage(finalPage, pdfOverlayImg, overlayInfo, totalRot);
+                }
+
+                if (stateObj.pageNumber && stateObj.pageNumber.num) {
+                    drawNativePageNumberOnPdfPage(finalPage, stateObj, helveticaFont, totalRot);
+                }
+            }
+        }
+
+        await yieldToMain();
+        return await mainPdf.save({ useObjectStreams: false });
+    }
+
+    async function buildNonOriginalPdfPageWithMargins(pdfDoc, stateObj, applyChanges, insertAtIdx = null) {
+        const { rgb } = window.PDFLib;
+        const m = (applyChanges && hasActiveMargins(stateObj.margins)) ? stateObj.margins : null;
+        const baseW = stateObj.pageWidth || 595.28;
+        const baseH = stateObj.pageHeight || 841.89;
+
+        const createPage = (dims) => (insertAtIdx !== null ? pdfDoc.insertPage(insertAtIdx, dims) : pdfDoc.addPage(dims));
+
+        if (!m) {
+            const finalPage = createPage([baseW, baseH]);
+            if (stateObj.type === 'image') {
                 const imgBytes = await fetch(stateObj.dataUrl || stateObj.cacheUrl).then(r => r.arrayBuffer());
-                const pdfImg = (stateObj.mime === 'image/jpeg') ? await newPdf.embedJpg(imgBytes) : await newPdf.embedPng(imgBytes);
-                finalPage = newPdf.addPage([baseW, baseH]);
+                const pdfImg = (stateObj.mime === 'image/jpeg') ? await pdfDoc.embedJpg(imgBytes) : await pdfDoc.embedPng(imgBytes);
                 const { width, height } = finalPage.getSize();
                 const imgDims = pdfImg.scaleToFit(width, height);
                 finalPage.drawImage(pdfImg, {
-                    x: width / 2 - imgDims.width / 2, y: height / 2 - imgDims.height / 2,
-                    width: imgDims.width, height: imgDims.height
+                    x: width / 2 - imgDims.width / 2,
+                    y: height / 2 - imgDims.height / 2,
+                    width: imgDims.width,
+                    height: imgDims.height
                 });
             } else {
-                finalPage = newPdf.addPage([baseW, baseH]);
+                finalPage.drawRectangle({ x: 0, y: 0, width: baseW, height: baseH, color: rgb(1, 1, 1) });
             }
             return finalPage;
         }
@@ -4290,8 +5325,7 @@ const initOrganisePdfTool = () => {
         const drawW = baseW * scaleX;
         const drawH = baseH * scaleY;
 
-        const finalPage = newPdf.addPage([finalPageW, finalPageH]);
-
+        const finalPage = createPage([finalPageW, finalPageH]);
         if (m.hasBg) {
             const bgRgb = hexToRgbPdf(m.color || '#FFFFFF');
             finalPage.drawRectangle({
@@ -4300,37 +5334,73 @@ const initOrganisePdfTool = () => {
             });
         }
 
-        if (stateObj.type === 'original') {
-            const { degrees } = window.PDFLib;
-            const srcDoc = loadedDocs[stateObj.sourceIndex];
-            const srcPage = srcDoc.getPage(stateObj.originalIndex - 1);
-            const srcRot = ((srcPage.getRotation().angle % 360) + 360) % 360;
-            const [embeddedPage] = await newPdf.embedPdf(srcDoc, [stateObj.originalIndex - 1]);
-
-            if (srcRot === 90) {
-                finalPage.drawPage(embeddedPage, { x: drawX, y: drawY + drawH, width: drawH, height: drawW, rotate: degrees(-90) });
-            } else if (srcRot === 180) {
-                finalPage.drawPage(embeddedPage, { x: drawX + drawW, y: drawY + drawH, width: drawW, height: drawH, rotate: degrees(-180) });
-            } else if (srcRot === 270) {
-                finalPage.drawPage(embeddedPage, { x: drawX + drawW, y: drawY, width: drawH, height: drawW, rotate: degrees(-270) });
-            } else {
-                finalPage.drawPage(embeddedPage, { x: drawX, y: drawY, width: drawW, height: drawH });
-            }
-        } else if (stateObj.type === 'image') {
+        if (stateObj.type === 'image') {
             const imgBytes = await fetch(stateObj.dataUrl || stateObj.cacheUrl).then(r => r.arrayBuffer());
-            const pdfImg = (stateObj.mime === 'image/jpeg') ? await newPdf.embedJpg(imgBytes) : await newPdf.embedPng(imgBytes);
-            finalPage.drawImage(pdfImg, {
-                x: drawX, y: drawY, width: drawW, height: drawH
-            });
+            const pdfImg = (stateObj.mime === 'image/jpeg') ? await pdfDoc.embedJpg(imgBytes) : await pdfDoc.embedPng(imgBytes);
+            finalPage.drawImage(pdfImg, { x: drawX, y: drawY, width: drawW, height: drawH });
         } else {
-            finalPage.drawRectangle({
-                x: drawX, y: drawY, width: drawW, height: drawH,
-                color: rgb(1, 1, 1)
-            });
+            finalPage.drawRectangle({ x: drawX, y: drawY, width: drawW, height: drawH, color: rgb(1, 1, 1) });
         }
-
         return finalPage;
     }
+
+    async function loadRequiredPdfLibDocs(statesArray) {
+        const { PDFDocument } = window.PDFLib;
+        const neededIndices = new Set();
+        statesArray.forEach(st => {
+            if (st && st.type === 'original' && typeof st.sourceIndex === 'number' && pdfSources[st.sourceIndex]) {
+                neededIndices.add(st.sourceIndex);
+            }
+        });
+        const loadedDocs = {};
+        for (const sIdx of neededIndices) {
+            loadedDocs[sIdx] = await PDFDocument.load(pdfSources[sIdx], { updateMetadata: false });
+            await yieldToMain();
+        }
+        return loadedDocs;
+    }
+
+    // Batch-copies ALL original pages (even those with Margins / Page Size!) in ONE single copyPages() call per source PDF
+    async function preCopyOriginalPagesInBatch(newPdf, targetStates, loadedDocs) {
+        const bySource = new Map();
+        targetStates.forEach((st, idx) => {
+            if (st && st.type === 'original' && loadedDocs[st.sourceIndex]) {
+                if (!bySource.has(st.sourceIndex)) bySource.set(st.sourceIndex, []);
+                bySource.get(st.sourceIndex).push({ targetIdx: idx, pageZeroIdx: st.originalIndex - 1 });
+            }
+        });
+
+        const preCopiedMap = new Map();
+        for (const [sIdx, items] of bySource.entries()) {
+            const srcDoc = loadedDocs[sIdx];
+            const pageIndices = items.map(it => it.pageZeroIdx);
+            const copiedPages = await newPdf.copyPages(srcDoc, pageIndices);
+            items.forEach((it, i) => {
+                preCopiedMap.set(it.targetIdx, copiedPages[i]);
+            });
+            await yieldToMain();
+        }
+        return preCopiedMap;
+    }
+
+    async function buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, applyChanges, preCopiedPage = null) {
+        if (stateObj.type === 'original') {
+            let finalPage;
+            if (preCopiedPage) {
+                finalPage = newPdf.addPage(preCopiedPage);
+            } else {
+                const srcDoc = loadedDocs[stateObj.sourceIndex];
+                const [copiedPage] = await newPdf.copyPages(srcDoc, [stateObj.originalIndex - 1]);
+                finalPage = newPdf.addPage(copiedPage);
+            }
+            if (applyChanges && hasActiveMargins(stateObj.margins)) {
+                applyMarginsToPdfPageInPlace(finalPage, stateObj, true);
+            }
+            return finalPage;
+        }
+        return await buildNonOriginalPdfPageWithMargins(newPdf, stateObj, applyChanges, null);
+    }
+
 
     function ensureExtractPopupCreated() {
         let popup = document.getElementById('extract-popup');
@@ -4466,7 +5536,7 @@ const initOrganisePdfTool = () => {
         return popup;
     }
 
-    async function renderSinglePageToImageDataUrl(stateObj, format, withChanges) {
+    async function renderSinglePageToImageBlob(stateObj, format, withChanges) {
         const rot = withChanges ? (stateObj.visualRotation || 0) : 0;
         const isSideways = Math.abs(rot % 180) === 90;
         let rawWidth = 0, rawHeight = 0, pageObj = null, imgObj = null;
@@ -4495,7 +5565,8 @@ const initOrganisePdfTool = () => {
         const totalUnscaledW = rawWidth + (m.left || 0) + (m.right || 0);
         const totalUnscaledH = rawHeight + (m.top || 0) + (m.bottom || 0);
 
-        const exportScale = Math.min(2.0, 2400 / Math.max(totalUnscaledW, totalUnscaledH, 1));
+        const maxDim = DEVICE_PROFILE.maxOverlayDim;
+        const exportScale = Math.min(DEVICE_PROFILE.exportScale, maxDim / Math.max(totalUnscaledW, totalUnscaledH, 1));
         const imgW = Math.round(rawWidth * exportScale);
         const imgH = Math.round(rawHeight * exportScale);
         const mTopPx = Math.round((m.top || 0) * exportScale);
@@ -4534,6 +5605,7 @@ const initOrganisePdfTool = () => {
             const totalRot = (pageObj.rotate || 0) + rot;
             const vp = pageObj.getViewport({ scale: exportScale, rotation: totalRot });
             await pageObj.render({ canvasContext: bCtx, viewport: vp }).promise;
+            if (pageObj.cleanup) { try { pageObj.cleanup(); } catch (e) {} }
         } else if (imgObj) {
             const drawW = isSideways ? rawHeight : rawWidth;
             const drawH = isSideways ? rawWidth : rawHeight;
@@ -4546,7 +5618,7 @@ const initOrganisePdfTool = () => {
         }
 
         outCtx.drawImage(baseCanvas, mLeftPx, mTopPx, imgW, imgH);
-        baseCanvas.width = 1; baseCanvas.height = 1;
+        releaseCanvasMemory(baseCanvas);
 
         if (withChanges) {
             if (stateObj.drawings && stateObj.drawings.length > 0) {
@@ -4555,7 +5627,7 @@ const initOrganisePdfTool = () => {
                 const tempDrawCtx = tempDrawCanvas.getContext('2d', { willReadFrequently: true });
                 replayDrawingsOnCanvas(tempDrawCanvas, tempDrawCtx, stateObj.drawings, exportScale, mLeftPx, mTopPx, imgW, imgH);
                 outCtx.drawImage(tempDrawCanvas, 0, 0);
-                tempDrawCanvas.width = 1; tempDrawCanvas.height = 1;
+                releaseCanvasMemory(tempDrawCanvas);
             }
             if (stateObj.texts && stateObj.texts.length > 0) {
                 drawSavedTextsOnContext(outCtx, stateObj.texts, mLeftPx, mTopPx, imgW, imgH, exportScale);
@@ -4564,14 +5636,13 @@ const initOrganisePdfTool = () => {
         }
 
         const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = format === 'png' ? outCanvas.toDataURL(mimeType) : outCanvas.toDataURL(mimeType, 0.92);
-        outCanvas.width = 1; outCanvas.height = 1;
-        return dataUrl;
+        const blob = await canvasToBlob(outCanvas, mimeType, format === 'png' ? undefined : 0.92);
+        releaseCanvasMemory(outCanvas);
+        return blob;
     }
 
     async function downloadSelectedPagesAsImages(format, withChanges) {
         const targetStates = getTargetPagesForBatchAction();
-
         if (targetStates.length === 0) return;
 
         try {
@@ -4579,31 +5650,28 @@ const initOrganisePdfTool = () => {
 
             if (targetStates.length === 1) {
                 updateProgress(30, `Extracting ${format.toUpperCase()}...`);
-                const dataUrl = await renderSinglePageToImageDataUrl(targetStates[0], format, withChanges);
+                const imgBlob = await renderSinglePageToImageBlob(targetStates[0], format, withChanges);
                 updateProgress(95, "Downloading...");
+                const url = URL.createObjectURL(imgBlob);
                 const a = document.createElement('a');
-                a.href = dataUrl;
+                a.href = url;
                 a.download = `extracted_page_${withChanges ? 'modified' : 'original'}_${Date.now()}.${format}`;
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 1500);
                 updateProgress(100, "Done!");
                 return;
             }
 
             if (typeof JSZip === 'undefined') {
-                await new Promise((res, rej) => {
-                    const sc = document.createElement('script');
-                    sc.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
-                    sc.onload = res; sc.onerror = rej;
-                    document.head.appendChild(sc);
-                });
+                await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
             }
 
             const zip = new JSZip();
             for (let i = 0; i < targetStates.length; i++) {
                 updateProgress(10 + ((i / targetStates.length) * 75), `Rendering Page ${i + 1} of ${targetStates.length}...`);
-                const dataUrl = await renderSinglePageToImageDataUrl(targetStates[i], format, withChanges);
-                const base64Data = dataUrl.split(',')[1];
-                zip.file(`page_${i + 1}.${format}`, base64Data, { base64: true });
+                await yieldToMain();
+                const imgBlob = await renderSinglePageToImageBlob(targetStates[i], format, withChanges);
+                zip.file(`page_${i + 1}.${format}`, imgBlob);
             }
 
             updateProgress(90, "Creating ZIP Archive...");
@@ -4625,49 +5693,69 @@ const initOrganisePdfTool = () => {
 
     async function downloadSelectedPagesAsPdf(withChanges, customName = "") {
         const targetStates = getTargetPagesForBatchAction();
-
         if (targetStates.length === 0) return;
 
         try {
             progressContainer.style.display = "block";
-            updateProgress(15, "Preparing PDF...");
+            updateProgress(12, "Freeing memory & preparing PDF...");
+            await ResourceManager.suspendPdfJsDocsForExport();
+            await yieldToMain();
 
-            const { PDFDocument, degrees } = window.PDFLib;
-            const newPdf = await PDFDocument.create();
+            let pdfBytes;
+            if (canExportSingleDocInPlace(targetStates, withChanges)) {
+                pdfBytes = await exportPagesInPlaceSingleDoc(targetStates, withChanges, (i, total) => {
+                    updateProgress(18 + ((i / total) * 72), `Packing Page ${i + 1} of ${total}...`);
+                });
+            } else {
+                const { PDFDocument, StandardFonts, degrees } = window.PDFLib;
+                const newPdf = await PDFDocument.create();
+                let loadedDocs = await loadRequiredPdfLibDocs(targetStates);
+                let preCopiedMap = await preCopyOriginalPagesInBatch(newPdf, targetStates, loadedDocs, withChanges);
 
-            const loadedDocs = [];
-            for (let s = 0; s < pdfSources.length; s++) {
-                loadedDocs.push(await PDFDocument.load(pdfSources[s].slice(0)));
-            }
+                let helveticaFont = null;
+                if (withChanges && targetStates.some(st => st && st.pageNumber && st.pageNumber.num)) {
+                    helveticaFont = await newPdf.embedFont(StandardFonts.Helvetica);
+                }
 
-            for (let i = 0; i < targetStates.length; i++) {
-                const stateObj = targetStates[i];
-                updateProgress(15 + ((i / targetStates.length) * 70), `Packing Page ${i + 1} of ${targetStates.length}...`);
+                for (let i = 0; i < targetStates.length; i++) {
+                    const stateObj = targetStates[i];
+                    updateProgress(18 + ((i / targetStates.length) * 68), `Packing Page ${i + 1} of ${targetStates.length}...`);
+                    if (i % 3 === 0) await yieldToMain();
 
-                const finalPage = await buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, withChanges);
+                    const preCopiedPage = preCopiedMap.get(i) || null;
+                    const finalPage = await buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, withChanges, preCopiedPage);
+                    preCopiedMap.delete(i);
 
-                if (withChanges) {
-                    let exportRot = (stateObj.visualRotation || 0) % 360;
-                    if(exportRot < 0) exportRot += 360;
-                    if (exportRot !== 0) {
-                        const currentRot = finalPage.getRotation().angle;
-                        finalPage.setRotation(degrees(currentRot + exportRot));
-                    }
-                    
-                    const { width, height } = finalPage.getSize();
-                    const overlayBytes = await generateOverlayPngBytesForPdf(stateObj, width, height);
-                    if (overlayBytes) {
-                        const pdfOverlayImg = await newPdf.embedPng(overlayBytes);
-                        if (exportRot === 0) finalPage.drawImage(pdfOverlayImg, { x: 0, y: 0, width: width, height: height });
-                        else if (exportRot === 90) finalPage.drawImage(pdfOverlayImg, { x: 0, y: height, width: height, height: width, rotate: degrees(-90) });
-                        else if (exportRot === 180) finalPage.drawImage(pdfOverlayImg, { x: width, y: height, width: width, height: height, rotate: degrees(-180) });
-                        else if (exportRot === 270) finalPage.drawImage(pdfOverlayImg, { x: width, y: 0, width: height, height: width, rotate: degrees(-270) });
+                    if (withChanges) {
+                        let exportRot = (stateObj.visualRotation || 0) % 360;
+                        if (exportRot < 0) exportRot += 360;
+                        if (exportRot !== 0) {
+                            const currentRot = finalPage.getRotation().angle;
+                            finalPage.setRotation(degrees(currentRot + exportRot));
+                        }
+
+                        const { width, height } = finalPage.getSize();
+                        const overlayInfo = await generateCroppedOverlayForPdf(stateObj, width, height);
+                        if (overlayInfo) {
+                            const pdfOverlayImg = await newPdf.embedPng(overlayInfo.pngBytes);
+                            overlayInfo.pngBytes = null;
+                            drawCroppedOverlayOnPdfPage(finalPage, pdfOverlayImg, overlayInfo, exportRot);
+                        }
+
+                        if (stateObj.pageNumber && stateObj.pageNumber.num) {
+                            drawNativePageNumberOnPdfPage(finalPage, stateObj, helveticaFont, exportRot);
+                        }
                     }
                 }
+
+                preCopiedMap.clear();
+                preCopiedMap = null;
+                loadedDocs = null;
+                updateProgress(92, "Finalizing PDF...");
+                await yieldToMain();
+                pdfBytes = await newPdf.save({ useObjectStreams: false });
             }
 
-            updateProgress(92, "Downloading...");
-            const pdfBytes = await newPdf.save();
             const blob = new Blob([pdfBytes], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -4702,25 +5790,41 @@ const initOrganisePdfTool = () => {
 
     function closeDetailView() {
         closeCustomDropupMenu();
+        if (textDragRafId) {
+            cancelAnimationFrame(textDragRafId);
+            textDragRafId = null;
+        }
+        if (currentPdfRenderTask) {
+            try { currentPdfRenderTask.cancel(); } catch (e) {}
+            currentPdfRenderTask = null;
+        }
         isDetailViewOpen = false; isTextEditingOpen = false; isDrawMode = false; isMarginsMode = false;
-        workingMargins = null; marginRawBaseCanvas = null; activeDragTextWrapper = null; textInteractionMode = null;
-        
+        workingMargins = null; activeDragTextWrapper = null; textInteractionMode = null;
+
+        if (marginRawBaseCanvas) {
+            releaseCanvasMemory(marginRawBaseCanvas);
+            marginRawBaseCanvas = null;
+        }
+        if (drawCanvas) {
+            releaseCanvasMemory(drawCanvas);
+            drawCanvas.remove(); drawCanvas = null; drawCtx = null;
+        }
+        if (strokeBufferCanvas) {
+            releaseCanvasMemory(strokeBufferCanvas);
+            strokeBufferCanvas = null; strokeBufferCtx = null;
+        }
+        if (editorCanvas) {
+            releaseCanvasMemory(editorCanvas);
+        }
+
         editorModal.classList.add('hidden');
         editorModal.classList.remove('subtool-open');
         floatingToolbar.style.zIndex = '9999';
 
-        if(fabDuplicate) fabDuplicate.style.display = '';
-        if(fabReplace) fabReplace.style.display = '';
+        if (fabDuplicate) fabDuplicate.style.display = '';
+        if (fabReplace) fabReplace.style.display = '';
         updateSelectionUI();
-        
-        if (drawCanvas) {
-            drawCanvas.width = 1; drawCanvas.height = 1;
-            drawCanvas.remove(); drawCanvas = null; drawCtx = null;
-        }
-        if (strokeBufferCanvas) {
-            strokeBufferCanvas.width = 1; strokeBufferCanvas.height = 1;
-            strokeBufferCanvas = null; strokeBufferCtx = null;
-        }
+
         if (drawJoystick) drawJoystick.classList.add('hidden');
         if (marginGuidesContainer) marginGuidesContainer.classList.add('hidden');
         editorOverlay.style.pointerEvents = 'none';
@@ -4748,7 +5852,7 @@ const initOrganisePdfTool = () => {
             const scaledSize = txt.fontSizeRatio ? (txt.fontSizeRatio * refW) : (txt.fontSizeBase * scaleFactor);
             const boxW = txt.boxWidthRatio ? (txt.boxWidthRatio * refW) : ((txt.boxWidth || 0) * scaleFactor);
             const boxH = txt.boxHeightRatio ? (txt.boxHeightRatio * refH) : ((txt.boxHeight || 0) * scaleFactor);
-            
+
             ctx.save();
             const centerX = pxX + boxW / 2;
             const centerY = pxY + boxH / 2;
@@ -4758,10 +5862,10 @@ const initOrganisePdfTool = () => {
                 ctx.translate(-centerX, -centerY);
             }
             ctx.translate(pxX, pxY);
-            
+
             const relScale = scaledSize / (txt.fontSizeBase || 24);
 
-            if(txt.hasBg) {
+            if (txt.hasBg) {
                 ctx.beginPath();
                 const r = (txt.bgRadius || 0) * relScale;
                 if (ctx.roundRect) ctx.roundRect(0, 0, boxW, boxH, r);
@@ -4778,7 +5882,7 @@ const initOrganisePdfTool = () => {
 
             if ('letterSpacing' in ctx) ctx.letterSpacing = ((txt.letterSpacing || 0) * relScale) + 'px';
             if ('wordSpacing' in ctx) ctx.wordSpacing = ((txt.wordSpacing || 0) * relScale) + 'px';
-            
+
             const padX = txt.hasBg ? (0.6 * scaledSize) : 0;
             const padY = txt.hasBg ? (0.4 * scaledSize) : 0;
             const listIndent = (txt.listType && txt.listType !== 'none') ? (1.2 * scaledSize) : 0;
@@ -4817,7 +5921,7 @@ const initOrganisePdfTool = () => {
                 if (txt.hasBorder) {
                     ctx.lineJoin = 'round';
                     ctx.miterLimit = 2;
-                    ctx.lineWidth = strokePx; 
+                    ctx.lineWidth = strokePx;
                     ctx.strokeStyle = txt.borderColor || '#00e676';
                     ctx.strokeText(line, anchorX, yMiddle);
                 }
@@ -4851,9 +5955,13 @@ const initOrganisePdfTool = () => {
         });
     }
 
+    let bigCanvasRenderToken = 0;
+
     async function renderBigCanvas(pageId, drawTexts, skipDrawingLayer = false) {
         const stateObj = pagesState.find(p => p.id === pageId);
         if (!stateObj) return;
+
+        const renderToken = ++bigCanvasRenderToken;
 
         if (currentPdfRenderTask) {
             try { currentPdfRenderTask.cancel(); } catch (e) {}
@@ -4865,7 +5973,12 @@ const initOrganisePdfTool = () => {
 
         if (stateObj.type === 'original') {
             const pdf = await getCachedPdfDoc(stateObj.sourceIndex);
+            if (renderToken !== bigCanvasRenderToken) return;
             pageObj = await pdf.getPage(stateObj.originalIndex);
+            if (renderToken !== bigCanvasRenderToken) {
+                if (pageObj.cleanup) { try { pageObj.cleanup(); } catch (e) {} }
+                return;
+            }
             const baseRot = (pageObj.rotate || 0) + (drawTexts ? (stateObj.visualRotation || 0) : 0);
             const tempViewport = pageObj.getViewport({ scale: 1, rotation: baseRot });
             rawWidth = tempViewport.width; rawHeight = tempViewport.height;
@@ -4873,6 +5986,7 @@ const initOrganisePdfTool = () => {
             imgObj = new Image();
             imgObj.src = stateObj.dataUrl || stateObj.cacheUrl;
             await new Promise(res => { imgObj.onload = res; imgObj.onerror = res; });
+            if (renderToken !== bigCanvasRenderToken) return;
             const isSideways = (drawTexts && Math.abs(stateObj.visualRotation % 180) === 90);
             rawWidth = isSideways ? imgObj.height : imgObj.width;
             rawHeight = isSideways ? imgObj.width : imgObj.height;
@@ -4891,8 +6005,10 @@ const initOrganisePdfTool = () => {
         const gapY = isMobile ? 145 : 180;
         const availableWidth = window.innerWidth - gapX;
         const availableHeight = window.innerHeight - gapY;
-        
-        editorScale = Math.min(availableWidth / totalUnscaledW, availableHeight / totalUnscaledH, 2.5) * (isMobile ? 0.96 : 0.90);
+        const maxSide = Math.max(totalUnscaledW, totalUnscaledH, 1);
+        const maxCap = Math.min(2.5, DEVICE_PROFILE.maxEditorDim / maxSide);
+
+        editorScale = Math.min(availableWidth / totalUnscaledW, availableHeight / totalUnscaledH, maxCap) * (isMobile ? 0.96 : 0.90);
         if (editorScale < 0.1) editorScale = 0.1;
 
         const imgW = Math.round(rawWidth * editorScale);
@@ -4907,68 +6023,98 @@ const initOrganisePdfTool = () => {
         currentImgDrawW = imgW;
         currentImgDrawH = imgH;
 
-        editorCanvas.width = imgW + mLeftPx + mRightPx;
-        editorCanvas.height = imgH + mTopPx + mBottomPx;
-        editorCanvas.style.width = editorCanvas.width + 'px';
-        editorCanvas.style.height = editorCanvas.height + 'px';
-        const ctx = editorCanvas.getContext('2d');
+        const cssW = imgW + mLeftPx + mRightPx;
+        const cssH = imgH + mTopPx + mBottomPx;
+
+        // Use High-DPI supersampling in Expand & Text modes so text/images look razor sharp on AMOLED screens
+        const dpr = (isDrawMode || isMarginsMode)
+            ? 1
+            : Math.min(DEVICE_PROFILE.editorDpr, DEVICE_PROFILE.maxEditorDim / Math.max(cssW, cssH, 1));
+
+        const physImgW = Math.max(1, Math.round(imgW * dpr));
+        const physImgH = Math.max(1, Math.round(imgH * dpr));
 
         const basePageCanvas = document.createElement('canvas');
-        basePageCanvas.width = imgW; basePageCanvas.height = imgH;
+        basePageCanvas.width = physImgW;
+        basePageCanvas.height = physImgH;
         const bCtx = basePageCanvas.getContext('2d');
+        bCtx.imageSmoothingEnabled = true;
+        bCtx.imageSmoothingQuality = 'high';
+
         if (stateObj.type === 'original' || stateObj.type === 'blank') {
             bCtx.fillStyle = '#ffffff';
-            bCtx.fillRect(0, 0, imgW, imgH);
+            bCtx.fillRect(0, 0, physImgW, physImgH);
         } else {
-            bCtx.clearRect(0, 0, imgW, imgH);
+            bCtx.clearRect(0, 0, physImgW, physImgH);
         }
 
         if (stateObj.type === 'original') {
             const totalRot = (pageObj.rotate || 0) + (drawTexts ? (stateObj.visualRotation || 0) : 0);
-            const viewport = pageObj.getViewport({ scale: editorScale, rotation: totalRot });
+            const viewport = pageObj.getViewport({ scale: editorScale * dpr, rotation: totalRot });
             currentPdfRenderTask = pageObj.render({ canvasContext: bCtx, viewport: viewport });
-            try { await currentPdfRenderTask.promise; } catch (err) {
+            try {
+                await currentPdfRenderTask.promise;
+            } catch (err) {
+                releaseCanvasMemory(basePageCanvas);
+                if (pageObj.cleanup) { try { pageObj.cleanup(); } catch (e) {} }
                 if (err && err.name === 'RenderingCancelledException') return;
             }
+            if (pageObj.cleanup) { try { pageObj.cleanup(); } catch (e) {} }
             currentPdfRenderTask = null;
+            if (renderToken !== bigCanvasRenderToken) {
+                releaseCanvasMemory(basePageCanvas);
+                return;
+            }
         } else {
             bCtx.save();
-            bCtx.translate(imgW / 2, imgH / 2);
+            bCtx.translate(physImgW / 2, physImgH / 2);
             if (drawTexts) bCtx.rotate((stateObj.visualRotation * Math.PI) / 180);
             const isSideways = (drawTexts && Math.abs(stateObj.visualRotation % 180) === 90);
             const drawW = isSideways ? rawHeight : rawWidth;
             const drawH = isSideways ? rawWidth : rawHeight;
-            bCtx.scale(editorScale, editorScale);
+            bCtx.scale(editorScale * dpr, editorScale * dpr);
             bCtx.drawImage(imgObj, -drawW / 2, -drawH / 2, drawW, drawH);
             bCtx.restore();
         }
 
         if (isMarginsMode) {
+            if (marginRawBaseCanvas && marginRawBaseCanvas !== basePageCanvas) {
+                releaseCanvasMemory(marginRawBaseCanvas);
+            }
             marginRawBaseCanvas = basePageCanvas;
         }
 
-        ctx.clearRect(0, 0, editorCanvas.width, editorCanvas.height);
+        editorCanvas.width = Math.max(1, Math.round(cssW * dpr));
+        editorCanvas.height = Math.max(1, Math.round(cssH * dpr));
+        editorCanvas.style.width = cssW + 'px';
+        editorCanvas.style.height = cssH + 'px';
+        const ctx = editorCanvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        ctx.clearRect(0, 0, cssW, cssH);
 
         if (hasActiveMargins(activeMargins) && activeMargins.hasBg) {
             ctx.fillStyle = activeMargins.color || '#ffffff';
-            ctx.fillRect(0, 0, editorCanvas.width, editorCanvas.height);
+            ctx.fillRect(0, 0, cssW, cssH);
         }
 
-        ctx.drawImage(basePageCanvas, mLeftPx, mTopPx, imgW, imgH);
+        ctx.drawImage(basePageCanvas, 0, 0, physImgW, physImgH, mLeftPx, mTopPx, imgW, imgH);
 
         if (!isMarginsMode) {
-            basePageCanvas.width = 1; basePageCanvas.height = 1;
+            releaseCanvasMemory(basePageCanvas);
         }
 
         if (drawTexts && !skipDrawingLayer && stateObj.drawings && stateObj.drawings.length > 0) {
             const tempDrawCanvas = document.createElement('canvas');
-            tempDrawCanvas.width = editorCanvas.width; tempDrawCanvas.height = editorCanvas.height;
+            tempDrawCanvas.width = cssW; tempDrawCanvas.height = cssH;
             const tempDrawCtx = tempDrawCanvas.getContext('2d', { willReadFrequently: true });
             replayDrawingsOnCanvas(tempDrawCanvas, tempDrawCtx, stateObj.drawings, editorScale, mLeftPx, mTopPx, imgW, imgH);
             ctx.save();
-            ctx.drawImage(tempDrawCanvas, 0, 0);
+            ctx.drawImage(tempDrawCanvas, 0, 0, cssW, cssH);
             ctx.restore();
-            tempDrawCanvas.width = 1; tempDrawCanvas.height = 1;
+            releaseCanvasMemory(tempDrawCanvas);
         }
 
         if (drawTexts && !isTextEditingOpen && stateObj.texts && stateObj.texts.length > 0) {
@@ -4976,12 +6122,12 @@ const initOrganisePdfTool = () => {
         }
 
         if (drawTexts) {
-            await drawWatermarkAndPageNumOnContext(ctx, stateObj, editorCanvas.width, editorCanvas.height, editorScale);
+            await drawWatermarkAndPageNumOnContext(ctx, stateObj, cssW, cssH, editorScale);
         }
     }
 
     // ==========================================
-    // 16. ADD TEXT TOOL & FORMAT TOOLBAR
+    // 16. ADD TEXT TOOL & FORMAT TOOLBAR (120Hz TOUCH OPTIMIZED)
     // ==========================================
     if (fabAddText) {
         fabAddText.addEventListener('click', async (e) => {
@@ -4990,22 +6136,22 @@ const initOrganisePdfTool = () => {
             openedSubToolFromExpand = isDetailViewOpen && !isTextEditingOpen && !isDrawMode && !isMarginsMode;
             editorModal.classList.add('subtool-open');
             isDetailViewOpen = true; isTextEditingOpen = true; isDrawMode = false; isMarginsMode = false;
-            
+
             editorModal.classList.remove('hidden');
             hideAllEditorHeadersAndToolbars();
 
             document.getElementById('text-header-group').style.display = 'flex';
             document.getElementById('text-format-toolbar').style.display = 'flex';
-            
+
             floatingToolbar.classList.add('hidden');
-            if (fabAddMoreTextWrapper) fabAddMoreTextWrapper.style.display = 'flex'; 
-            
+            if (fabAddMoreTextWrapper) fabAddMoreTextWrapper.style.display = 'flex';
+
             editorOverlay.querySelectorAll('.text-wrapper').forEach(w => w.remove());
             editorOverlay.style.pointerEvents = 'none';
             editorOverlay.style.overflow = 'hidden';
-            
+
             await renderBigCanvas(selectedPageId, true, false);
-            
+
             const stateObj = pagesState.find(p => p.id === selectedPageId);
             const refW = currentImgDrawW || editorCanvas.width;
             const refH = currentImgDrawH || editorCanvas.height;
@@ -5054,7 +6200,7 @@ const initOrganisePdfTool = () => {
             const r = wrapper.dataset.bgRadius || '0';
             target.style.backgroundColor = hexToRgba(hex, op / 100);
             target.style.borderRadius = r + 'px';
-            target.style.padding = '0.4em 0.6em'; 
+            target.style.padding = '0.4em 0.6em';
             wrapper.setAttribute('data-has-bg', 'true');
         } else {
             target.style.backgroundColor = 'transparent';
@@ -5068,7 +6214,7 @@ const initOrganisePdfTool = () => {
         if (!target) return;
         const wrapper = target.parentElement;
         if (!wrapper) return;
-        
+
         const hasBorder = wrapper.dataset.hasBorder === 'true';
         if (hasBorder) {
             const hex = wrapper.dataset.borderColor || '#00e676';
@@ -5082,8 +6228,8 @@ const initOrganisePdfTool = () => {
             target.style.removeProperty('paint-order');
             wrapper.setAttribute('data-has-border', 'false');
         }
-        target.style.textShadow = 'none'; 
-        target.style.border = 'none'; 
+        target.style.textShadow = 'none';
+        target.style.border = 'none';
     }
 
     function updateBorderToolbarUI(wrapper) {
@@ -5108,7 +6254,7 @@ const initOrganisePdfTool = () => {
         bgColorTriggerBtn.classList.toggle('hidden', !show);
         const targetContent = getActiveTextElement();
         if (!targetContent) return;
-        
+
         targetContent.parentElement.dataset.hasBg = show ? 'true' : 'false';
         if (show && (!targetContent.parentElement.dataset.bgColor || targetContent.parentElement.dataset.bgColor === '#000000')) {
             const tColor = targetContent.style.color ? rgbToHex(targetContent.style.color) : '#000000';
@@ -5126,13 +6272,13 @@ const initOrganisePdfTool = () => {
             const show = e.target.checked;
             const wrapper = targetContent.parentElement;
             wrapper.dataset.hasBorder = show ? 'true' : 'false';
-            
+
             if (show) {
                 if (!wrapper.dataset.borderColor || wrapper.dataset.borderColor === '') {
                     const currentTextCol = targetContent.style.color ? rgbToHex(targetContent.style.color) : '#000000';
                     wrapper.dataset.borderColor = getContrastColor(currentTextCol);
                 }
-                if (!wrapper.dataset.borderWeight) wrapper.dataset.borderWeight = '10'; 
+                if (!wrapper.dataset.borderWeight) wrapper.dataset.borderWeight = '10';
             }
             updateBorderToolbarUI(wrapper);
             updateBorderStyles(targetContent);
@@ -5145,7 +6291,7 @@ const initOrganisePdfTool = () => {
 
     btnEditorSave.addEventListener('click', () => {
         if (!selectedPageId) return;
-        saveState(); 
+        saveState();
         const stateObj = pagesState.find(p => p.id === selectedPageId);
         stateObj.texts = [];
 
@@ -5153,7 +6299,7 @@ const initOrganisePdfTool = () => {
         const refH = currentImgDrawH || editorCanvas.height || 1;
         const offX = currentImgOffsetX || 0;
         const offY = currentImgOffsetY || 0;
-        
+
         editorOverlay.querySelectorAll('.text-wrapper').forEach(wrapper => {
             const content = wrapper.querySelector('.text-content');
             let finalOutputText = '';
@@ -5165,7 +6311,7 @@ const initOrganisePdfTool = () => {
             }
             if (!finalOutputText.trim()) finalOutputText = 'SArixa';
 
-            const computedFontSizePx = parseFloat(window.getComputedStyle(content).fontSize) || (24 * editorScale);
+            const computedFontSizePx = parseFloat(content.style.fontSize) || parseFloat(window.getComputedStyle(content).fontSize) || (24 * editorScale);
             const leftPx = parseFloat(wrapper.style.left) || 0;
             const topPx = parseFloat(wrapper.style.top) || 0;
 
@@ -5182,9 +6328,9 @@ const initOrganisePdfTool = () => {
                 fontSizeBase: computedFontSizePx / editorScale,
                 fontSizeRatio: computedFontSizePx / refW,
                 color: content.style.color ? rgbToHex(content.style.color) : '#000000',
-                letterSpacing: parseFloat(window.getComputedStyle(content).letterSpacing) || 0,
-                wordSpacing: parseFloat(window.getComputedStyle(content).wordSpacing) || 0,
-                lineGap: parseFloat(window.getComputedStyle(content).lineHeight) / computedFontSizePx || 1.2,
+                letterSpacing: parseFloat(content.style.letterSpacing) || 0,
+                wordSpacing: parseFloat(content.style.wordSpacing) || 0,
+                lineGap: parseFloat(content.style.lineHeight) || 1.2,
                 align: content.style.textAlign || 'left',
                 rotation: parseFloat(wrapper.dataset.rotation) || 0,
                 listType: wrapper.dataset.listType || 'none',
@@ -5201,58 +6347,90 @@ const initOrganisePdfTool = () => {
                 boxHeightRatio: content.offsetHeight / refH
             });
         });
-        
+
         updateSingleCardBadge(selectedPageId);
         returnFromSubTool();
     });
 
+    // rAF-throttled pointermove for 120Hz mobile touch screens
+    let pendingTextPointerX = 0;
+    let pendingTextPointerY = 0;
+
     window.addEventListener('pointermove', (e) => {
         if (!isTextEditingOpen || !activeDragTextWrapper || !textInteractionMode) return;
-        const content = activeDragTextWrapper.querySelector('.text-content');
-        if (!content) return;
+        pendingTextPointerX = e.clientX;
+        pendingTextPointerY = e.clientY;
 
         if (textInteractionMode === 'move') {
-            const dx = e.clientX - textDragStartX;
-            const dy = e.clientY - textDragStartY;
-            if (Math.hypot(dx, dy) > 2) {
-                activeDragTextWrapper.style.left = (textInitialLeft + dx) + 'px';
-                activeDragTextWrapper.style.top = (textInitialTop + dy) + 'px';
+            const dx = pendingTextPointerX - textDragStartX;
+            const dy = pendingTextPointerY - textDragStartY;
+            if (!textHasDragged && Math.hypot(dx, dy) > 3) {
+                textHasDragged = true;
+                if (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('text-content')) {
+                    document.activeElement.blur();
+                }
             }
-        } else if (textInteractionMode === 'resize') {
-            const diff = e.clientY - textDragStartY;
-            const newSize = Math.max(10, textInitialFontSize + diff);
-            content.style.fontSize = newSize + 'px';
-            if (activeTextContent === content) {
-                const dispSize = Math.round(newSize / editorScale);
-                document.getElementById('format-size').value = dispSize;
-                document.getElementById('slider-size').value = dispSize;
-            }
-            updateBorderStyles(content);
-        } else if (textInteractionMode === 'rotate') {
-            const rect = activeDragTextWrapper.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-            const deg = (angle * 180 / Math.PI) - 90; 
-            activeDragTextWrapper.dataset.rotation = deg;
-            activeDragTextWrapper.style.transform = `rotate(${deg}deg)`;
+            if (!textHasDragged) return;
         }
-    });
 
-    window.addEventListener('pointerup', () => {
+        if (e.cancelable) e.preventDefault();
+
+        if (textDragRafId) return;
+        textDragRafId = requestAnimationFrame(() => {
+            textDragRafId = null;
+            if (!isTextEditingOpen || !activeDragTextWrapper || !textInteractionMode) return;
+            const content = activeDragTextWrapper.querySelector('.text-content');
+            if (!content) return;
+
+            if (textInteractionMode === 'move' && textHasDragged) {
+                const dx = pendingTextPointerX - textDragStartX;
+                const dy = pendingTextPointerY - textDragStartY;
+                activeDragTextWrapper.style.left = Math.round(textInitialLeft + dx) + 'px';
+                activeDragTextWrapper.style.top = Math.round(textInitialTop + dy) + 'px';
+            } else if (textInteractionMode === 'resize') {
+                const diff = pendingTextPointerY - textDragStartY;
+                const newSize = Math.max(10, textInitialFontSize + diff);
+                content.style.fontSize = newSize + 'px';
+                if (activeTextContent === content) {
+                    const dispSize = Math.round(newSize / editorScale);
+                    document.getElementById('format-size').value = dispSize;
+                    document.getElementById('slider-size').value = dispSize;
+                }
+                updateBorderStyles(content);
+            } else if (textInteractionMode === 'rotate') {
+                const rect = activeDragTextWrapper.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const angle = Math.atan2(pendingTextPointerY - centerY, pendingTextPointerX - centerX);
+                const deg = (angle * 180 / Math.PI) - 90;
+                activeDragTextWrapper.dataset.rotation = deg;
+                activeDragTextWrapper.style.transform = `rotate(${deg}deg)`;
+            }
+        });
+    }, { passive: false });
+
+    const endTextPointerInteraction = () => {
+        if (textDragRafId) {
+            cancelAnimationFrame(textDragRafId);
+            textDragRafId = null;
+        }
         activeDragTextWrapper = null;
         textInteractionMode = null;
-    });
+        textHasDragged = false;
+    };
+    window.addEventListener('pointerup', endTextPointerInteraction);
+    window.addEventListener('pointercancel', endTextPointerInteraction);
 
     function createTextBox(x, y, txtObj = null, isNew = false) {
         const wrapper = document.createElement('div');
         wrapper.className = 'text-wrapper';
         wrapper.style.left = Math.round(x) + 'px';
         wrapper.style.top = Math.round(y) + 'px';
+        wrapper.style.touchAction = 'none';
         wrapper.dataset.rotation = txtObj ? (txtObj.rotation || 0) : 0;
         wrapper.style.transform = `rotate(${wrapper.dataset.rotation}deg)`;
         wrapper.dataset.listType = txtObj && txtObj.listType ? txtObj.listType : 'none';
-        
+
         if (txtObj && txtObj.hasBg) {
             wrapper.dataset.hasBg = 'true';
             wrapper.dataset.bgColor = txtObj.bgColor;
@@ -5268,10 +6446,11 @@ const initOrganisePdfTool = () => {
         const content = document.createElement('div');
         content.className = 'text-content';
         content.contentEditable = true;
+        content.style.touchAction = 'none';
 
         let defaultTextColor = '#000000';
         const refW = currentImgDrawW || editorCanvas.width || 1;
-        
+
         if (txtObj) {
             content.style.fontFamily = txtObj.fontFamily;
             content.style.fontWeight = txtObj.isBold ? 'bold' : 'normal';
@@ -5285,7 +6464,7 @@ const initOrganisePdfTool = () => {
             content.style.wordSpacing = (txtObj.wordSpacing || 0) + 'px';
             content.style.lineHeight = txtObj.lineGap || 1.2;
             content.style.textAlign = txtObj.align || 'left';
-            
+
             if (txtObj.listType && txtObj.listType !== 'none') {
                 content.classList.add('is-list', `list-${txtObj.listType}`);
                 txtObj.text.split('\n').forEach(line => {
@@ -5301,6 +6480,8 @@ const initOrganisePdfTool = () => {
             content.setAttribute('data-placeholder', 'SArixa');
             content.style.fontFamily = 'Arial';
             content.style.fontSize = (24 * editorScale) + 'px';
+            content.style.letterSpacing = '0px';
+            content.style.wordSpacing = '0px';
             content.style.lineHeight = 1.2;
             content.style.textAlign = 'left';
             if (isNew) {
@@ -5318,22 +6499,22 @@ const initOrganisePdfTool = () => {
             wrapper.dataset.borderWeight = txtObj.borderWeight || '10';
         } else {
             wrapper.dataset.hasBorder = 'false';
-            wrapper.dataset.borderColor = getContrastColor(rgbToHex(defaultTextColor)); 
+            wrapper.dataset.borderColor = getContrastColor(rgbToHex(defaultTextColor));
             wrapper.dataset.borderWeight = '10';
         }
 
-        const handleDel = document.createElement('div'); handleDel.className = 'text-handle text-handle-delete';
-        const handleCopy = document.createElement('div'); handleCopy.className = 'text-handle text-handle-copy';
-        const handleResize = document.createElement('div'); handleResize.className = 'text-handle text-handle-resize';
-        const handleRotate = document.createElement('div'); handleRotate.className = 'text-handle text-handle-rotate';
-        
+        const handleDel = document.createElement('div'); handleDel.className = 'text-handle text-handle-delete'; handleDel.style.touchAction = 'none';
+        const handleCopy = document.createElement('div'); handleCopy.className = 'text-handle text-handle-copy'; handleCopy.style.touchAction = 'none';
+        const handleResize = document.createElement('div'); handleResize.className = 'text-handle text-handle-resize'; handleResize.style.touchAction = 'none';
+        const handleRotate = document.createElement('div'); handleRotate.className = 'text-handle text-handle-rotate'; handleRotate.style.touchAction = 'none';
+
         wrapper.appendChild(content);
         wrapper.appendChild(handleDel);
         wrapper.appendChild(handleCopy);
         wrapper.appendChild(handleResize);
         wrapper.appendChild(handleRotate);
         editorOverlay.appendChild(wrapper);
-        
+
         updateBgStyles(content);
         updateBorderStyles(content);
 
@@ -5346,6 +6527,7 @@ const initOrganisePdfTool = () => {
 
             activeDragTextWrapper = wrapper;
             textInteractionMode = 'move';
+            textHasDragged = false;
             textDragStartX = e.clientX;
             textDragStartY = e.clientY;
             textInitialLeft = parseFloat(wrapper.style.left) || 0;
@@ -5357,13 +6539,19 @@ const initOrganisePdfTool = () => {
             activeDragTextWrapper = wrapper;
             textInteractionMode = 'resize';
             textDragStartY = e.clientY;
-            textInitialFontSize = parseFloat(window.getComputedStyle(content).fontSize) || 24;
+            textInitialFontSize = parseFloat(content.style.fontSize) || 24;
+            if (handleResize.setPointerCapture) {
+                try { handleResize.setPointerCapture(e.pointerId); } catch (err) {}
+            }
         });
 
         handleRotate.addEventListener('pointerdown', (e) => {
             e.stopPropagation(); e.preventDefault();
             activeDragTextWrapper = wrapper;
             textInteractionMode = 'rotate';
+            if (handleRotate.setPointerCapture) {
+                try { handleRotate.setPointerCapture(e.pointerId); } catch (err) {}
+            }
         });
 
         handleDel.addEventListener('pointerdown', (e) => {
@@ -5371,10 +6559,10 @@ const initOrganisePdfTool = () => {
             wrapper.remove();
             activeTextContent = null;
         });
-        
-        handleCopy.addEventListener('pointerdown', (e) => { 
+
+        handleCopy.addEventListener('pointerdown', (e) => {
             e.stopPropagation(); e.preventDefault();
-            const curFontSizePx = parseFloat(window.getComputedStyle(content).fontSize) || (24 * editorScale);
+            const curFontSizePx = parseFloat(content.style.fontSize) || (24 * editorScale);
             const newObj = {
                 text: content.innerText,
                 fontFamily: content.style.fontFamily,
@@ -5385,9 +6573,9 @@ const initOrganisePdfTool = () => {
                 fontSizeBase: curFontSizePx / editorScale,
                 fontSizeRatio: curFontSizePx / refW,
                 color: content.style.color,
-                letterSpacing: parseFloat(window.getComputedStyle(content).letterSpacing) || 0,
-                wordSpacing: parseFloat(window.getComputedStyle(content).wordSpacing) || 0,
-                lineGap: parseFloat(window.getComputedStyle(content).lineHeight) / curFontSizePx || 1.2,
+                letterSpacing: parseFloat(content.style.letterSpacing) || 0,
+                wordSpacing: parseFloat(content.style.wordSpacing) || 0,
+                lineGap: parseFloat(content.style.lineHeight) || 1.2,
                 align: content.style.textAlign || 'left',
                 rotation: parseFloat(wrapper.dataset.rotation) || 0,
                 listType: wrapper.dataset.listType || 'none',
@@ -5411,7 +6599,7 @@ const initOrganisePdfTool = () => {
     }
 
     function updateFormatToolbarUI(content, wrapper) {
-        let currentFont = content.style.fontFamily.replace(/['"]/g, '');
+        let currentFont = (content.style.fontFamily || 'Arial').replace(/['"]/g, '');
         let matched = false;
         Array.from(formatFont.options).forEach(opt => {
             if (opt.value.replace(/['"]/g, '') === currentFont) { formatFont.value = opt.value; matched = true; }
@@ -5422,19 +6610,20 @@ const initOrganisePdfTool = () => {
         formatItalic.classList.toggle('active', content.style.fontStyle === 'italic');
         formatUnderline.classList.toggle('active', content.style.textDecoration.includes('underline'));
         formatStrike.classList.toggle('active', content.style.textDecoration.includes('line-through'));
-        
+
         colorTriggerBtn.style.backgroundColor = content.style.color || '#000000';
-        
+
         const setSync = (idInput, idSlider, val) => {
             document.getElementById(idInput).value = val;
             document.getElementById(idSlider).value = val;
         };
-        
-        setSync('format-size', 'slider-size', Math.round(parseFloat(window.getComputedStyle(content).fontSize) / editorScale));
-        setSync('format-letter-spacing', 'slider-letter-spacing', parseFloat(window.getComputedStyle(content).letterSpacing) || 0);
-        setSync('format-word-spacing', 'slider-word-spacing', parseFloat(window.getComputedStyle(content).wordSpacing) || 0);
-        setSync('format-line-gap', 'slider-line-gap', Math.round((parseFloat(window.getComputedStyle(content).lineHeight) / parseFloat(window.getComputedStyle(content).fontSize) || 1.2) * 10) / 10);
-        
+
+        const fontSizePx = parseFloat(content.style.fontSize) || (24 * editorScale);
+        setSync('format-size', 'slider-size', Math.round(fontSizePx / editorScale));
+        setSync('format-letter-spacing', 'slider-letter-spacing', parseFloat(content.style.letterSpacing) || 0);
+        setSync('format-word-spacing', 'slider-word-spacing', parseFloat(content.style.wordSpacing) || 0);
+        setSync('format-line-gap', 'slider-line-gap', Math.round((parseFloat(content.style.lineHeight) || 1.2) * 10) / 10);
+
         alignBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.align === (content.style.textAlign || 'left')));
 
         if (wrapper) {
@@ -5460,7 +6649,7 @@ const initOrganisePdfTool = () => {
         const target = getActiveTextElement();
         if (target) target.style.fontFamily = formatFont.value;
     });
-    
+
     alignBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -5523,7 +6712,7 @@ const initOrganisePdfTool = () => {
         const target = getActiveTextElement();
         if (!target) return;
         const wrapper = target.parentElement;
-        
+
         if (pointerToggle.checked) {
             wrapper.dataset.listType = pointerStyleSelect.value || 'bullet';
             target.classList.add('is-list', `list-${wrapper.dataset.listType}`);
@@ -5533,7 +6722,7 @@ const initOrganisePdfTool = () => {
         } else {
             wrapper.dataset.listType = 'none';
             target.className = 'text-content';
-            target.innerHTML = target.innerText; 
+            target.innerHTML = target.innerText;
         }
     });
 
@@ -5565,9 +6754,13 @@ const initOrganisePdfTool = () => {
         try {
             exportBtn.disabled = true;
             exportBtn.innerText = 'Processing...';
+            exportedPdfBlob = null;
             hideExportResultArea();
             progressContainer.style.display = "block";
-            updateProgress(10, "Preparing...");
+            updateProgress(8, "Freeing memory for export...");
+
+            await ResourceManager.suspendPdfJsDocsForExport();
+            await yieldToMain();
 
             if (globalWmToggle && globalWmToggle.checked) {
                 const anyHasWm = pagesState.some(p => p.watermark);
@@ -5577,50 +6770,76 @@ const initOrganisePdfTool = () => {
                         const wmCfg = buildCurrentWatermarkConfig();
                         if (wmCfg) {
                             const targets = getTargetPagesForBatchAction();
-                            targets.forEach(p => { p.watermark = JSON.parse(JSON.stringify(wmCfg)); });
+                            targets.forEach(p => { p.watermark = { ...wmCfg }; });
                         }
                     }
                 }
             }
 
-            const { PDFDocument, degrees } = window.PDFLib;
-            const newPdf = await PDFDocument.create();
-            newPdf.setTitle('SArixa Organized Document');
-            
-            const loadedDocs = [];
-            for (let buffer of pdfSources) {
-                loadedDocs.push(await PDFDocument.load(buffer.slice(0)));
-            }
+            let pdfBytes;
+            if (canExportSingleDocInPlace(pagesState, true)) {
+                updateProgress(15, "Optimizing PDF in-place...");
+                pdfBytes = await exportPagesInPlaceSingleDoc(pagesState, true, (i, total) => {
+                    updateProgress(18 + ((i / total) * 74), `Packing Page ${i + 1} of ${total}...`);
+                });
+            } else {
+                updateProgress(14, "Loading PDF structure...");
+                const { PDFDocument, StandardFonts, degrees } = window.PDFLib;
+                const newPdf = await PDFDocument.create();
+                newPdf.setTitle('SArixa Organized Document');
 
-            const totalCards = pagesState.length;
+                let loadedDocs = await loadRequiredPdfLibDocs(pagesState);
+                updateProgress(22, "Copying pages in batch...");
+                let preCopiedMap = await preCopyOriginalPagesInBatch(newPdf, pagesState, loadedDocs, true);
 
-            for (let i = 0; i < totalCards; i++) {
-                const stateObj = pagesState[i];
-                const finalPage = await buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, true);
-
-                let exportRot = (stateObj.visualRotation || 0) % 360;
-                if (exportRot < 0) exportRot += 360;
-                if (exportRot !== 0) {
-                    const currentRot = finalPage.getRotation().angle;
-                    finalPage.setRotation(degrees(currentRot + exportRot));
+                let helveticaFont = null;
+                if (pagesState.some(st => st && st.pageNumber && st.pageNumber.num)) {
+                    helveticaFont = await newPdf.embedFont(StandardFonts.Helvetica);
                 }
 
-                const { width, height } = finalPage.getSize();
-                const overlayBytes = await generateOverlayPngBytesForPdf(stateObj, width, height);
-                if (overlayBytes) {
-                    const pdfOverlayImg = await newPdf.embedPng(overlayBytes);
-                    if (exportRot === 0) finalPage.drawImage(pdfOverlayImg, { x: 0, y: 0, width: width, height: height });
-                    else if (exportRot === 90) finalPage.drawImage(pdfOverlayImg, { x: 0, y: height, width: height, height: width, rotate: degrees(-90) });
-                    else if (exportRot === 180) finalPage.drawImage(pdfOverlayImg, { x: width, y: height, width: width, height: height, rotate: degrees(-180) });
-                    else if (exportRot === 270) finalPage.drawImage(pdfOverlayImg, { x: width, y: 0, width: height, height: width, rotate: degrees(-270) });
+                const totalCards = pagesState.length;
+
+                for (let i = 0; i < totalCards; i++) {
+                    const stateObj = pagesState[i];
+                    if (i % 3 === 0) await yieldToMain();
+
+                    const preCopiedPage = preCopiedMap.get(i) || null;
+                    const finalPage = await buildPdfPageWithMargins(newPdf, stateObj, loadedDocs, true, preCopiedPage);
+                    preCopiedMap.delete(i);
+
+                    let exportRot = (stateObj.visualRotation || 0) % 360;
+                    if (exportRot < 0) exportRot += 360;
+                    if (exportRot !== 0) {
+                        const currentRot = finalPage.getRotation().angle;
+                        finalPage.setRotation(degrees(currentRot + exportRot));
+                    }
+
+                    const { width, height } = finalPage.getSize();
+                    const overlayInfo = await generateCroppedOverlayForPdf(stateObj, width, height);
+                    if (overlayInfo) {
+                        const pdfOverlayImg = await newPdf.embedPng(overlayInfo.pngBytes);
+                        overlayInfo.pngBytes = null;
+                        drawCroppedOverlayOnPdfPage(finalPage, pdfOverlayImg, overlayInfo, exportRot);
+                    }
+
+                    if (stateObj.pageNumber && stateObj.pageNumber.num) {
+                        drawNativePageNumberOnPdfPage(finalPage, stateObj, helveticaFont, exportRot);
+                    }
+
+                    updateProgress(22 + ((i / totalCards) * 68), `Packing Page ${i + 1} of ${totalCards}...`);
                 }
 
-                updateProgress(10 + ((i / totalCards) * 80), `Packing Page ${i + 1} of ${totalCards}...`);
+                preCopiedMap.clear();
+                preCopiedMap = null;
+                loadedDocs = null;
+
+                updateProgress(94, "Finalizing PDF...");
+                await yieldToMain();
+                pdfBytes = await newPdf.save({ useObjectStreams: false });
             }
 
-            updateProgress(95, "Finalizing PDF...");
-            const pdfBytes = await newPdf.save();
             exportedPdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+            pdfBytes = null;
             updateProgress(100, "Done!");
 
             setTimeout(() => {
@@ -5661,14 +6880,13 @@ const initOrganisePdfTool = () => {
         }
     });
 
-    // Scrollable PDF Preview Handler
+    // Memory-Safe Lazy Scrollable PDF Preview Handler
     if (previewBtn) {
         previewBtn.addEventListener('click', async () => {
             if (!exportedPdfBlob) return;
 
             if (isExportPreviewOpen) {
-                const existingViewer = document.getElementById('pdfViewerContainer');
-                if (existingViewer) existingViewer.remove();
+                cleanupPreviewResources();
                 isExportPreviewOpen = false;
                 previewBtn.innerHTML = "Preview PDF";
                 return;
@@ -5687,38 +6905,82 @@ const initOrganisePdfTool = () => {
             try {
                 const arrayBuf = await exportedPdfBlob.arrayBuffer();
                 const typedArray = new Uint8Array(arrayBuf);
-                const task = pdfjsLib.getDocument({ data: typedArray, verbosity: 0 });
+                const task = pdfjsLib.getDocument({
+                    data: typedArray,
+                    verbosity: 0,
+                    disableAutoFetch: true,
+                    disableStream: false
+                });
                 const pdfDoc = await task.promise;
+                activePreviewPdfDoc = pdfDoc;
 
                 vContainer.innerHTML = "";
-                const outputScale = window.devicePixelRatio || 1;
+                const outputScale = DEVICE_PROFILE.previewDpr || Math.min(window.devicePixelRatio || 1, 2.25);
                 const totalPages = pdfDoc.numPages;
+
+                const renderPreviewPageCanvas = async (pageNum, canvas) => {
+                    if (!isExportPreviewOpen || !activePreviewPdfDoc || canvas.dataset.rendered === 'true') return;
+                    canvas.dataset.rendered = 'true';
+                    let page = null;
+                    try {
+                        page = await pdfDoc.getPage(pageNum);
+                        const unscaledViewport = page.getViewport({ scale: 1 });
+                        const containerWidth = vContainer.clientWidth > 0 ? vContainer.clientWidth - 40 : window.innerWidth - 60;
+                        const scale = Math.min(containerWidth / unscaledViewport.width, 1.2);
+                        const viewport = page.getViewport({ scale: scale });
+
+                        const ctx = canvas.getContext("2d");
+                        canvas.width = Math.floor(viewport.width * outputScale);
+                        canvas.height = Math.floor(viewport.height * outputScale);
+                        canvas.style.width = Math.floor(viewport.width) + "px";
+                        canvas.style.height = Math.floor(viewport.height) + "px";
+
+                        await page.render({
+                            canvasContext: ctx,
+                            transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null,
+                            viewport: viewport
+                        }).promise;
+                    } catch (e) {} finally {
+                        if (page && page.cleanup) { try { page.cleanup(); } catch (err) {} }
+                    }
+                };
+
+                const previewObserver = (typeof IntersectionObserver !== 'undefined')
+                    ? new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            const c = entry.target;
+                            const pNum = parseInt(c.dataset.pageNum, 10);
+                            if (entry.isIntersecting) {
+                                renderPreviewPageCanvas(pNum, c);
+                            } else if (DEVICE_PROFILE.isMobile && c.dataset.rendered === 'true') {
+                                releaseCanvasMemory(c);
+                                c.dataset.rendered = 'false';
+                            }
+                        });
+                    }, { root: vContainer, rootMargin: '250px 0px', threshold: 0.01 })
+                    : null;
 
                 for (let i = 1; i <= totalPages; i++) {
                     if (!isExportPreviewOpen) break;
-                    const page = await pdfDoc.getPage(i);
-                    const unscaledViewport = page.getViewport({ scale: 1 });
-                    const containerWidth = vContainer.clientWidth > 0 ? vContainer.clientWidth - 40 : window.innerWidth - 60;
-                    const scale = Math.min(containerWidth / unscaledViewport.width, 1.2);
-                    const viewport = page.getViewport({ scale: scale });
-
                     const canvas = document.createElement("canvas");
-                    const ctx = canvas.getContext("2d");
-                    canvas.width = Math.floor(viewport.width * outputScale);
-                    canvas.height = Math.floor(viewport.height * outputScale);
-                    canvas.style.width = Math.floor(viewport.width) + "px";
-                    canvas.style.height = Math.floor(viewport.height) + "px";
-                    canvas.style.maxWidth = "100%";
+                    canvas.dataset.pageNum = i;
+                    canvas.dataset.rendered = 'false';
+                    canvas.width = 1;
+                    canvas.height = 1;
+                    canvas.style.width = "100%";
+                    canvas.style.maxWidth = "560px";
+                    canvas.style.minHeight = "260px";
                     canvas.style.border = "1px solid #00e676";
                     canvas.style.borderRadius = "5px";
                     canvas.style.marginBottom = "10px";
-
                     vContainer.appendChild(canvas);
-                    await page.render({
-                        canvasContext: ctx,
-                        transform: outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null,
-                        viewport: viewport
-                    }).promise;
+
+                    if (previewObserver) {
+                        previewObserver.observe(canvas);
+                        if (i <= 2) await renderPreviewPageCanvas(i, canvas);
+                    } else {
+                        await renderPreviewPageCanvas(i, canvas);
+                    }
                 }
             } catch (err) {
                 console.error(err);

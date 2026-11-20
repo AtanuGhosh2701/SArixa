@@ -62,8 +62,16 @@
       })();
     </script>
 
+    <!-- Resource Hints for Faster Dynamic PDF & UI Library Loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+
+    <link rel="modulepreload" href="../js/tools/organise-pdf/organise-pdf.js">
+    <link rel="modulepreload" href="../js/tools/rating.js">
+
     <link rel="icon" type="image/png" href="../assets/Main_logo.png">
     <link rel="apple-touch-icon" href="../assets/Main_logo.png">
 
@@ -83,7 +91,7 @@
             <h1 class="tool-title">PDF Organizer</h1>
             <p class="tool-desc">Reorder, rotate, remove, insert pages/images, crop, and add watermarks. <strong>No uploads.</strong></p>
             <div class="trust-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>100% Private • Zero Server Uploads</span>
             </div>
         </div>
@@ -91,7 +99,7 @@
         <div class="file-input-group">
             <label class="file-btn" for="fileInput">
                 <span id="fileInputLabel">Select PDF File</span>
-                <input type="file" id="fileInput" accept="application/pdf" hidden>
+                <input type="file" id="fileInput" accept="application/pdf" aria-label="Select PDF File" hidden>
             </label>
         </div>
 
@@ -107,15 +115,15 @@
         <div id="workspaceSection" class="workspace-section" style="display: none;">
             <div class="workspace-controls">
                 <div class="workspace-toolbar">
-                    <button id="global-reset-btn" class="btn-secondary" style="color: var(--accent-secondary); border-color: var(--accent-secondary);" title="Reset Entire Workspace">
-                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    <button type="button" id="global-reset-btn" class="btn-secondary" style="color: var(--accent-secondary); border-color: var(--accent-secondary);" title="Reset Entire Workspace" aria-label="Reset Entire Workspace">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
                         Reset All
                     </button>
 
                     <!-- Select All Pages Checkbox -->
                     <label class="toggle-group select-all-box" for="select-all-pages-toggle" style="cursor: pointer; max-width: 210px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="select-all-pages-toggle" class="custom-Checkmark-input">
+                            <input type="checkbox" id="select-all-pages-toggle" class="custom-Checkmark-input" aria-label="Select All Pages">
                             <span class="custom-checkmark-box"></span>
                             <span class="toggle-label" style="margin: 0;">Select All</span>
                         </div>
@@ -125,15 +133,15 @@
                     <!-- Page Numbers Toggle and Settings Button -->
                     <div class="toggle-group" style="max-width: 260px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                             <span class="toggle-label" style="margin: 0;">Page Numbers</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button type="button" id="open-page-num-settings-btn" class="gear-icon-btn" title="Customize Page Numbers" style="display: none;">
-                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <button type="button" id="open-page-num-settings-btn" class="gear-icon-btn" title="Customize Page Numbers" aria-label="Customize Page Numbers" style="display: none;">
+                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
                             <label class="switch" style="margin: 0;">
-                                <input type="checkbox" id="pageNumToggle">
+                                <input type="checkbox" id="pageNumToggle" aria-label="Toggle Page Numbers">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -142,15 +150,15 @@
                     <!-- Watermark Toggle and Settings Button -->
                     <div class="toggle-group" style="max-width: 250px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             <span class="toggle-label" style="margin: 0;">Watermark</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button type="button" id="open-wm-settings-btn" class="gear-icon-btn" title="Customize Watermark" style="display: none;">
-                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <button type="button" id="open-wm-settings-btn" class="gear-icon-btn" title="Customize Watermark" aria-label="Customize Watermark" style="display: none;">
+                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
                             <label class="switch" style="margin: 0;">
-                                <input type="checkbox" id="global-wm-toggle">
+                                <input type="checkbox" id="global-wm-toggle" aria-label="Toggle Watermark">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -159,15 +167,15 @@
                     <!-- Page Size Toggle and Settings Button -->
                     <div class="toggle-group" style="max-width: 250px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 3v18"></path><path d="M3 9h18"></path></svg>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--text-sub)" stroke-width="2" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M9 3v18"></path><path d="M3 9h18"></path></svg>
                             <span class="toggle-label" style="margin: 0;">Page Size</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <button type="button" id="open-batch-resize-btn" class="gear-icon-btn" title="Customize Page Size" style="display: none;">
-                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                            <button type="button" id="open-batch-resize-btn" class="gear-icon-btn" title="Customize Page Size" aria-label="Customize Page Size" style="display: none;">
+                                <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                             </button>
                             <label class="switch" style="margin: 0;">
-                                <input type="checkbox" id="batchResizeToggle">
+                                <input type="checkbox" id="batchResizeToggle" aria-label="Toggle Batch Page Resize">
                                 <span class="slider round"></span>
                             </label>
                         </div>
@@ -176,11 +184,11 @@
                     <div class="search-group">
                         <input type="number" id="page-search-input" placeholder="Page no..." min="1" aria-label="Search Page Number">
                         <button type="button" id="page-search-btn" class="search-icon-btn" title="Search Page" aria-label="Search Page">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </button>
                     </div>
 
-                    <button id="export-btn" class="action-btn" style="max-width: 250px; margin-top: 0;">Export Modified PDF</button>
+                    <button type="button" id="export-btn" class="action-btn" style="max-width: 250px; margin-top: 0;">Export Modified PDF</button>
                 </div>
 
                 <div id="progressContainer" class="progress-container" style="display: none;">
@@ -203,7 +211,7 @@
                     
                     <div class="download-btn-container" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
                         <button class="action-btn" id="downloadBtn" type="button" aria-label="Download PDF" style="max-width: 240px;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;" aria-hidden="true">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -211,8 +219,8 @@
                             Download PDF
                         </button>
                         
-                        <button class="action-btn share-btn" id="shareBtn" type="button" disabled style="max-width: 240px;">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;">
+                        <button class="action-btn share-btn" id="shareBtn" type="button" disabled aria-label="Share PDF" style="max-width: 240px;">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px; margin-top: -2px;" aria-hidden="true">
                                 <circle cx="18" cy="5" r="3"></circle>
                                 <circle cx="6" cy="12" r="3"></circle>
                                 <circle cx="18" cy="19" r="3"></circle>
@@ -235,14 +243,14 @@
     <!-- Protected PDF Password Prompt Modal -->
     <div id="password-prompt-popup" class="popup-overlay hidden" style="display: none;">
         <div class="popup-content">
-            <span id="close-password-popup" class="close-btn">&times;</span>
+            <span id="close-password-popup" class="close-btn" role="button" tabindex="0" aria-label="Close Password Prompt">&times;</span>
             <h3 style="color: #00e676; margin-bottom: 5px;">🔒 Protected PDF</h3>
             <p style="color: #b2ebf2; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.4;" id="password-file-name">filename.pdf is password protected.</p>
             
             <div class="password-input-wrapper" style="position: relative; margin-bottom: 15px;">
-                <input type="password" id="pdfPasswordInput" class="filename-input" placeholder="Enter PDF Password" style="margin-bottom: 0; padding-right: 40px;" spellcheck="false">
+                <input type="password" id="pdfPasswordInput" class="filename-input" placeholder="Enter PDF Password" aria-label="Enter PDF Password" style="margin-bottom: 0; padding-right: 40px;" spellcheck="false">
                 <button type="button" id="togglePasswordBtn" class="eye-btn" aria-label="Toggle Password Visibility">
-                    <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="eye-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
@@ -250,8 +258,8 @@
             </div>
 
             <div style="display: flex; gap: 12px; width: 100%;">
-                <button id="btn-cancel-password" class="popup-btn popup-btn-outline-red" style="margin: 0; flex: 1;">Cancel</button>
-                <button id="btn-submit-password" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Unlock</button>
+                <button type="button" id="btn-cancel-password" class="popup-btn popup-btn-outline-red" style="margin: 0; flex: 1;">Cancel</button>
+                <button type="button" id="btn-submit-password" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Unlock</button>
             </div>
         </div>
     </div>
@@ -261,7 +269,7 @@
     <!-- Page Numbers Customization Modal -->
     <div id="page-num-modal" class="popup-overlay hidden">
         <div class="popup-content custom-settings-modal-box">
-            <button type="button" id="close-page-num-modal-x" class="modal-top-close-btn" title="Close">&times;</button>
+            <button type="button" id="close-page-num-modal-x" class="modal-top-close-btn" title="Close" aria-label="Close Page Number Settings">&times;</button>
             <h3 style="color: var(--accent-primary); margin-top: 0; margin-bottom: 6px;">Page Number Settings</h3>
             <p id="page-num-target-hint" style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 18px;">
                 Numbers will be added sequentially to selected pages (or all pages).
@@ -269,7 +277,7 @@
 
             <div id="page-num-settings-panel" class="settings-group page-num-extra" style="display: grid; grid-template-columns: 1fr; gap: 16px; margin: 0 0 20px 0; padding: 16px;">
                 <div class="setting-item">
-                    <label>Number Position:</label>
+                    <label for="pageNumPos">Number Position:</label>
                     <select id="pageNumPos" aria-label="Select Page Number Position">
                         <option value="bottom-center">Bottom Center</option>
                         <option value="bottom-right" selected>Bottom Right</option>
@@ -312,7 +320,7 @@
     <!-- Watermark Customization Modal -->
     <div id="wm-modal" class="popup-overlay hidden">
         <div class="popup-content custom-settings-modal-box wm-modal-wide">
-            <button type="button" id="close-wm-modal-x" class="modal-top-close-btn" title="Close">&times;</button>
+            <button type="button" id="close-wm-modal-x" class="modal-top-close-btn" title="Close" aria-label="Close Watermark Settings">&times;</button>
             <h3 style="color: var(--accent-primary); margin-top: 0; margin-bottom: 6px;">Watermark Customization</h3>
             <p id="wm-target-hint" style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 16px;">
                 Applies watermark to selected pages (or all pages).
@@ -321,7 +329,7 @@
             <div id="wm-settings-panel" class="settings-group wm-extra" style="display: grid; margin: 0 0 20px 0; padding: 18px; max-height: 62vh; overflow-y: auto;">
                 
                 <div class="setting-item">
-                    <label>Watermark Type:</label>
+                    <label for="wmType">Watermark Type:</label>
                     <select id="wmType" aria-label="Select Watermark Type">
                         <option value="text">Text</option>
                         <option value="image">Image/Logo</option>
@@ -329,12 +337,12 @@
                 </div>
 
                 <div class="setting-item wm-text-only">
-                    <label>Watermark Text:</label>
+                    <label for="wmTextInput">Watermark Text:</label>
                     <input type="text" id="wmTextInput" value="" placeholder="SArixa" aria-label="Watermark Text" spellcheck="false">
                 </div>
                 <div class="setting-item wm-text-only" style="z-index: 9999; position: relative;">
                     <label>Font Style:</label>
-                    <div class="custom-dropdown" id="fontDropdown" role="button" tabindex="0">
+                    <div class="custom-dropdown" id="fontDropdown" role="button" tabindex="0" aria-label="Select Watermark Font Style">
                         <div class="dropdown-selected">
                             <span id="selectedFontText" style="font-family: Arial, sans-serif;">Arial</span>
                             <div class="dropdown-actions">
@@ -362,10 +370,10 @@
                     <label>Text Format:</label>
                     <div class="text-format-group">
                         <button type="button" class="format-btn wm-format-btn" data-format="bold" aria-label="Bold" title="Bold">
-                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg>
                         </button>
                         <button type="button" class="format-btn wm-format-btn" data-format="italic" aria-label="Italic" title="Italic">
-                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
+                            <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg>
                         </button>
                     </div>
                 </div>
@@ -390,7 +398,7 @@
                 </div>
 
                 <div class="setting-item" id="wmPosContainer">
-                    <label>Watermark Position:</label>
+                    <label for="wmPos">Watermark Position:</label>
                     <select id="wmPos" aria-label="Select Watermark Position">
                         <option value="center" selected>Center</option>
                         <option value="bottom-center">Bottom Center</option>
@@ -403,22 +411,22 @@
                 </div>
 
                 <div class="setting-item wm-mosaic-extra" style="display:none;">
-                    <label>Mosaic Density: <span id="wmDensityVal">4</span></label>
+                    <label for="wmDensity">Mosaic Density: <span id="wmDensityVal">4</span></label>
                     <input type="range" id="wmDensity" min="2" max="10" value="4" aria-label="Watermark Mosaic Density">
                 </div>
 
                 <div class="setting-item">
-                    <label>Size: <span id="wmSizeVal">30</span>%</label>
+                    <label for="wmSize">Size: <span id="wmSizeVal">30</span>%</label>
                     <input type="range" id="wmSize" min="5" max="100" value="30" aria-label="Watermark Size">
                 </div>
 
                 <div class="setting-item">
-                    <label>Opacity: <span id="wmOpacityVal">50</span>%</label>
+                    <label for="wmOpacity">Opacity: <span id="wmOpacityVal">50</span>%</label>
                     <input type="range" id="wmOpacity" min="1" max="100" value="50" aria-label="Watermark Opacity">
                 </div>
 
                 <div class="setting-item wm-text-only">
-                    <label>Angle:</label>
+                    <label for="wmAngle">Angle:</label>
                     <select id="wmAngle" aria-label="Select Watermark Angle">
                         <option value="45">Diagonal (45°)</option>
                         <option value="-45">Diagonal (-45°)</option>
@@ -459,7 +467,7 @@
     <!-- Batch Page Size Modal -->
     <div id="batch-resize-modal" class="popup-overlay hidden">
         <div class="popup-content custom-settings-modal-box">
-            <button type="button" id="close-batch-resize-modal-x" class="modal-top-close-btn" title="Close">&times;</button>
+            <button type="button" id="close-batch-resize-modal-x" class="modal-top-close-btn" title="Close" aria-label="Close Resize Page Settings">&times;</button>
             <h3 style="color: var(--accent-primary); margin-top: 0; margin-bottom: 6px;">Resize Page(s)</h3>
             <p id="batch-resize-target-hint" style="color: var(--text-sub); font-size: 0.85rem; margin-bottom: 18px;">
                 Centers each page inside the chosen size by adding equal margins around it.
@@ -467,8 +475,8 @@
 
             <div class="settings-group" style="display: grid; grid-template-columns: 1fr; gap: 16px; margin: 0 0 20px 0; padding: 16px;">
                 <div class="setting-item">
-                    <label>Select Target Page Size:</label>
-                    <select id="batch-resize-preset-select">
+                    <label for="batch-resize-preset-select">Select Target Page Size:</label>
+                    <select id="batch-resize-preset-select" aria-label="Select Target Page Size">
                         <option value="original">Original Size (Remove Resize)</option>
                         <option value="A4">A4 (210 × 297 mm)</option>
                         <option value="A3">A3 (297 × 420 mm)</option>
@@ -482,7 +490,7 @@
                     <label>Margin Fill Color:</label>
                     <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px;">
                         <label class="switch" title="OFF = Transparent, ON = Solid Color">
-                            <input type="checkbox" id="batch-resize-bg-toggle" checked>
+                            <input type="checkbox" id="batch-resize-bg-toggle" checked aria-label="Toggle Margin Solid Background Color">
                             <span class="slider round"></span>
                         </label>
                         <input type="color" id="batch-resize-color-input" value="#FFFFFF" aria-label="Margin Fill Color" style="width: 42px; height: 34px; border: 1px solid var(--accent-primary); border-radius: 6px; background: transparent; cursor: pointer; padding: 2px;">
@@ -503,85 +511,75 @@
         
         <div id="submenu-watermark" class="fab-submenu hidden">
             <input type="text" id="page-wm-text" class="submenu-select" value="" placeholder="SArixa" aria-label="Watermark text">
-            <button class="submenu-btn green-btn" id="apply-page-wm">Apply Text</button>
+            <button type="button" class="submenu-btn green-btn" id="apply-page-wm">Apply Text</button>
         </div>
 
-        <div id="submenu-resize" class="fab-submenu hidden">
-            <select id="resize-preset" class="submenu-select" aria-label="Resize preset">
-                <option value="original">Original Size</option>
-                <option value="A4">A4 (210 x 297 mm)</option>
-                <option value="A3">A3 (297 x 420 mm)</option>
-                <option value="Letter">Letter (8.5 x 11 in)</option>
-            </select>
-            <button class="submenu-btn green-btn" id="apply-resize">Apply</button>
-        </div>
-
-        <button class="fab-btn" id="fab-view-changes" title="Expand & Edit" style="color: var(--accent-primary);">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+        <button type="button" class="fab-btn" id="fab-view-changes" title="Expand & Edit" aria-label="Expand and Edit" style="color: var(--accent-primary);">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
             <span>Expand</span>
         </button>
 
-        <button class="fab-btn" id="fab-undo" title="Undo" disabled>
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+        <button type="button" class="fab-btn" id="fab-undo" title="Undo" aria-label="Undo" disabled>
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
             <span>Undo</span>
         </button>
-        <button class="fab-btn" id="fab-redo" title="Redo" disabled>
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+        <button type="button" class="fab-btn" id="fab-redo" title="Redo" aria-label="Redo" disabled>
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
             <span>Redo</span>
         </button>
 
         <div class="fab-divider"></div>
 
-        <button class="fab-btn" id="fab-add-text" title="Add Text">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+        <button type="button" class="fab-btn" id="fab-add-text" title="Add Text" aria-label="Add Text">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line></svg>
             <span>Text</span>
         </button>
 
-        <button class="fab-btn" id="fab-duplicate" title="Duplicate">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <button type="button" class="fab-btn" id="fab-duplicate" title="Duplicate" aria-label="Duplicate Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             <span>Duplicate</span>
         </button>
-        <button class="fab-btn" id="fab-replace" title="Replace">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
+        <button type="button" class="fab-btn" id="fab-replace" title="Replace" aria-label="Replace Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path></svg>
             <span>Replace</span>
         </button>
-        <button class="fab-btn" id="fab-rotate-left" title="Rotate Left">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
+        <button type="button" class="fab-btn" id="fab-rotate-left" title="Rotate Left" aria-label="Rotate Left">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path></svg>
             <span>Rotate Left</span>
         </button>
-        <button class="fab-btn" id="fab-rotate-right" title="Rotate Right">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+        <button type="button" class="fab-btn" id="fab-rotate-right" title="Rotate Right" aria-label="Rotate Right">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
             <span>Rotate Right</span>
         </button>
-        <button class="fab-btn" id="fab-crop" title="Crop">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
+        <button type="button" class="fab-btn" id="fab-crop" title="Crop" aria-label="Crop Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
             <span>Crop</span>
         </button>
-        <button class="fab-btn" id="fab-draw" title="Draw">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+        <button type="button" class="fab-btn" id="fab-draw" title="Draw" aria-label="Draw on Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
             <span>Draw</span>
         </button>
-        <button class="fab-btn" id="fab-margins" title="Margins">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+        <button type="button" class="fab-btn" id="fab-margins" title="Margins" aria-label="Adjust Page Margins">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
             <span>Margins</span>
         </button>
-        <button class="fab-btn" id="fab-extract" title="Extract">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <button type="button" class="fab-btn" id="fab-extract" title="Extract" aria-label="Extract Pages">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             <span>Extract</span>
         </button>
-        <button class="fab-btn" id="fab-watermark" title="Watermark">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <button type="button" class="fab-btn" id="fab-watermark" title="Watermark" aria-label="Add Watermark">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
             <span>Watermark</span>
         </button>
         
         <div class="fab-divider"></div>
         
-        <button class="fab-btn danger" id="fab-reset" title="Reset Page">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+        <button type="button" class="fab-btn danger" id="fab-reset" title="Reset Page" aria-label="Reset Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
             <span>Reset</span>
         </button>
-        <button class="fab-btn danger" id="fab-remove" title="Remove Page">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+        <button type="button" class="fab-btn danger" id="fab-remove" title="Remove Page" aria-label="Remove Page">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
             <span>Remove</span>
         </button>
     </div>
@@ -592,31 +590,31 @@
             
             <div id="detail-header-group" style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                 <h3 id="detail-page-title" style="margin: 0; color: var(--text-bright); font-size: 1.1rem; font-weight: 600;">Page View</h3>
-                <button id="detail-close-btn" class="btn-secondary">Close Expand</button>
+                <button type="button" id="detail-close-btn" class="btn-secondary">Close Expand</button>
             </div>
 
             <!-- Add Text Header -->
             <div id="text-header-group" style="display: none; justify-content: space-between; width: 100%; align-items: center;">
                 <h3 style="margin: 0; color: var(--text-bright); font-size: 1.1rem; font-weight: 600;">Edit Text</h3>
                 <div class="editor-header-actions" style="display: flex; gap: 15px;">
-                    <button id="editor-cancel" class="btn-secondary">Cancel</button>
-                    <button id="editor-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Changes</button>
+                    <button type="button" id="editor-cancel" class="btn-secondary">Cancel</button>
+                    <button type="button" id="editor-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Changes</button>
                 </div>
             </div>
 
             <!-- Extract Header -->
             <div id="extract-header-group" style="display: none; justify-content: space-between; width: 100%; align-items: center;">
-                <button id="extract-cancel-btn" class="btn-secondary">Cancel</button>
+                <button type="button" id="extract-cancel-btn" class="btn-secondary">Cancel</button>
                 <div class="extract-controls-wrapper" style="display: flex; align-items: center; gap: 15px;">
                     <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px 12px; border-radius: 8px; border: 1px solid rgba(0,255,200,0.2);">
                         <span style="color: var(--text-sub); font-size: 0.85rem; font-weight: 600;">With Changes</span>
                         <label class="switch" style="margin:0; width: 40px; height: 20px;">
-                            <input type="checkbox" id="extract-changes-toggle" checked>
+                            <input type="checkbox" id="extract-changes-toggle" checked aria-label="Extract With Changes">
                             <span class="slider round" style="border-radius: 20px;"></span>
                         </label>
                     </div>
-                    <button id="extract-download-btn" class="action-btn" style="display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 14px;">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <button type="button" id="extract-download-btn" class="action-btn" style="display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 14px;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                         Download
                     </button>
                 </div>
@@ -628,8 +626,8 @@
                     <h3 style="margin: 0; color: var(--text-bright); font-size: 1.1rem; font-weight: 600;">Draw</h3>
                 </div>
                 <div class="editor-header-actions" style="display: flex; gap: 15px;">
-                    <button id="draw-cancel" class="btn-secondary">Cancel</button>
-                    <button id="draw-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Drawing</button>
+                    <button type="button" id="draw-cancel" class="btn-secondary">Cancel</button>
+                    <button type="button" id="draw-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Drawing</button>
                 </div>
             </div>
             
@@ -639,8 +637,8 @@
                     <h3 style="margin: 0; color: var(--text-bright); font-size: 1.1rem; font-weight: 600;">Page Margins</h3>
                 </div>
                 <div class="editor-header-actions" style="display: flex; gap: 15px;">
-                    <button id="margins-cancel" class="btn-secondary">Cancel</button>
-                    <button id="margins-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Margins</button>
+                    <button type="button" id="margins-cancel" class="btn-secondary">Cancel</button>
+                    <button type="button" id="margins-save" class="action-btn" style="min-height: 36px; padding: 8px 16px;">Save Margins</button>
                 </div>
             </div>
 
@@ -652,14 +650,14 @@
                 
                 <div class="toolbar-control-wrapper" id="add-text-btn-wrapper" style="display: none;">
                     <span class="control-label">New</span>
-                    <button id="fab-add-more-text" type="button" class="premium-add-btn" title="Add Another Text Box">
-                        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <button id="fab-add-more-text" type="button" class="premium-add-btn" title="Add Another Text Box" aria-label="Add Another Text Box">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-linecap="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     </button>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Font</span>
-                    <select id="format-font" class="toolbar-select font-select">
+                    <select id="format-font" class="toolbar-select font-select" aria-label="Text Font Family">
                         <option value="Arial" style="font-family: Arial;">Arial</option>
                         <option value="Times New Roman" style="font-family: 'Times New Roman';">Times New Roman</option>
                         <option value="Courier New" style="font-family: 'Courier New';">Courier</option>
@@ -675,59 +673,59 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Size</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="format-size" class="toolbar-num-input" value="24" style="width: 45px; margin: 0;">
+                        <input type="number" id="format-size" class="toolbar-num-input" value="24" aria-label="Text Font Size" style="width: 45px; margin: 0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="slider-size" min="8" max="150" value="24">
+                            <input type="range" id="slider-size" min="8" max="150" value="24" aria-label="Text Font Size Slider">
                         </div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Color</span>
-                    <button id="color-trigger-btn" type="button" class="toolbar-color-trigger" style="background-color: #000000; margin-top:2px;"></button>
+                    <button id="color-trigger-btn" type="button" class="toolbar-color-trigger" aria-label="Text Color" style="background-color: #000000; margin-top:2px;"></button>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Align</span>
                     <div class="toolbar-input-group align-group" style="padding: 2px;">
-                        <button type="button" class="format-btn align-btn active" data-align="left" aria-label="Align Left" title="Align Left"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg></button>
-                        <button type="button" class="format-btn align-btn" data-align="center" aria-label="Align Center" title="Align Center"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="19" y1="12" x2="5" y2="12"></line><line x1="19" y1="18" x2="5" y2="18"></line></svg></button>
-                        <button type="button" class="format-btn align-btn" data-align="right" aria-label="Align Right" title="Align Right"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="9" y2="12"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg></button>
+                        <button type="button" class="format-btn align-btn active" data-align="left" aria-label="Align Left" title="Align Left"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="15" y1="12" x2="3" y2="12"></line><line x1="17" y1="18" x2="3" y2="18"></line></svg></button>
+                        <button type="button" class="format-btn align-btn" data-align="center" aria-label="Align Center" title="Align Center"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="19" y1="12" x2="5" y2="12"></line><line x1="19" y1="18" x2="5" y2="18"></line></svg></button>
+                        <button type="button" class="format-btn align-btn" data-align="right" aria-label="Align Right" title="Align Right"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" aria-hidden="true"><line x1="21" y1="6" x2="3" y2="6"></line><line x1="21" y1="12" x2="9" y2="12"></line><line x1="21" y1="18" x2="7" y2="18"></line></svg></button>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Letter Gap</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="format-letter-spacing" class="toolbar-num-input" value="0" style="width: 45px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="slider-letter-spacing" min="-10" max="50" value="0"></div>
+                        <input type="number" id="format-letter-spacing" class="toolbar-num-input" value="0" aria-label="Letter Spacing" style="width: 45px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="slider-letter-spacing" min="-10" max="50" value="0" aria-label="Letter Spacing Slider"></div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Word Gap</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="format-word-spacing" class="toolbar-num-input" value="0" style="width: 45px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="slider-word-spacing" min="-10" max="100" value="0"></div>
+                        <input type="number" id="format-word-spacing" class="toolbar-num-input" value="0" aria-label="Word Spacing" style="width: 45px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="slider-word-spacing" min="-10" max="100" value="0" aria-label="Word Spacing Slider"></div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Line Gap</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="format-line-gap" class="toolbar-num-input" value="1.2" step="0.1" style="width: 45px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="slider-line-gap" min="0.5" max="3" step="0.1" value="1.2"></div>
+                        <input type="number" id="format-line-gap" class="toolbar-num-input" value="1.2" step="0.1" aria-label="Line Spacing" style="width: 45px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="slider-line-gap" min="0.5" max="3" step="0.1" value="1.2" aria-label="Line Spacing Slider"></div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Format</span>
                     <div class="toolbar-icons-group" style="padding-left: 0; border-left: none;">
-                        <button class="format-btn" id="format-bold" title="Bold"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg></button>
-                        <button class="format-btn" id="format-italic" title="Italic"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg></button>
-                        <button class="format-btn" id="format-underline" title="Underline"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg></button>
-                        <button class="format-btn" id="format-strike" title="Strikethrough">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><text x="12" y="17.2" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="500" letter-spacing="-0.35" fill="currentColor">abc</text><path d="M2.2 12.1H21.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                        <button type="button" class="format-btn" id="format-bold" title="Bold" aria-label="Bold"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path></svg></button>
+                        <button type="button" class="format-btn" id="format-italic" title="Italic" aria-label="Italic"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><line x1="19" y1="4" x2="10" y2="4"></line><line x1="14" y1="20" x2="5" y2="20"></line><line x1="15" y1="4" x2="9" y2="20"></line></svg></button>
+                        <button type="button" class="format-btn" id="format-underline" title="Underline" aria-label="Underline"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><path d="M6 3v7a6 6 0 0 0 6 6 6 6 0 0 0 6-6V3"></path><line x1="4" y1="21" x2="20" y2="21"></line></svg></button>
+                        <button type="button" class="format-btn" id="format-strike" title="Strikethrough" aria-label="Strikethrough">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><text x="12" y="17.2" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14.5" font-weight="500" letter-spacing="-0.35" fill="currentColor">abc</text><path d="M2.2 12.1H21.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
                         </button>
                     </div>
                 </div>
@@ -735,8 +733,8 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Pointer</span>
                     <div style="display:flex; align-items:center; gap:8px; height: 34px;">
-                        <label class="switch"><input type="checkbox" id="pointer-toggle"><span class="slider"></span></label>
-                        <select id="pointer-style-select" class="toolbar-select font-select hidden" style="width: 100px; padding: 6px;">
+                        <label class="switch"><input type="checkbox" id="pointer-toggle" aria-label="Toggle List Bullet or Numbering"><span class="slider"></span></label>
+                        <select id="pointer-style-select" class="toolbar-select font-select hidden" aria-label="Select List Pointer Style" style="width: 100px; padding: 6px;">
                             <option value="bullet">• Bullet</option>
                             <option value="number">1. Number</option>
                             <option value="alpha">a. Alpha</option>
@@ -747,24 +745,24 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Textbox</span>
                     <div style="display:flex; align-items:center; height: 34px;">
-                        <label class="switch"><input type="checkbox" id="format-bg-toggle"><span class="slider"></span></label>
+                        <label class="switch"><input type="checkbox" id="format-bg-toggle" aria-label="Toggle Textbox Background"><span class="slider"></span></label>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper bg-option-item hidden">
                     <span class="control-label">Bg Color</span>
-                    <button id="bg-color-trigger-btn" type="button" class="toolbar-color-trigger" style="background-color: #ffffff; margin-top:2px;"></button>
+                    <button id="bg-color-trigger-btn" type="button" class="toolbar-color-trigger" aria-label="Textbox Background Color" style="background-color: #ffffff; margin-top:2px;"></button>
                 </div>
 
                 <div class="toolbar-control-wrapper bg-option-item hidden">
                     <span class="control-label">Radius</span>
                     <div class="toolbar-input-group">
-                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" transform="rotate(270)" style="color:var(--text-bright); margin-right: 2px;">
+                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" transform="rotate(270)" style="color:var(--text-bright); margin-right: 2px;" aria-hidden="true">
                             <path clip-rule="evenodd" d="m7.8 2.25h-.0321-.00002c-.81283-.00001-1.46844-.00001-1.99935.04336-.54663.04467-1.02678.13903-1.47099.36537-.70561.35952-1.27929.9332-1.63881 1.63881-.22634.44421-.3207.92436-.36537 1.47099-.04337.53091-.04337 1.18652-.04336 1.99935v.00002.0321 8.4.0321c-.00001.8129-.00001 1.4685.04336 1.9994.04467.5466.13903 1.0267.36537 1.471.35952.7056.9332 1.2792 1.63881 1.6388.44421.2263.92436.3207 1.47099.3653.53091.0434 1.18652.0434 1.99935.0434h.03212 8.4.0321c.8129 0 1.4685 0 1.9994-.0434.5466-.0446 1.0267-.139 1.471-.3653.7056-.3596 1.2792-.9332 1.6388-1.6388.2263-.4443.3207-.9244.3653-1.471.0434-.5309.0434-1.1865.0434-1.9994v-.0321-8.4-.03212c0-.81283 0-1.46844-.0434-1.99935-.0446-.54663-.139-1.02678-.3653-1.47099-.3596-.70561-.9332-1.27929-1.6388-1.63881-.4443-.22634-.9244-.3207-1.471-.36537-.5309-.04337-1.1865-.04337-1.9994-.04336h-.0321zm-2.82148 1.74524c.19752-.10064.45829-.16977.91216-.20686.46263-.0378 1.05687-.03838 1.90932-.03838h8.4c.8525 0 1.4467.00058 1.9093.03838.4539.03709.7147.10622.9122.20686.4233.21571.7675.55992.9833.98328.1006.19752.1697.45829.2068.91216.0378.46263.0384 1.05687.0384 1.90932v8.4c0 .8525-.0006 1.4467-.0384 1.9093-.0371.4539-.1062.7147-.2068.9122-.2158.4233-.56.7675-.9833.9833-.1975.1006-.4583.1697-.9122.2068-.4626.0378-1.0568.0384-1.9093.0384h-8.4c-.85245 0-1.44669-.0006-1.90932-.0384-.45387-.0371-.71464-.1062-.91216-.2068-.42336-.2158-.76757-.56-.98328-.9833-.10064-.1975-.16977-.4583-.20686-.9122-.0378-.4626-.03838-1.0568-.03838-1.9093v-8.4c0-.85245.00058-1.44669.03838-1.90932.03709-.45387.10622-.71464.20686-.91216.21571-.42336.55992-.76757.98328-.98328zm8.22148 2.75476c.8525 0 1.4467.00058 1.9093.03838.4539.03709.7147.10622.9122.20686.4233.21571.7675.55992.9833.98328.1006.19752.1697.45828.2068.91216.0378.46263.0384 1.05687.0384 1.90932v2.2c0 .4142.3358.75.75.75s.75-.3358.75-.75v-2.2-.0321c0-.81284 0-1.46846-.0434-1.99937-.0446-.54663-.139-1.02678-.3653-1.47099-.3596-.70561-.9332-1.27929-1.6388-1.63881-.4443-.22634-.9244-.3207-1.471-.36537-.5309-.04337-1.1866-.04337-1.9994-.04336h-.0321-2.2c-.4142 0-.75.33579-.75.75s.3358.75.75.75z" fill="currentColor" fill-rule="evenodd"></path>
                         </svg>
-                        <input type="number" id="format-bg-radius" class="toolbar-num-input" value="0" min="0" max="50" style="width:35px; margin:0;">
+                        <input type="number" id="format-bg-radius" class="toolbar-num-input" value="0" min="0" max="50" aria-label="Textbox Corner Radius" style="width:35px; margin:0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="slider-bg-radius" min="0" max="50" value="0">
+                            <input type="range" id="slider-bg-radius" min="0" max="50" value="0" aria-label="Textbox Corner Radius Slider">
                         </div>
                     </div>
                 </div>
@@ -772,10 +770,10 @@
                 <div class="toolbar-control-wrapper bg-option-item hidden">
                     <span class="control-label">Opacity</span>
                     <div class="toolbar-input-group">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path></svg>
-                        <input type="number" id="format-bg-opacity" class="toolbar-num-input" value="100" min="0" max="100" style="width:35px; margin:0;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path></svg>
+                        <input type="number" id="format-bg-opacity" class="toolbar-num-input" value="100" min="0" max="100" aria-label="Textbox Background Opacity" style="width:35px; margin:0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="slider-bg-opacity" min="0" max="100" value="100">
+                            <input type="range" id="slider-bg-opacity" min="0" max="100" value="100" aria-label="Textbox Background Opacity Slider">
                         </div>
                     </div>
                 </div>
@@ -783,24 +781,24 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Stroke</span>
                     <div style="display:flex; align-items:center; height: 34px;">
-                        <label class="switch"><input type="checkbox" id="format-border-toggle"><span class="slider"></span></label>
+                        <label class="switch"><input type="checkbox" id="format-border-toggle" aria-label="Toggle Text Outline Stroke"><span class="slider"></span></label>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper border-option-item hidden">
                     <span class="control-label">Stroke Color</span>
-                    <button id="border-color-trigger-btn" type="button" class="toolbar-color-trigger" style="background-color: #00e676; margin-top:2px;"></button>
+                    <button id="border-color-trigger-btn" type="button" class="toolbar-color-trigger" aria-label="Text Stroke Color" style="background-color: #00e676; margin-top:2px;"></button>
                 </div>
 
                 <div class="toolbar-control-wrapper border-option-item hidden">
                     <span class="control-label">Weight</span>
                     <div class="toolbar-input-group">
-                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="color:var(--text-bright); margin-right: 2px;">
+                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="color:var(--text-bright); margin-right: 2px;" aria-hidden="true">
                             <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"></circle>
                         </svg>
-                        <input type="number" id="format-border-weight" class="toolbar-num-input" value="10" min="1" max="50" style="width:35px; margin:0;">
+                        <input type="number" id="format-border-weight" class="toolbar-num-input" value="10" min="1" max="50" aria-label="Text Stroke Weight" style="width:35px; margin:0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="slider-border-weight" min="1" max="50" value="10">
+                            <input type="range" id="slider-border-weight" min="1" max="50" value="10" aria-label="Text Stroke Weight Slider">
                         </div>
                     </div>
                 </div>
@@ -815,11 +813,11 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">History</span>
                     <div class="toolbar-icons-group" style="gap: 6px;">
-                        <button id="draw-undo-btn" class="header-icon-btn" title="Undo" style="width: 34px; height: 34px;" disabled>
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                        <button type="button" id="draw-undo-btn" class="header-icon-btn" title="Undo" aria-label="Undo Drawing" style="width: 34px; height: 34px;" disabled>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
                         </button>
-                        <button id="draw-redo-btn" class="header-icon-btn" title="Redo" style="width: 34px; height: 34px;" disabled>
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+                        <button type="button" id="draw-redo-btn" class="header-icon-btn" title="Redo" aria-label="Redo Drawing" style="width: 34px; height: 34px;" disabled>
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" aria-hidden="true"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
                         </button>
                     </div>
                 </div>
@@ -827,27 +825,27 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Tools</span>
                     <div class="toolbar-icons-group" style="padding: 2px; border: 1px solid var(--accent-primary); border-radius: 8px; background: rgba(0, 230, 118, 0.05);">
-                        <button class="format-btn align-btn active" id="tool-pen" title="Pen">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" class="format-btn align-btn active" id="tool-pen" title="Pen" aria-label="Pen Tool">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                                 <path d="m15 5 4 4"></path>
                             </svg>
                         </button>
-                        <button class="format-btn align-btn" id="tool-marker" title="Highlighter">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" class="format-btn align-btn" id="tool-marker" title="Highlighter" aria-label="Highlighter Tool">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m9 11-6 6v3h9l3-3"></path>
                                 <path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"></path>
                             </svg>
                         </button>
-                        <button class="format-btn align-btn" id="tool-eraser" title="Eraser">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" class="format-btn align-btn" id="tool-eraser" title="Eraser" aria-label="Eraser Tool">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path>
                                 <path d="M22 21H7"></path>
                                 <path d="m5 11 9 9"></path>
                             </svg>
                         </button>
-                        <button class="format-btn align-btn" id="tool-fill" title="Fill Color">
-                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <button type="button" class="format-btn align-btn" id="tool-fill" title="Fill Color" aria-label="Fill Color Tool">
+                            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"></path>
                                 <path d="m5 2 5 5"></path>
                                 <path d="M2 13h15"></path>
@@ -859,18 +857,18 @@
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Color</span>
-                    <button id="draw-color-trigger-btn" type="button" class="toolbar-color-trigger" style="background-color: #ff5252; margin-top:2px;"></button>
+                    <button id="draw-color-trigger-btn" type="button" class="toolbar-color-trigger" aria-label="Drawing Color" style="background-color: #ff5252; margin-top:2px;"></button>
                 </div>
                 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Size</span>
                     <div class="toolbar-input-group">
-                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="color:var(--text-bright); margin-right: 2px;">
+                        <svg viewBox="0 0 24 24" fill="none" width="16" height="16" style="color:var(--text-bright); margin-right: 2px;" aria-hidden="true">
                             <circle cx="12" cy="12" r="8" fill="currentColor"></circle>
                         </svg>
-                        <input type="number" id="draw-size" class="toolbar-num-input" value="5" min="1" max="100" style="width: 45px; margin: 0;">
+                        <input type="number" id="draw-size" class="toolbar-num-input" value="5" min="1" max="100" aria-label="Brush Size" style="width: 45px; margin: 0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="draw-slider-size" min="1" max="100" value="5">
+                            <input type="range" id="draw-slider-size" min="1" max="100" value="5" aria-label="Brush Size Slider">
                         </div>
                     </div>
                 </div>
@@ -878,10 +876,10 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Opacity</span>
                     <div class="toolbar-input-group">
-                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path></svg>
-                        <input type="number" id="draw-opacity" class="toolbar-num-input" value="100" min="0" max="100" style="width:35px; margin:0;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20z" fill="currentColor"></path></svg>
+                        <input type="number" id="draw-opacity" class="toolbar-num-input" value="100" min="0" max="100" aria-label="Brush Opacity" style="width:35px; margin:0;">
                         <div class="slider-popup hidden">
-                            <input type="range" id="draw-slider-opacity" min="0" max="100" value="100">
+                            <input type="range" id="draw-slider-opacity" min="0" max="100" value="100" aria-label="Brush Opacity Slider">
                         </div>
                     </div>
                 </div>
@@ -889,12 +887,12 @@
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Offset Pointer</span>
                     <div style="display:flex; align-items:center; gap:8px; height: 34px;">
-                        <label class="switch"><input type="checkbox" id="draw-offset-toggle"><span class="slider"></span></label>
+                        <label class="switch"><input type="checkbox" id="draw-offset-toggle" aria-label="Toggle Offset Drawing Pointer"><span class="slider"></span></label>
                         <div class="toolbar-input-group">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-                            <input type="number" id="draw-offset" class="toolbar-num-input" value="60" min="30" max="150" style="width:35px; margin:0;">
+                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="var(--text-bright)" stroke-width="2" fill="none" style="margin-right: 2px;" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            <input type="number" id="draw-offset" class="toolbar-num-input" value="60" min="30" max="150" aria-label="Offset Pointer Distance" style="width:35px; margin:0;">
                             <div class="slider-popup hidden">
-                                <input type="range" id="draw-slider-offset" min="30" max="150" value="60">
+                                <input type="range" id="draw-slider-offset" min="30" max="150" value="60" aria-label="Offset Pointer Distance Slider">
                             </div>
                         </div>
                     </div>
@@ -909,7 +907,7 @@
                 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Page Size</span>
-                    <select id="margin-resize-select" class="toolbar-select" style="width: 150px;">
+                    <select id="margin-resize-select" class="toolbar-select" aria-label="Page Size Preset" style="width: 150px;">
                         <option value="original">Original Size</option>
                         <option value="A4">A4 (210 × 297 mm)</option>
                         <option value="A3">A3 (297 × 420 mm)</option>
@@ -922,7 +920,7 @@
 
                 <div class="toolbar-control-wrapper">
                     <span class="control-label">Side</span>
-                    <select id="margin-side-select" class="toolbar-select" style="width: 130px;">
+                    <select id="margin-side-select" class="toolbar-select" aria-label="Margin Side Selection" style="width: 130px;">
                         <option value="all">All Sides</option>
                         <option value="top">Top</option>
                         <option value="bottom">Bottom</option>
@@ -936,8 +934,8 @@
                 <div class="toolbar-control-wrapper" id="margin-single-wrapper">
                     <span class="control-label" id="margin-single-label">All Sides</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="margin-single-input" class="toolbar-num-input" value="0" min="0" max="2000" style="width: 50px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="margin-single-slider" min="0" max="600" value="0"></div>
+                        <input type="number" id="margin-single-input" class="toolbar-num-input" value="0" min="0" max="2000" aria-label="Margin Size" style="width: 50px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="margin-single-slider" min="0" max="600" value="0" aria-label="Margin Size Slider"></div>
                     </div>
                 </div>
 
@@ -945,32 +943,32 @@
                 <div class="toolbar-control-wrapper custom-margin-item hidden">
                     <span class="control-label">Top</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="margin-top-input" class="toolbar-num-input" value="0" min="0" max="2000" style="width: 50px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="margin-top-slider" min="0" max="600" value="0"></div>
+                        <input type="number" id="margin-top-input" class="toolbar-num-input" value="0" min="0" max="2000" aria-label="Top Margin" style="width: 50px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="margin-top-slider" min="0" max="600" value="0" aria-label="Top Margin Slider"></div>
                     </div>
                 </div>
                 
                 <div class="toolbar-control-wrapper custom-margin-item hidden">
                     <span class="control-label">Bottom</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="margin-bottom-input" class="toolbar-num-input" value="0" min="0" max="2000" style="width: 50px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="margin-bottom-slider" min="0" max="600" value="0"></div>
+                        <input type="number" id="margin-bottom-input" class="toolbar-num-input" value="0" min="0" max="2000" aria-label="Bottom Margin" style="width: 50px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="margin-bottom-slider" min="0" max="600" value="0" aria-label="Bottom Margin Slider"></div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper custom-margin-item hidden">
                     <span class="control-label">Left</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="margin-left-input" class="toolbar-num-input" value="0" min="0" max="2000" style="width: 50px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="margin-left-slider" min="0" max="600" value="0"></div>
+                        <input type="number" id="margin-left-input" class="toolbar-num-input" value="0" min="0" max="2000" aria-label="Left Margin" style="width: 50px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="margin-left-slider" min="0" max="600" value="0" aria-label="Left Margin Slider"></div>
                     </div>
                 </div>
 
                 <div class="toolbar-control-wrapper custom-margin-item hidden">
                     <span class="control-label">Right</span>
                     <div class="toolbar-input-group">
-                        <input type="number" id="margin-right-input" class="toolbar-num-input" value="0" min="0" max="2000" style="width: 50px; margin: 0;">
-                        <div class="slider-popup hidden"><input type="range" id="margin-right-slider" min="0" max="600" value="0"></div>
+                        <input type="number" id="margin-right-input" class="toolbar-num-input" value="0" min="0" max="2000" aria-label="Right Margin" style="width: 50px; margin: 0;">
+                        <div class="slider-popup hidden"><input type="range" id="margin-right-slider" min="0" max="600" value="0" aria-label="Right Margin Slider"></div>
                     </div>
                 </div>
 
@@ -978,10 +976,10 @@
                     <span class="control-label">Margin Color</span>
                     <div style="display:flex; align-items:center; gap:8px; height: 34px;">
                         <label class="switch" title="OFF = Transparent, ON = Solid Color">
-                            <input type="checkbox" id="margin-bg-toggle">
+                            <input type="checkbox" id="margin-bg-toggle" aria-label="Toggle Margin Solid Color">
                             <span class="slider"></span>
                         </label>
-                        <button id="margin-color-trigger-btn" type="button" class="toolbar-color-trigger hidden" style="background-color: #FFFFFF; margin-top:0;"></button>
+                        <button id="margin-color-trigger-btn" type="button" class="toolbar-color-trigger hidden" aria-label="Select Margin Color" style="background-color: #FFFFFF; margin-top:0;"></button>
                     </div>
                 </div>
 
@@ -990,8 +988,8 @@
 
         <div class="editor-workspace" id="editor-workspace-area">
             <!-- Expand View Prev / Next Page Navigation -->
-            <button type="button" id="expand-prev-page-btn" class="expand-slide-nav-btn left" title="Previous Page">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <button type="button" id="expand-prev-page-btn" class="expand-slide-nav-btn left" title="Previous Page" aria-label="Previous Page">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
 
             <div class="editor-canvas-container" id="editor-canvas-container">
@@ -1016,8 +1014,8 @@
                 </div>
             </div>
 
-            <button type="button" id="expand-next-page-btn" class="expand-slide-nav-btn right" title="Next Page">
-                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            <button type="button" id="expand-next-page-btn" class="expand-slide-nav-btn right" title="Next Page" aria-label="Next Page">
+                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
         </div>
     </div>
@@ -1043,8 +1041,8 @@
             <h3 id="confirm-title" style="color: var(--accent-secondary); margin-bottom: 10px;">Confirm Action</h3>
             <p id="confirm-desc" style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">Are you sure?</p>
             <div style="display: flex; gap: 12px; width: 100%;">
-                <button id="btn-cancel-confirm" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
-                <button id="btn-submit-confirm" class="popup-btn popup-btn-red" style="margin: 0; flex: 1;">Confirm</button>
+                <button type="button" id="btn-cancel-confirm" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
+                <button type="button" id="btn-submit-confirm" class="popup-btn popup-btn-red" style="margin: 0; flex: 1;">Confirm</button>
             </div>
         </div>
     </div>
@@ -1055,9 +1053,9 @@
             <h3 style="color: var(--accent-primary); margin-bottom: 10px;">Duplicate Page</h3>
             <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">This page has modifications. How would you like to duplicate it?</p>
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <button id="btn-dup-changes" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">With Modifications</button>
-                <button id="btn-dup-original" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">Original Page Only</button>
-                <button id="btn-dup-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
+                <button type="button" id="btn-dup-changes" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">With Modifications</button>
+                <button type="button" id="btn-dup-original" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">Original Page Only</button>
+                <button type="button" id="btn-dup-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
             </div>
         </div>
     </div>
@@ -1070,17 +1068,17 @@
 
             <div class="extract-format-group">
                 <label class="extract-format-option">
-                    <input type="radio" name="extract-format" value="pdf" checked>
+                    <input type="radio" name="extract-format" value="pdf" checked aria-label="Extract as PDF">
                     <span class="extract-dot"></span>
                     <span class="extract-format-label">PDF</span>
                 </label>
                 <label class="extract-format-option">
-                    <input type="radio" name="extract-format" value="png">
+                    <input type="radio" name="extract-format" value="png" aria-label="Extract as PNG">
                     <span class="extract-dot"></span>
                     <span class="extract-format-label">PNG</span>
                 </label>
                 <label class="extract-format-option">
-                    <input type="radio" name="extract-format" value="jpg">
+                    <input type="radio" name="extract-format" value="jpg" aria-label="Extract as JPG">
                     <span class="extract-dot"></span>
                     <span class="extract-format-label">JPG</span>
                 </label>
@@ -1089,13 +1087,13 @@
             <!-- Custom PDF File Name Input (Displayed only when PDF format is selected) -->
             <div id="extract-filename-container" style="margin-bottom: 14px; text-align: left;">
                 <label for="extract-filename-input" style="display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600;">PDF File Name:</label>
-                <input type="text" id="extract-filename-input" value="" placeholder="SArixa-PDF" style="width: 100%; padding: 8px 12px; background: #012f28; color: var(--text-bright); border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 6px; box-sizing: border-box; font-size: 0.92rem; outline: none;" spellcheck="false">
+                <input type="text" id="extract-filename-input" value="" placeholder="SArixa-PDF" aria-label="Extracted PDF File Name" style="width: 100%; padding: 8px 12px; background: #012f28; color: var(--text-bright); border: 1px solid rgba(0, 255, 200, 0.3); border-radius: 6px; box-sizing: border-box; font-size: 0.92rem; outline: none;" spellcheck="false">
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <button id="btn-extract-with-changes" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Extract With Modifications</button>
-                <button id="btn-extract-without-changes" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">Extract Without Modifications</button>
-                <button id="btn-extract-popup-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
+                <button type="button" id="btn-extract-with-changes" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Extract With Modifications</button>
+                <button type="button" id="btn-extract-without-changes" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">Extract Without Modifications</button>
+                <button type="button" id="btn-extract-popup-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
             </div>
         </div>
     </div>
@@ -1106,11 +1104,11 @@
             <h3 style="color: var(--accent-primary); margin-bottom: 10px;">Replace Page</h3>
             <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">What do you want to replace this page with?</p>
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <button id="btn-replace-blank" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Blank Page</button>
-                <button id="btn-replace-image" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">An Image</button>
-                <button id="btn-replace-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
+                <button type="button" id="btn-replace-blank" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Blank Page</button>
+                <button type="button" id="btn-replace-image" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">An Image</button>
+                <button type="button" id="btn-replace-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
             </div>
-            <input type="file" id="replaceImageInput" accept="image/png, image/jpeg" hidden>
+            <input type="file" id="replaceImageInput" accept="image/png, image/jpeg" aria-label="Select Replacement Image" hidden>
         </div>
     </div>
 
@@ -1120,8 +1118,8 @@
             <h3 style="color: #ffc107; margin-bottom: 10px;">⚠️ Reset Page(s)?</h3>
             <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">This will remove all text, crops, watermarks, and rotations from the selected page(s).</p>
             <div style="display: flex; gap: 12px; width: 100%;">
-                <button id="btn-cancel-page-reset" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
-                <button id="btn-confirm-page-reset" class="popup-btn popup-btn-red" style="margin: 0; flex: 1; background: #ffc107; color: #000;">Reset</button>
+                <button type="button" id="btn-cancel-page-reset" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
+                <button type="button" id="btn-confirm-page-reset" class="popup-btn popup-btn-red" style="margin: 0; flex: 1; background: #ffc107; color: #000;">Reset</button>
             </div>
         </div>
     </div>
@@ -1132,8 +1130,8 @@
             <h3 style="color: var(--accent-secondary); margin-bottom: 10px;">⚠️ Remove Page(s)?</h3>
             <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">Are you sure you want to completely remove the selected page(s) from the PDF?</p>
             <div style="display: flex; gap: 12px; width: 100%;">
-                <button id="btn-cancel-page-remove" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
-                <button id="btn-confirm-page-remove" class="popup-btn popup-btn-red" style="margin: 0; flex: 1;">Remove</button>
+                <button type="button" id="btn-cancel-page-remove" class="popup-btn popup-btn-green" style="margin: 0; flex: 1;">Cancel</button>
+                <button type="button" id="btn-confirm-page-remove" class="popup-btn popup-btn-red" style="margin: 0; flex: 1;">Remove</button>
             </div>
         </div>
     </div>
@@ -1144,11 +1142,11 @@
             <h3 style="color: var(--accent-primary); margin-bottom: 10px;">Insert Page</h3>
             <p style="color: var(--text-main); font-size: 0.95rem; margin-bottom: 20px;">What do you want to insert here?</p>
             <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-                <button id="btn-insert-blank" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Blank Page</button>
-                <button id="btn-insert-image" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">An Image</button>
-                <button id="btn-insert-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
+                <button type="button" id="btn-insert-blank" class="popup-btn popup-btn-green" style="margin: 0; width: 100%;">Blank Page</button>
+                <button type="button" id="btn-insert-image" class="popup-btn" style="margin: 0; width: 100%; background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary);">An Image</button>
+                <button type="button" id="btn-insert-cancel" class="popup-btn popup-btn-red" style="margin: 0; width: 100%;">Cancel</button>
             </div>
-            <input type="file" id="insertImageInput" accept="image/png, image/jpeg" hidden>
+            <input type="file" id="insertImageInput" accept="image/png, image/jpeg" aria-label="Select Image to Insert" hidden>
         </div>
     </div>
 
